@@ -34,33 +34,28 @@ Domino-Agent is an **AI-powered financial analysis system** that automatically d
 
 > **Try it yourself**: Enter any macro event like "Fed raises interest rates by 50bps" and watch the causal chain unfold.
 
-![Domino-Agent Demo](https://raw.githubusercontent.com/Puss-M/Domino-Agent/main/demo.png)
+### Example 1: Trump Election Victory
 
-**Example Analysis**: "特朗普赢得大选" (Trump wins election)
+![Demo 1 - Trump Election](https://raw.githubusercontent.com/Puss-M/Domino-Agent/main/demo.png)
+
+**Analysis**: "特朗普赢得大选" (Trump wins election)
 
 - 🔴 **Root Event**: Political shift
 - 🔵 **Direct Impacts**: US Dollar strength, Treasury yields, Defense stocks
 - 🔵 **Downstream Effects**: Emerging market currencies, Renewable energy sector
 
+### Example 2: Fed Rate Hike
+
+![Demo 2 - Fed Rate Hike](https://raw.githubusercontent.com/Puss-M/Domino-Agent/main/demo1.png)
+
+**Analysis**: "美联储加息 50 个基点" (Fed raises rates by 50bps)
+
+- 🔴 **Root Event**: Monetary policy tightening
+- 🔵 **Multi-Agent Analysis**: Detective proposes creative impacts, Reviewer validates
+- 🔵 **Console Logs**: See the AI agents' debate in real-time
+
 ---
 
-## ✨ Features
-
-### 🎯 Core Capabilities
-
-| Feature                  | Description                                                                 |
-| ------------------------ | --------------------------------------------------------------------------- |
-| **Causal Discovery**     | Automatically identifies 3 direct impacts + 2 downstream effects per impact |
-| **Sentiment Analysis**   | Classifies each relationship as positive/negative with explanations         |
-| **Interactive Graph**    | Drag nodes, zoom, hover for details - fully interactive visualization       |
-| **Narrative Generation** | AI-generated executive summary of the entire causal chain                   |
-| **Bilingual Support**    | English and Chinese UI (easily extensible)                                  |
-
-### 🎨 UI/UX Highlights
-
-- **Glassmorphism Design**: Modern, premium light theme
-- **Directional Arrows**: Clear cause → effect visualization
-- **Animated Particles**: Orange particles flow along connections
 - **Sidebar Controls**: Dedicated control panel for clean UX
 - **Responsive Layout**: Works on desktop and tablet
 
