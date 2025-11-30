@@ -34,7 +34,7 @@ Domino-Agent is an **AI-powered financial analysis system** that automatically d
 
 > **Try it yourself**: Enter any macro event like "Fed raises interest rates by 50bps" and watch the causal chain unfold.
 
-![Domino-Agent Demo](./demo.png)
+![Domino-Agent Demo](https://raw.githubusercontent.com/Puss-M/Domino-Agent/main/demo.png)
 
 **Example Analysis**: "特朗普赢得大选" (Trump wins election)
 
