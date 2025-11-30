@@ -18,53 +18,132 @@ class Impact(BaseModel):
 class ImpactList(BaseModel):
     impacts: List[Impact]
 
+class ValidationResult(BaseModel):
+    valid: bool = Field(description="Whether the causal link is logical and probable")
+    reasoning: str = Field(description="Explanation for the validation decision")
+
 class CausalDiscoveryEngine:
     def __init__(self):
-        self.llm = ChatOpenAI(
+        # Agent A: The Macro Detective (Creative Generator)
+        self.detective = ChatOpenAI(
             model="deepseek-chat",
-            temperature=0.1,
+            temperature=0.7,  # Higher temperature for creativity
             openai_api_base="https://api.deepseek.com",
             api_key=os.getenv("OPENAI_API_KEY")
         )
         
-        self.system_prompt = """You are a Senior Macro Analyst with decades of experience in financial markets and economic theory. 
-        Your goal is to identify causal relationships between economic events and financial entities (Assets, Industries, Economic Indicators).
+        # Agent B: The Risk Officer (Critical Reviewer)
+        self.reviewer = ChatOpenAI(
+            model="deepseek-chat",
+            temperature=0.1,  # Lower temperature for consistency
+            openai_api_base="https://api.deepseek.com",
+            api_key=os.getenv("OPENAI_API_KEY")
+        )
         
-        When analyzing an event, identify the most significant direct impacts.
-        Focus on logical, first-order and second-order consequences.
-        Classify the sentiment of the impact as 'positive' (bullish/beneficial) or 'negative' (bearish/detrimental).
-        """
-
-        self.parser = JsonOutputParser(pydantic_object=ImpactList)
+        self.detective_prompt = """You are a VISIONARY MACRO STRATEGIST with a talent for spotting non-obvious connections.
+        Your role is to generate creative, second-order causal impacts that others might miss.
+        Think beyond the obvious - consider:
+        - Cross-market spillovers
+        - Behavioral finance effects
+        - Political economy dynamics
+        - Supply chain ripple effects
+        
+        Be bold but grounded in economic theory."""
+        
+        self.reviewer_prompt = """You are a CONSERVATIVE RISK OFFICER with decades of experience.
+        Your role is to critically evaluate causal links for logical consistency and probability.
+        
+        Reject impacts that are:
+        - Too speculative or far-fetched
+        - Based on weak causal mechanisms
+        - Contradicting established economic principles
+        
+        Only approve impacts with clear, defensible causal chains."""
+        
+        self.impact_parser = JsonOutputParser(pydantic_object=ImpactList)
+        self.validation_parser = JsonOutputParser(pydantic_object=ValidationResult)
 
     def _get_impacts(self, event_description: str, count: int = 3) -> List[Impact]:
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", self.system_prompt),
-            ("user", "Analyze the event: '{event}'. Identify exactly {count} direct impacts. \n{format_instructions}")
+        """Multi-Agent workflow: Detective proposes, Reviewer validates"""
+        
+        # Step 1: Detective generates 5 candidate impacts
+        print(f"\n🕵️ Detective analyzing: {event_description[:50]}...")
+        
+        detective_prompt = ChatPromptTemplate.from_messages([
+            ("system", self.detective_prompt),
+            ("user", "Analyze the event: '{event}'. Generate exactly 5 potential causal impacts (including non-obvious ones). \n{format_instructions}")
         ])
-
-        chain = prompt | self.llm | self.parser
-
+        
+        detective_chain = detective_prompt | self.detective | self.impact_parser
+        
         try:
-            result = chain.invoke({
-                "event": event_description, 
-                "count": count,
-                "format_instructions": self.parser.get_format_instructions()
+            candidates = detective_chain.invoke({
+                "event": event_description,
+                "format_instructions": self.impact_parser.get_format_instructions()
             })
-            return [Impact(**i) for i in result['impacts']]
+            candidate_impacts = [Impact(**i) for i in candidates['impacts']]
+            print(f"   Generated {len(candidate_impacts)} candidates")
         except Exception as e:
-            print(f"Error fetching impacts for '{event_description}': {e}")
+            print(f"   ❌ Detective error: {e}")
             return []
+        
+        # Step 2: Reviewer validates each candidate
+        validated_impacts = []
+        
+        for idx, impact in enumerate(candidate_impacts, 1):
+            print(f"\n⚖️  Reviewer evaluating #{idx}: {impact.target_entity}")
+            
+            reviewer_prompt = ChatPromptTemplate.from_messages([
+                ("system", self.reviewer_prompt),
+                ("user", """Evaluate this causal link:
+                
+Event: {event}
+Proposed Impact: {target} ({sentiment})
+Explanation: {explanation}
+
+Is this causal link logical and probable? Return your validation decision.
+{format_instructions}""")
+            ])
+            
+            reviewer_chain = reviewer_prompt | self.reviewer | self.validation_parser
+            
+            try:
+                validation = reviewer_chain.invoke({
+                    "event": event_description,
+                    "target": impact.target_entity,
+                    "sentiment": impact.sentiment,
+                    "explanation": impact.explanation,
+                    "format_instructions": self.validation_parser.get_format_instructions()
+                })
+                
+                result = ValidationResult(**validation)
+                
+                if result.valid:
+                    print(f"   ✅ APPROVED: {result.reasoning[:80]}...")
+                    validated_impacts.append(impact)
+                else:
+                    print(f"   ❌ REJECTED: {result.reasoning[:80]}...")
+                
+                # Stop once we have enough validated impacts
+                if len(validated_impacts) >= count:
+                    break
+                    
+            except Exception as e:
+                print(f"   ⚠️  Validation error: {e}")
+                continue
+        
+        print(f"\n✨ Final result: {len(validated_impacts)}/{len(candidate_impacts)} impacts approved\n")
+        return validated_impacts[:count]
 
     def _generate_narrative(self, event_text: str, graph: nx.DiGraph) -> str:
         graph_data = self._graph_to_json(graph)
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", self.system_prompt),
+            ("system", self.detective_prompt),  # Use detective for creative narrative
             ("user", "Based on the following causal graph for the event '{event}', write a single cohesive paragraph (approx. 100 words) summarizing the potential chain reaction. Focus on the most critical risks and opportunities. Use a professional financial tone.\n\nGraph Data: {graph_data}")
         ])
 
-        chain = prompt | self.llm
+        chain = prompt | self.detective
 
         try:
             response = chain.invoke({
@@ -77,6 +156,10 @@ class CausalDiscoveryEngine:
             return "Analysis complete. Unable to generate narrative summary."
 
     def analyze_event(self, event_text: str):
+        print(f"\n{'='*60}")
+        print(f"🎯 MULTI-AGENT ANALYSIS: {event_text}")
+        print(f"{'='*60}")
+        
         graph = nx.DiGraph()
         root_id = event_text
         graph.add_node(root_id, label=event_text, type="Event", layer=0)
@@ -101,6 +184,11 @@ class CausalDiscoveryEngine:
         narrative = self._generate_narrative(event_text, graph)
         result = self._graph_to_json(graph)
         result['narrative'] = narrative
+        
+        print(f"\n{'='*60}")
+        print(f"✅ ANALYSIS COMPLETE")
+        print(f"{'='*60}\n")
+        
         return result
 
     def _graph_to_json(self, graph: nx.DiGraph):
