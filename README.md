@@ -227,9 +227,9 @@ If you find this project useful, please consider giving it a ⭐ on GitHub!
 
 ## 📬 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/Domino-Agent/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/Domino-Agent/discussions)
-- **Twitter**: [@yourusername](https://twitter.com/yourusername)
+- **Issues**: [GitHub Issues](https://github.com/Puss-M/Domino-Agent/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Puss-M/Domino-Agent/discussions)
+- **Star this repo**: [⭐ Give us a star!](https://github.com/Puss-M/Domino-Agent)
 
 ---
 
