@@ -2,6 +2,7 @@
 
 <div align="center">
 
+[![CI](https://github.com/Puss-M/Domino-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Puss-M/Domino-Agent/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-green.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-14+-black.svg)
