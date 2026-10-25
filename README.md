@@ -17,6 +17,9 @@
 
 ---
 
+> [!NOTE]
+> **Project status: working prototype.** The causal-inference engine (`backend/`) runs end-to-end; the `frontend/` directory is a placeholder — the demo screenshots show the exploratory UI from the prototyping phase, not a shipped web app. Treat the FastAPI/Next.js badges below as the target architecture.
+
 ## 🌟 What is Domino-Agent?
 
 Domino-Agent is an **AI-powered financial analysis system** that automatically discovers and visualizes causal chains in macroeconomic events. Using Large Language Models (LLMs) and graph theory, it helps analysts understand how a single event can trigger a cascade of impacts across global markets.
