@@ -1,6 +1,8 @@
 fastapi
 uvicorn
-langchain
-langchain-openai
+# 2026-10 实测：engine 仅用 langchain-openai/core 的现代 API，1.x 线兼容
+# （此前裸装的 langchain 元包完全未被 import，已移除）
+langchain-openai>=1.7,<2
+langchain-core>=1.7,<2
 networkx
 python-dotenv

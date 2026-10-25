@@ -6,7 +6,7 @@
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.95+-green.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-14+-black.svg)
-![LangChain](https://img.shields.io/badge/LangChain-Latest-orange.svg)
+![langchain](https://img.shields.io/badge/langchain--openai-1.x-orange.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 **Visualize the "Butterfly Effect" in Macroeconomics with AI**
