@@ -19,5 +19,6 @@ jobs:
       - name: Syntax check
         run: python -m compileall engine.py main.py models.py backend
       - name: Lint fatal issues only (E9,F = syntax & undefined names)
-        uses: astral-sh/ruff-action@v3
-      - run: ruff check . --select E9,F --extend-exclude frontend
+        run: |
+          pip install ruff
+          ruff check . --select E9,F --extend-exclude frontend
