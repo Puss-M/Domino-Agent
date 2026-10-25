@@ -186,7 +186,7 @@ Is this causal link logical and probable? Return your validation decision.
         result['narrative'] = narrative
         
         print(f"\n{'='*60}")
-        print(f"✅ ANALYSIS COMPLETE")
+        print("✅ ANALYSIS COMPLETE")
         print(f"{'='*60}\n")
         
         return result
