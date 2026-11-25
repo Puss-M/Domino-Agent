@@ -79,11 +79,37 @@ Add a dated entry to `backend/data/events/events.yaml` with:
 
 Then add it to `tests/test_extractor.py` if it exercises a new pattern. Run the backtest and inspect whether the event has enough price history and whether the outcome window overlaps other events.
 
+## Adding or rebuilding the FOMC benchmark
+
+The FOMC split is generated, not hand-edited:
+
+```bash
+python scripts/build_fomc_events.py
+python -m backend.app.cli events --dataset fomc
+python -m backend.app.cli backtest --dataset fomc --window-end 1 --out backtest_fomc.json
+```
+
+- Source snapshot: `backend/data/fomc/statements_2000_2025.csv` (official statements, 2000–2025).
+- The builder parses the target range, computes the change, repairs mojibake with `ftfy`, and rejects ambiguous changes that are not 25/50/75/100bp.
+- 2000–2003 statements are excluded due to parsing artefacts.
+- If you add a new statement, add a test in `tests/test_dataset.py` for the event count and tag.
+- The FOMC split is a **stress test**, not an extraction benchmark. Templated headlines are excluded from `extraction.n`.
+
+## Docker
+
+```bash
+docker build -t domino-agent .
+docker run --rm -p 8000:8000 domino-agent
+```
+
+The image contains the bundled snapshots; it runs offline.
+
 ## Data refresh
 
 ```bash
-python scripts/fetch_market_snapshot.py --start 2015-01-01
+python scripts/fetch_market_snapshot.py --start 2000-01-01
 python scripts/fetch_public_snapshots.py
+python scripts/build_fomc_events.py
 ```
 
 - Yahoo adjusted closes are revised. Re-running the backtest after a refresh can change historical CARs.
@@ -112,11 +138,14 @@ Conventional Commits:
 - [ ] If a number in the README changed, `docs/evaluation.md` was updated with the new value and the same protocol.
 - [ ] New mechanisms have citations and a retrieval test.
 - [ ] New events have a source URL and a session.
-- [ ] No claim of causal identification or trading alpha was added.
+- [ ] If the benchmark changed, `docs/benchmark.md` and `docs/model_card.md` were updated.
+- [ ] The FOMC negative result is still reported, not hidden.
+- [ ] No claim of causal identification, trading alpha, or SOTA prediction was added.
 
 ## Research integrity
 
-- Report failures. The QQQ/XLU/FXI and 5-day results are in `docs/evaluation.md` for a reason.
+- Report failures. The FOMC negative skill, QQQ/XLU/FXI and 5-day results are in `docs/evaluation.md` for a reason.
+- The FOMC stress test is a feature, not an embarrassment: it is the evidence that action-only priors need a surprise/positioning measure.
 - Do not cherry-pick the test window.
 - Do not call a curated label “ground truth” without qualification.
 - Do not call a cited transmission hypothesis “causal inference” without an identification strategy.

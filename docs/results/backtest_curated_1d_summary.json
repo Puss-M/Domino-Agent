@@ -1,7 +1,8 @@
 {
-  "generated_at": "2026-11-25T12:57:15+00:00",
+  "generated_at": "2026-11-25T15:04:52+00:00",
   "config": {
     "assets": null,
+    "dataset": "curated",
     "window_start": 0,
     "window_end": 1,
     "estimation_start": -120,
@@ -192,6 +193,41 @@
       ]
     }
   ],
+  "comparisons": [
+    {
+      "model": "stacked_calibrated_test",
+      "baseline": "always_up_test",
+      "delta_brier": -0.0082,
+      "ci": [
+        -0.0235,
+        0.0055
+      ],
+      "p_value": 0.128,
+      "n_pairs": 265
+    },
+    {
+      "model": "stacked_calibrated_test",
+      "baseline": "mechanism_test",
+      "delta_brier": -0.0212,
+      "ci": [
+        -0.0467,
+        0.0038
+      ],
+      "p_value": 0.048,
+      "n_pairs": 254
+    },
+    {
+      "model": "mechanism_test",
+      "baseline": "always_up_test",
+      "delta_brier": 0.0116,
+      "ci": [
+        -0.0277,
+        0.0459
+      ],
+      "p_value": 0.736,
+      "n_pairs": 254
+    }
+  ],
   "by_asset": [
     {
       "asset": "SPY",
@@ -268,7 +304,7 @@
       "n": 19,
       "accuracy": 0.5263,
       "brier": 0.2353,
-      "mean_car_bps": 470.7
+      "mean_car_bps": 470.69
     },
     {
       "asset": "FXI",
@@ -432,6 +468,7 @@
   "notes": [
     "Only the stack weights and Platt calibration are fitted, on the first half of the events; all other components are fixed or walk-forward.",
     "Analog priors use only prior events whose outcome window has matured before the current event.",
+    "Dataset: curated.",
     "The sample is small and event windows overlap; the bootstrap resamples events, not asset rows.",
     "Mechanism priors were authored by the project, not preregistered, and were not fitted to these outcomes.",
     "Stack weights fitted on train: mechanism=0.60, analog=0.40, base_rate=0.40.",
@@ -445,7 +482,7 @@
       "knowledge: mechanisms.yaml v1",
       "extraction: rules-v1"
     ],
-    "retrieved_at": "2026-11-25T12:57:15.628506Z",
+    "retrieved_at": "2026-11-25T15:04:52.459448Z",
     "as_of": "2025-04-09T13:30:00-04:00",
     "snapshot_version": "local",
     "notes": [

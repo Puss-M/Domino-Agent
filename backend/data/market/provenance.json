@@ -1,82 +1,88 @@
 {
   "source": "Yahoo Finance chart API",
   "endpoint": "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}",
-  "retrieved_at_utc": "2026-11-25T11:35:04+00:00",
+  "retrieved_at_utc": "2026-11-25T13:52:33+00:00",
   "requested_window": {
-    "start": "2015-01-01",
+    "start": "2000-01-01",
     "end": "2026-11-25"
   },
   "price_field": "adjusted close (dividends and splits reinvested)",
   "tickers": {
     "SPY": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 6766,
+      "first_date": "1999-12-31",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "QQQ": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 6766,
+      "first_date": "1999-12-31",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "TLT": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 6121,
+      "first_date": "2002-07-30",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "IEF": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 6121,
+      "first_date": "2002-07-30",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "UUP": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 4967,
+      "first_date": "2007-03-01",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "GLD": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 5539,
+      "first_date": "2004-11-18",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "XLE": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 6766,
+      "first_date": "1999-12-31",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "XLU": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 6766,
+      "first_date": "1999-12-31",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "EEM": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 5943,
+      "first_date": "2003-04-14",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "HYG": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 4939,
+      "first_date": "2007-04-11",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "^VIX": {
-      "rows": 2995,
-      "first_date": "2014-12-31",
+      "rows": 6768,
+      "first_date": "1999-12-31",
       "last_date": "2026-11-24",
       "currency": "USD"
     },
     "FXI": {
-      "rows": 2993,
-      "first_date": "2014-12-31",
+      "rows": 5568,
+      "first_date": "2004-10-08",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "SHY": {
+      "rows": 6121,
+      "first_date": "2002-07-30",
       "last_date": "2026-11-24",
       "currency": "USD"
     }

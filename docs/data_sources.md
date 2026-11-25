@@ -12,6 +12,7 @@ The repository is designed to run offline from small, redistributable snapshots.
 | `fred` | FRED / ALFRED | Macro series, vintage-aware | `FRED_API_KEY` | Daily–quarterly | Yes | **Yes**, `realtime_start` / `realtime_end` |
 | `worldbank` | World Bank Indicators API | Annual regime context | No key | Annual/quarterly | Yes | No |
 | `yahoo` | Yahoo Finance chart API | Event-window ETF outcomes | No key; convenience endpoint | Daily | Adjusted prices revised after splits/dividends | No |
+| `fomc` | FOMC Dataset (HusseinKh90) + Federal Reserve statements | Systematic FOMC rate-change benchmark | No key; static snapshot | Event-driven | Statements are immutable | Archive the snapshot; no live vintage feed |
 
 The machine-readable version is served at `GET /api/data-sources`.
 
@@ -19,7 +20,7 @@ The machine-readable version is served at `GET /api/data-sources`.
 
 | Path | Contents | Refresh |
 |---|---|---|
-| `backend/data/market/prices.csv` | 12 ETFs, daily adjusted close, 2015–present, plus `provenance.json` | `python scripts/fetch_market_snapshot.py --start 2015-01-01` |
+| `backend/data/market/prices.csv` | 13 ETFs, daily adjusted close, 2000–present, plus `provenance.json` | `python scripts/fetch_market_snapshot.py --start 2000-01-01` |
 | `backend/data/macro/treasury_yields_2024.csv` | 250 daily Treasury curves | `python scripts/fetch_public_snapshots.py` |
 | `backend/data/sec/aapl_sample.json` | One 8-K exhibit (truncated) + 12 XBRL revenue observations | `python scripts/fetch_public_snapshots.py` |
 | `backend/data/news/gdelt_fed_sample.json` | 20 GDELT headlines and 10 deduplicated clusters | `python scripts/fetch_public_snapshots.py` |
@@ -36,6 +37,14 @@ The event labels and the mechanism library are curated, not downloaded:
 - `data.sec.gov` and `www.sec.gov` use different hostnames. Do not pin a `Host` header on the shared session.
 - `company_facts` preserves the `filed` date, which is what makes as-filed reconstruction possible. A convenience price/fundamental API that only returns the latest value does not.
 - The 8-K exhibit in the snapshot may be a debt issuance rather than an earnings release. The connector exposes the text; the demo does not claim that every 8-K is an earnings release.
+
+### FOMC statements
+
+- The FOMC benchmark uses the public [FOMC Dataset](https://github.com/HusseinKh90/fomc-dataset) as a convenience snapshot of official Federal Reserve statements.
+- `scripts/build_fomc_events.py` parses the target range from each statement, computes the change versus the previous statement, repairs mojibake with `ftfy`, and emits only non-zero changes.
+- 2000–2003 statements are excluded because their single-value phrasing produced parsing artefacts; the systematic benchmark starts with the 2004–2006 hiking cycle.
+- Headlines are templated from the parsed range; summaries are statement excerpts. Surprise is `neutral` because no Fed-funds/SOFR futures series is bundled.
+- This is the source of the negative result in `docs/evaluation.md`: action-only policy events need a surprise/positioning measure.
 
 ### GDELT
 

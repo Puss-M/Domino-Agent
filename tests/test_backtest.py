@@ -34,6 +34,18 @@ def test_walk_forward_backtest_contract():
     assert any("Stack weights" in note for note in result.notes)
 
 
+def test_fomc_stress_test_contract():
+    config = BacktestConfig(dataset="fomc", window_end=1, bootstrap_samples=30)
+    result = BacktestEngine(config=config).run(config)
+    assert result.n_events == 58
+    # Templated FOMC headlines are excluded from the extraction metric.
+    assert result.extraction.n == 0
+    assert result.comparisons
+    names = {metric.model for metric in result.metrics}
+    assert "stacked_calibrated_test" in names
+    assert any("Dataset: fomc" in note for note in result.notes)
+
+
 def test_event_detail_contains_realized_outcomes():
     config = BacktestConfig(include_events=SUBSET[:4], window_end=1, bootstrap_samples=20)
     result = BacktestEngine(config=config).run(config)

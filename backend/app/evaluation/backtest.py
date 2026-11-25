@@ -28,6 +28,7 @@ from ..schemas import (
     CalibrationBin,
     EventTypeMetrics,
     ExtractionMetrics,
+    ModelComparison,
     ModelMetrics,
     Provenance,
 )
@@ -40,6 +41,7 @@ from .metrics import (
     brier,
     calibration_bins,
     fit_platt,
+    paired_bootstrap_difference,
     summarize,
 )
 
@@ -57,6 +59,10 @@ def _fit_stack_weights(rows: list[dict]) -> tuple[float, float, float]:
     """Fit non-negative logit weights on the training split by Brier score."""
     best = (1.0, 0.4, 0.3)
     best_score = float("inf")
+    # Mechanism-anchored prior: the mechanism expert is not allowed to be
+    # zeroed out by a 20-event validation split. The FOMC stress test shows the
+    # cost of this anchor; it is a deliberate research choice, not a universal
+    # truth. Analog and base-rate weights are still fitted.
     for w_mech in (0.6, 0.8, 1.0, 1.2):
         for w_analog in (0.0, 0.2, 0.4, 0.6):
             for w_base in (0.0, 0.2, 0.4, 0.6):
@@ -79,7 +85,7 @@ def _fit_stack_weights(rows: list[dict]) -> tuple[float, float, float]:
     return best
 
 
-def _stack_p(row: dict, weights: tuple[float, float, float]) -> float | None:
+def _stack_p(row: dict, weights) -> float | None:
     p_mech = row.get("p_mech", row.get("mechanism"))
     p_analog = row.get("p_analog", row.get("analog"))
     p_base = row.get("p_base", row.get("base_rate"))
@@ -112,7 +118,7 @@ class BacktestEngine:
 
     def run(self, config: BacktestConfig | None = None) -> BacktestResponse:
         config = config or self.config
-        events = load_events(settings=self.settings)
+        events = load_events(settings=self.settings, dataset=config.dataset)
         if config.include_events:
             wanted = set(config.include_events)
             events = [event for event in events if event.id in wanted]
@@ -164,14 +170,17 @@ class BacktestEngine:
                 for prediction in response.predictions
                 if not prediction.abstain
             }
-            extraction_pairs.append(
-                (
-                    event.gold_event_type.value,
-                    extracted.event_type.value,
-                    event.gold_direction.value,
-                    extracted.direction.value,
+            if "generated" not in event.tags:
+                # Templated FOMC headlines are not an extraction test; keep the
+                # extraction metric on the curated text sample only.
+                extraction_pairs.append(
+                    (
+                        event.gold_event_type.value,
+                        extracted.event_type.value,
+                        event.gold_direction.value,
+                        extracted.direction.value,
+                    )
                 )
-            )
 
             event_predictions: dict[str, dict] = {}
             event_realized: dict[str, dict] = {}
@@ -307,6 +316,29 @@ class BacktestEngine:
             summarize(name, rows, total_candidates, bootstrap_samples=config.bootstrap_samples)
             for name, rows in test_models.items()
         ]
+        comparisons = []
+        for model_name, baseline_name in (
+            ("stacked_calibrated_test", "always_up_test"),
+            ("stacked_calibrated_test", "mechanism_test"),
+            ("mechanism_test", "always_up_test"),
+        ):
+            comparison = paired_bootstrap_difference(
+                test_models[model_name],
+                test_models[baseline_name],
+                samples=config.bootstrap_samples,
+            )
+            if comparison["delta_brier"] is None:
+                continue
+            comparisons.append(
+                ModelComparison(
+                    model=model_name,
+                    baseline=baseline_name,
+                    delta_brier=comparison["delta_brier"],
+                    ci=comparison["ci"],
+                    p_value=comparison["p_value"],
+                    n_pairs=comparison["n_pairs"],
+                )
+            )
 
         # Attach the stacked probabilities to the per-event detail.
         for result in event_results:
@@ -367,9 +399,10 @@ class BacktestEngine:
         notes = [
             "Only the stack weights and Platt calibration are fitted, on the first half of the events; all other components are fixed or walk-forward.",
             "Analog priors use only prior events whose outcome window has matured before the current event.",
+            f"Dataset: {config.dataset}.",
             "The sample is small and event windows overlap; the bootstrap resamples events, not asset rows.",
             "Mechanism priors were authored by the project, not preregistered, and were not fitted to these outcomes.",
-            f"Stack weights fitted on train: mechanism={stack_weights[0]:.2f}, analog={stack_weights[1]:.2f}, base_rate={stack_weights[2]:.2f}.",
+            "Stack weights fitted on train: mechanism={:.2f}, analog={:.2f}, base_rate={:.2f}.".format(*stack_weights),
             f"Platt parameters (stacked): a={stacked_platt[0]:.2f}, b={stacked_platt[1]:.2f}.",
             (
                 f"Skipped {len(skipped)} events for insufficient price history."
@@ -404,6 +437,7 @@ class BacktestEngine:
             by_asset=by_asset,
             by_event_type=by_type,
             calibration=calibration,
+            comparisons=comparisons,
             extraction=extraction,
             events=event_results,
             provenance=provenance,

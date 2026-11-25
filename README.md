@@ -8,7 +8,7 @@
 
 **An event-driven macro transmission engine with cited mechanisms, deterministic graph construction, and an event-study backtest.**
 
-Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.2 is a rebuild around three questions a macro desk actually asks:
+Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.3 is a rebuild around three questions a macro desk actually asks:
 
 1. **What happened, and how much of it was a surprise?**
    `50bp` is not the same as `50bp more than priced`. `8.6%` CPI is a level; `+0.3pp vs consensus` is the shock.
@@ -25,21 +25,21 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 
 ---
 
-## What v0.2 changes
+## What v0.3 changes
 
-| v0.1 prototype | v0.2 |
+| v0.1 prototype | v0.3 |
 |---|---|
 | 2 LLM personas (Detective / Reviewer), ~300 LOC | 5 typed stages: extract → retrieve → transmit → audit → report |
-| No data layer | 6 source connectors + provenance, caching, retries, point-in-time notes |
+| No data layer | 7 data sources (6 live connectors + FOMC snapshot) + provenance, caching, retries, point-in-time notes |
 | Free-form causal edges | 20 cited mechanisms → 14 channels → 12 assets; every edge has a mechanism ID and references |
 | No text normalization | bps/pp/%/$tn/mb/d/Chinese units, surprise vs level, entity linking, LM-style sentiment, near-duplicate clustering |
-| No evaluation | 50 dated events, 1-day market-model CAR, walk-forward analog + base rate, stacked ensemble, Platt calibration, event-clustered bootstrap |
+| No evaluation | 50 curated + 58 FOMC + 92 extended events; 1-day market-model CAR; walk-forward analog/base rate; stacked ensemble; Platt; event-clustered bootstrap; paired Brier tests; documented FOMC negative skill |
 | "Reviewer agent" prompt | Deterministic audit: citations, evidence grades, sign conflicts, abstention, look-ahead check |
 | Empty frontend | Zero-build dashboard served by FastAPI; run it with one command |
 
 ### Why the agents are not LLM personas
 
-The v0.1 Detective/Reviewer debate is easy to demo and hard to audit. v0.2 keeps the role separation as typed contracts: extractor, retriever, auditor, quantifier, reporter. A language model can be added as a narrator, but it cannot write a number, choose a sign, or invent a mechanism. The moat is the data, text, evidence and evaluation layer — not the prompt.
+The v0.1 Detective/Reviewer debate is easy to demo and hard to audit. v0.3 keeps the role separation as typed contracts: extractor, retriever, auditor, quantifier, reporter. A language model can be added as a narrator, but it cannot write a number, choose a sign, or invent a mechanism. The moat is the data, text, evidence and evaluation layer — not the prompt.
 
 ---
 
@@ -63,9 +63,20 @@ Open **http://127.0.0.1:8000**. The dashboard runs an example on load. The same 
 
 ```bash
 python -m backend.app.cli analyze "Fed raises rates by 50 basis points"
-python -m backend.app.cli backtest --window-end 1 --out backtest.json
-python -m backend.app.cli events
+python -m backend.app.cli backtest --dataset curated  --window-end 1 --out backtest_curated.json
+python -m backend.app.cli backtest --dataset fomc     --window-end 1 --out backtest_fomc.json
+python -m backend.app.cli backtest --dataset extended --window-end 1 --out backtest_extended.json
+python -m backend.app.cli events --dataset fomc
 ```
+
+### Docker
+
+```bash
+docker build -t domino-agent .
+docker run --rm -p 8000:8000 domino-agent
+```
+
+The image contains the bundled snapshots; it runs offline.
 
 ### Optional live data
 
@@ -79,7 +90,7 @@ python -m backend.app.cli events
 Refresh the bundled public-data snapshots:
 
 ```bash
-python scripts/fetch_market_snapshot.py --start 2015-01-01
+python scripts/fetch_market_snapshot.py --start 2000-01-01
 python scripts/fetch_public_snapshots.py
 ```
 
@@ -133,13 +144,14 @@ Full methodology, formulas and threats to validity: [`docs/methodology.md`](docs
 | **FRED / ALFRED** | Macro series, vintage-aware | **Yes**, via `realtime_start/end` |
 | **World Bank** | Annual regime context | No |
 | **Yahoo Finance** | Event-window ETF outcomes | No; adjusted closes are revised |
+| **FOMC statements** | 58-event systematic stress benchmark | Snapshot; statements immutable |
 
 The bundled snapshot makes the backtest reproducible offline. The connectors exist for refresh and extension; they never silently change a reasoning result.
 
 ### 2. Financial text processing is explicit
 
 - **Units are normalized at the boundary**: `50bp`, `0.50 percentage points`, `$1.9 trillion`, `2 mb/d`, `200万桶/日`, `50个基点`.
-- **Surprise is separated from level**: CPI `8.6%` is a level; `8.6% vs 8.3% expected` is a `+0.3pp` surprise. FOMC decisions carry an explicit surprise direction, not just the policy change.
+- **Surprise is separated from level**: CPI `8.6%` is a level; `8.6% vs 8.3% expected` is a `+0.3pp` surprise. FOMC decisions carry an explicit surprise field; it is often neutral when no consensus series is bundled, and the FOMC stress test shows why that matters.
 - **Entities are a controlled vocabulary**, not guessed NER: `Fed/FOMC/美联储 → US_FED`, `OPEC+ → OPEC_PLUS`, `原油 → ENERGY`.
 - **Sentiment is finance-aware**: polarity, uncertainty, hawkish/dovish, risk-on/risk-off, negation scope, intensifiers. The shipped lexicon is a small auditable seed; the licensed Loughran–McDonald dictionary can be loaded from your own path.
 - **Duplicates are clustered**: syndicated headlines are one story, not 30 independent observations. The cluster reports duplicate count, source diversity and novelty.
@@ -181,9 +193,21 @@ If no mechanism matches, **the engine abstains** instead of writing a plausible 
 
 ---
 
-## Results
+## Benchmarks
 
-Primary protocol: **50 events, 12 assets, 1-day announcement window, first half for fitting, second half held out.**
+| Dataset | Events | Period | Purpose |
+|---|---:|---|---|
+| **Curated** | 50 | 2018-03 – 2025-04 | Heterogeneous macro text + transmission |
+| **FOMC** | 58 | 2004-06 – 2025-12 | Systematic action-only policy stress test |
+| **Extended** | 92 | 2004-06 – 2025-12 | Curated + FOMC, deduplicated by type/date |
+
+The FOMC benchmark is generated from official statements by `scripts/build_fomc_events.py`; only non-zero target-range changes are included. It is deliberately a **stress test**: the event is the policy action, without a high-frequency surprise/positioning measure. The extended benchmark shows what happens when the two are mixed.
+
+The benchmark card is in [`docs/benchmark.md`](docs/benchmark.md); the model card is in [`docs/model_card.md`](docs/model_card.md).
+
+## Curated benchmark (primary)
+
+Protocol: **50 events, 12 assets, 1-day announcement window, first half for fitting, second half held out.**
 
 | Model (held-out) | Coverage | Directional accuracy | Brier | AUC | ECE |
 |---|---:|---:|---:|---:|---:|
@@ -194,16 +218,47 @@ Primary protocol: **50 events, 12 assets, 1-day announcement window, first half 
 | Hybrid (mechanism + analog) | 96.4% | 62.1% | 0.258 | 0.625 | 0.135 |
 | **Stacked + Platt (headline)** | **96.4%** | **60.4%** | **0.238** | **0.634** | **0.052** |
 
-- 95% event-clustered accuracy interval for the headline model: **0.537–0.668**.
-- The mechanism-only model is more accurate than the calibrated stack but **overconfident**; calibration buys a better Brier score and a much lower ECE at a small accuracy cost. This trade-off is shown, not hidden.
-- 5-day robustness: headline accuracy **54.5%**, Brier **0.252**, AUC **0.528**. The edge is concentrated in the announcement session; the 5-day horizon is noisier.
-- Extraction: **50/50** joint event-type + direction on the curated sample. This is in-sample vocabulary coverage, not an out-of-distribution benchmark.
+- 95% event-clustered accuracy interval for the headline: **0.537–0.668**.
+- Paired Brier vs base rate: **−0.0082**, 95% CI **−0.0235–0.0055**, one-sided p=**0.128**. The improvement is **not statistically significant** at 5%; the sample is small.
+- Paired Brier vs mechanism-only: **−0.0212**, CI **−0.0467–0.0038**, p=**0.048**. The stack is marginally better than the overconfident mechanism-only model.
+- The mechanism-only model is more accurate but overconfident (Brier 0.259, ECE 0.117); calibration buys a better Brier/ECE at a small accuracy cost.
+- 5-day robustness: **54.5%**, Brier **0.252**, AUC **0.528**. The edge is concentrated in the announcement session.
+- Extraction: **50/50** joint event-type + direction on the curated sample. This is in-sample vocabulary coverage, not an OOD benchmark.
 
-Per-asset and per-event-type breakdowns, calibration bins and failure cases are in [`docs/evaluation.md`](docs/evaluation.md). The backtest is reproducible:
+## FOMC stress test: the mechanism prior needs surprise data
+
+The homogeneous FOMC sample is where the current design fails, and that is the most useful result in the project.
+
+| Model (held-out) | Coverage | Directional accuracy | Brier | AUC |
+|---|---:|---:|---:|---:|
+| Always-up base rate | 100% | **56.6%** | 0.250 | 0.544 |
+| Mechanism only | 93.1% | **41.1%** | 0.384 | 0.416 |
+| Historical analog only | 93.1% | 52.4% | 0.262 | 0.506 |
+| Mechanism calibrated | 93.1% | 53.9% | 0.250 | 0.416 |
+| Stacked + Platt | 93.1% | 41.2% | 0.255 | 0.404 |
+
+- Paired Brier, mechanism vs base rate: **+0.1338**, 95% CI **0.076–0.180**, one-sided p=**1.0** — the mechanism prior is **significantly worse** than a naive base rate.
+- Why: a policy action is not a surprise. 2004–2006 hikes were telegraphed normalization; 2007–2008 cuts were a recession/funding shock; 2022 hikes were an inflation shock. The same “hike = risk-off” sign cannot be right in all three regimes.
+- Calibration helps the Brier score (0.384 → 0.250) but **cannot fix the sign**. The missing input is high-frequency Fed-funds/SOFR pricing and positioning, not another prompt.
+- This is a **documented failure boundary**, not a hidden backtest. A production version should abstain or use base rates on action-only FOMC until a surprise provider is wired in.
+
+## Extended benchmark
+
+Mixing the two families (92 events) produces no dominant model: base rate 54.1% / Brier 0.253, mechanism 57.5% / 0.283, stacked + Platt 50.8% / 0.248. The mechanism’s accuracy advantage comes with overconfidence; the calibrated stack has the best Brier but loses accuracy. We report the instability instead of selecting the best-looking cell.
+
+## SOTA framing
+
+This is **not** a SOTA return predictor, and the README does not claim one. It is a SOTA-grade **evaluation and evidence pipeline**: two open benchmarks, paired event-clustered bootstrap, calibration, a documented negative result, and a clear statement of the missing input. A 60% number without the FOMC failure would be marketing; the failure is the research contribution.
+
+Reproduce:
 
 ```bash
-python -m backend.app.cli backtest --window-end 1 --out backtest.json
+python -m backend.app.cli backtest --dataset curated  --window-end 1 --out backtest_curated.json
+python -m backend.app.cli backtest --dataset fomc     --window-end 1 --out backtest_fomc.json
+python -m backend.app.cli backtest --dataset extended --window-end 1 --out backtest_extended.json
 ```
+
+Compact summaries are in `docs/results/`.
 
 ![Backtest panel](docs/assets/backtest.png)
 
@@ -214,8 +269,10 @@ python -m backend.app.cli backtest --window-end 1 --out backtest.json
 - **Not identified causal inference.** The output is a transmission hypothesis with a citation, not an ATE from a randomized intervention. DoWhy/EconML-style identification is out of scope.
 - **Not a trading strategy.** The event study is an evaluation harness; it does not model transaction costs, slippage, capacity, borrow, or execution.
 - **Not a point-in-time price database.** Yahoo adjusted closes are revised. The event labels are editorial. A production version would use CRSP/Compustat or a vendor with vintages.
-- **Not a large-sample result.** 50 events, overlapping windows, 12 correlated assets. The bootstrap is clustered by event, but the sample is still small.
+- **Not a SOTA return predictor.** The curated improvement is not statistically significant; the systematic FOMC stress test shows the mechanism prior is significantly worse than a base rate on action-only policy events. The project’s SOTA claim is about evaluation and evidence, not alpha.
+- **Not a large-sample result.** 50 curated events and 58 systematic FOMC events, overlapping windows, 12 correlated assets. The bootstrap is clustered by event, but the samples are still small.
 - **Mechanism priors were authored by the project, not preregistered.** They are theory- and literature-informed, not fitted to the test outcomes. That is weaker than a preregistered specification and should be read that way.
+- **No high-frequency surprise provider is bundled.** Fed-funds/SOFR futures and consensus data are the missing input for the FOMC benchmark; the adapter is a documented next step, not a solved problem.
 
 ---
 
@@ -228,17 +285,18 @@ backend/
     knowledge/      # mechanism loader, retrieval
     reasoning/      # transmission, audit, memo, orchestration
     evaluation/     # event study, analog model, metrics, backtest
-    datasources/    # SEC, GDELT, Treasury, FRED, World Bank, Yahoo
+    datasources/    # SEC, GDELT, Treasury, FRED, World Bank, Yahoo, FOMC catalog
     api.py          # FastAPI surface
     cli.py          # offline CLI
   data/
-    events/         # 50 dated, labelled events
+    events/         # 50 curated + 58 generated FOMC events
+    fomc/           # official FOMC statement snapshot + builder
     knowledge/      # 20 mechanisms, 14 channels
-    market/         # reproducible ETF price snapshot + provenance
+    market/         # 13 ETFs, 2000–present + provenance
     macro/ sec/ news/  # small public-data snapshots
 frontend/           # zero-build dashboard (HTML/CSS/JS + SVG)
-tests/              # 79 unit/contract tests
-docs/               # methodology, data sources, evaluation, resume bullets
+tests/              # 85 unit/contract tests
+docs/               # methodology, data sources, evaluation, benchmark/model cards, resume bullets
 ```
 
 ---
@@ -260,7 +318,7 @@ See [`docs/resume_bullets.md`](docs/resume_bullets.md) for Chinese and English v
 
 **English (condensed):**
 
-> Built a five-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → evidence audit → memo), with 20 cited mechanisms, 14 channels, 50 dated events and 79 tests; runs fully offline with no API key.
+> Built a five-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → evidence audit → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC events and 85 tests; runs fully offline with no API key.
 >
 > Implemented finance-aware text normalization (bps vs percentage points vs percent, `$tn`, `mb/d`, Chinese units, surprise vs level), entity linking, LM-style sentiment with negation, and near-duplicate news clustering; added provenance-aware connectors for SEC EDGAR/XBRL, GDELT, Treasury, FRED/ALFRED, World Bank and Yahoo.
 >

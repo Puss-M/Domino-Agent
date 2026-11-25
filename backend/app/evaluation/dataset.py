@@ -1,9 +1,18 @@
-"""Hand-curated, dated event sample used for extraction and event-study tests.
+"""Dated event datasets used for extraction and event-study tests.
 
-The labels are editorial: event type and direction are assigned from the
-official action and the published consensus, not from the market reaction.
-Market outcomes are computed separately from the price snapshot. Keeping the
-label and the outcome separate is what makes the evaluation non-circular.
+Three datasets are available:
+
+- ``curated``: 50 hand-curated, heterogeneous macro events. The labels are
+  editorial and the headlines are real-ish text, so this is the extraction
+  benchmark.
+- ``fomc``: 31 systematic FOMC target-range changes (2015-2025) generated from
+  official statements. This is a homogeneous transmission benchmark; headlines
+  are templated from the parsed range.
+- ``extended``: curated + FOMC, deduplicated by event type and date. Curated
+  events win when both describe the same decision.
+
+Labels are assigned from the official action/consensus, not from the market
+reaction. Outcomes are computed separately in ``event_study.py``.
 """
 
 from __future__ import annotations
@@ -11,6 +20,7 @@ from __future__ import annotations
 import datetime as dt
 from datetime import datetime
 from pathlib import Path
+from typing import Literal
 from zoneinfo import ZoneInfo
 
 import yaml
@@ -29,6 +39,8 @@ from ..schemas import (
 )
 
 ET = ZoneInfo("America/New_York")
+DatasetName = Literal["curated", "fomc", "extended"]
+DATASETS: tuple[str, ...] = ("curated", "fomc", "extended")
 
 
 class DatasetError(RuntimeError):
@@ -47,11 +59,7 @@ def _published_at(date_value: str | dt.date, time_et: str | None) -> datetime:
     return datetime(day.year, day.month, day.day, hour, minute, tzinfo=ET)
 
 
-def load_events(
-    path: Path | None = None, settings: Settings | None = None
-) -> list[LabeledEvent]:
-    settings = settings or get_settings()
-    target = path or settings.events_path
+def _load_file(target: Path) -> list[LabeledEvent]:
     if not target.exists():
         raise DatasetError(f"event dataset not found: {target}")
     raw = yaml.safe_load(target.read_text(encoding="utf-8"))
@@ -61,7 +69,7 @@ def load_events(
     for row in rows:
         event_id = row["id"]
         if event_id in seen:
-            raise DatasetError(f"duplicate event id {event_id}")
+            raise DatasetError(f"duplicate event id {event_id} in {target}")
         seen.add(event_id)
         published_at = _published_at(row["date"], row.get("time_et"))
         source = SourceRef(
@@ -98,6 +106,42 @@ def load_events(
         except (ValidationError, KeyError, ValueError) as exc:
             raise DatasetError(f"invalid event {event_id}: {exc}") from exc
         events.append(event)
+    return events
+
+
+def fomc_events_path(settings: Settings | None = None) -> Path:
+    settings = settings or get_settings()
+    return settings.data_dir / "events" / "fomc_generated.yaml"
+
+
+def load_events(
+    path: Path | None = None,
+    settings: Settings | None = None,
+    dataset: DatasetName = "curated",
+) -> list[LabeledEvent]:
+    """Load a named dataset, or a specific file when ``path`` is given."""
+    if dataset not in DATASETS:
+        raise DatasetError(f"unknown dataset {dataset!r}; choose from {DATASETS}")
+    settings = settings or get_settings()
+    if path is not None:
+        events = _load_file(path)
+    elif dataset == "curated":
+        events = _load_file(settings.events_path)
+    elif dataset == "fomc":
+        events = _load_file(fomc_events_path(settings))
+    else:
+        curated = _load_file(settings.events_path)
+        generated = _load_file(fomc_events_path(settings))
+        # Curated wins when both files describe the same decision.
+        keys = {(event.event_type, event.published_at.date()) for event in curated}
+        merged = list(curated)
+        for event in generated:
+            key = (event.event_type, event.published_at.date())
+            if key in keys:
+                continue
+            keys.add(key)
+            merged.append(event)
+        events = merged
     events.sort(key=lambda item: item.published_at)
     return events
 

@@ -5,7 +5,7 @@ const state = {
   analysis: null,
   health: null,
   sources: null,
-  backtest: null,
+  backtest: {},
   selected: null,
   edges: [],
 };
@@ -503,15 +503,19 @@ function closeModal(id) {
 
 async function loadBacktest() {
   openModal("backtestModal");
+  const dataset = $("#datasetSelect").value;
   const body = $("#backtestBody");
-  if (state.backtest) {
-    renderBacktest(state.backtest);
+  if (state.backtest[dataset]) {
+    renderBacktest(state.backtest[dataset]);
     return;
   }
-  body.innerHTML = `<div class="placeholder">Running 50-event walk-forward evaluation…</div>`;
+  body.innerHTML = `<div class="placeholder">Running walk-forward evaluation on ${escapeHtml(dataset)}…</div>`;
   try {
-    state.backtest = await fetchJSON("/api/backtest/latest");
-    renderBacktest(state.backtest);
+    state.backtest[dataset] = await fetchJSON("/api/backtest", {
+      method: "POST",
+      body: JSON.stringify({ dataset, window_end: 1, bootstrap_samples: 300 }),
+    });
+    renderBacktest(state.backtest[dataset]);
   } catch (error) {
     body.innerHTML = `<div class="empty-state">Backtest failed: ${escapeHtml(error.message)}</div>`;
   }
@@ -556,7 +560,7 @@ function renderBacktest(data) {
     )
     .join("");
   $("#backtestBody").innerHTML = `
-    <p class="hint" style="margin:0 0 12px">All model metrics below are on the held-out second half of the event sample. Stack weights and Platt calibration are fitted on the first half only.</p>
+    <p class="hint" style="margin:0 0 12px">Benchmark: <strong>${escapeHtml(data.config.dataset)}</strong>. All model metrics below are on the held-out second half of the event sample. Stack weights and Platt calibration are fitted on the first half only. Dataset <em>fomc</em> is a stress test of action-only policy events; it is expected to expose the cost of the mechanism prior.</p>
     <div class="metric-grid">
       ${metricCard("Events", data.n_events, `${data.n_outcome_observations} outcome obs`)}
       ${metricCard("Window", `0..${data.config.window_end}`, "trading days")}
@@ -564,7 +568,11 @@ function renderBacktest(data) {
       ${metricCard("Brier", fmt(chosen?.brier, 3), `baseline ${fmt(metrics.find((m) => m.model === "always_up_test")?.brier, 3)}`)}
       ${metricCard("AUC", fmt(chosen?.auc, 3), "rank discrimination")}
       ${metricCard("Coverage", pct(chosen?.coverage, 1), "non-abstain")}
-      ${metricCard("Extraction", pct(extraction.joint_accuracy, 0), "type + direction")}
+      ${metricCard(
+        "Extraction",
+        extraction.n ? pct(extraction.joint_accuracy, 0) : "n/a",
+        extraction.n ? "type + direction" : "templated headlines"
+      )}
       ${metricCard("Bootstrap CI", chosen?.accuracy_ci ? `${fmt(chosen.accuracy_ci[0], 2)}–${fmt(chosen.accuracy_ci[1], 2)}` : "—", "event-clustered")}
     </div>
     <table>
@@ -674,6 +682,10 @@ async function init() {
   $("#analyzeBtn").addEventListener("click", analyze);
   $("#downloadBtn").addEventListener("click", downloadJSON);
   $("#backtestBtn").addEventListener("click", loadBacktest);
+  $("#datasetSelect").addEventListener("change", () => {
+    state.backtest = {};
+    loadBacktest();
+  });
   $("#sourcesBtn").addEventListener("click", loadSources);
   $("#closeBacktest").addEventListener("click", () => closeModal("backtestModal"));
   $("#closeSources").addEventListener("click", () => closeModal("sourcesModal"));

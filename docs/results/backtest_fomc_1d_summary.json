@@ -1,0 +1,416 @@
+{
+  "generated_at": "2026-11-25T15:04:57+00:00",
+  "config": {
+    "assets": null,
+    "dataset": "fomc",
+    "window_start": 0,
+    "window_end": 1,
+    "estimation_start": -120,
+    "estimation_end": -21,
+    "flat_threshold_bps": 10.0,
+    "train_fraction": 0.5,
+    "bootstrap_samples": 500,
+    "include_events": null
+  },
+  "n_events": 58,
+  "n_outcome_observations": 592,
+  "metrics": [
+    {
+      "model": "always_up_test",
+      "n": 319,
+      "coverage": 1.0,
+      "accuracy": 0.5663,
+      "brier": 0.2504,
+      "log_loss": 0.6946,
+      "auc": 0.5439,
+      "ece": 0.0518,
+      "accuracy_ci": [
+        0.5051,
+        0.6242
+      ],
+      "brier_ci": [
+        0.2388,
+        0.2631
+      ]
+    },
+    {
+      "model": "coin_flip_test",
+      "n": 319,
+      "coverage": 1.0,
+      "accuracy": null,
+      "brier": 0.25,
+      "log_loss": 0.6931,
+      "auc": 0.5,
+      "ece": 0.0329,
+      "accuracy_ci": null,
+      "brier_ci": [
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "model": "mechanism_test",
+      "n": 297,
+      "coverage": 0.931,
+      "accuracy": 0.4108,
+      "brier": 0.3837,
+      "log_loss": 1.0203,
+      "auc": 0.4161,
+      "ece": 0.3683,
+      "accuracy_ci": [
+        0.3392,
+        0.4848
+      ],
+      "brier_ci": [
+        0.3376,
+        0.4249
+      ]
+    },
+    {
+      "model": "analog_test",
+      "n": 297,
+      "coverage": 0.931,
+      "accuracy": 0.5238,
+      "brier": 0.2618,
+      "log_loss": 0.7206,
+      "auc": 0.5059,
+      "ece": 0.0936,
+      "accuracy_ci": [
+        0.4721,
+        0.5749
+      ],
+      "brier_ci": [
+        0.2485,
+        0.2749
+      ]
+    },
+    {
+      "model": "hybrid_test",
+      "n": 297,
+      "coverage": 0.931,
+      "accuracy": 0.4108,
+      "brier": 0.3749,
+      "log_loss": 1.0022,
+      "auc": 0.4096,
+      "ece": 0.3565,
+      "accuracy_ci": [
+        0.3366,
+        0.4883
+      ],
+      "brier_ci": [
+        0.3319,
+        0.4172
+      ]
+    },
+    {
+      "model": "stacked_test",
+      "n": 297,
+      "coverage": 0.931,
+      "accuracy": 0.4377,
+      "brier": 0.3141,
+      "log_loss": 0.8348,
+      "auc": 0.4036,
+      "ece": 0.2534,
+      "accuracy_ci": [
+        0.3608,
+        0.5084
+      ],
+      "brier_ci": [
+        0.2862,
+        0.3446
+      ]
+    },
+    {
+      "model": "mechanism_calibrated_test",
+      "n": 297,
+      "coverage": 0.931,
+      "accuracy": 0.5387,
+      "brier": 0.2501,
+      "log_loss": 0.6933,
+      "auc": 0.4157,
+      "ece": 0.0267,
+      "accuracy_ci": [
+        0.4828,
+        0.5941
+      ],
+      "brier_ci": [
+        0.2487,
+        0.2514
+      ]
+    },
+    {
+      "model": "analog_calibrated_test",
+      "n": 297,
+      "coverage": 0.931,
+      "accuracy": 0.5185,
+      "brier": 0.2535,
+      "log_loss": 0.7007,
+      "auc": 0.5059,
+      "ece": 0.046,
+      "accuracy_ci": [
+        0.4642,
+        0.57
+      ],
+      "brier_ci": [
+        0.2448,
+        0.2623
+      ]
+    },
+    {
+      "model": "hybrid_calibrated_test",
+      "n": 297,
+      "coverage": 0.931,
+      "accuracy": 0.4781,
+      "brier": 0.2522,
+      "log_loss": 0.6975,
+      "auc": 0.4094,
+      "ece": 0.0358,
+      "accuracy_ci": [
+        0.4161,
+        0.5369
+      ],
+      "brier_ci": [
+        0.25,
+        0.2544
+      ]
+    },
+    {
+      "model": "stacked_calibrated_test",
+      "n": 297,
+      "coverage": 0.931,
+      "accuracy": 0.4122,
+      "brier": 0.2548,
+      "log_loss": 0.7028,
+      "auc": 0.4035,
+      "ece": 0.113,
+      "accuracy_ci": [
+        0.3333,
+        0.486
+      ],
+      "brier_ci": [
+        0.2507,
+        0.2591
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "model": "stacked_calibrated_test",
+      "baseline": "always_up_test",
+      "delta_brier": 0.0049,
+      "ci": [
+        -0.008,
+        0.0169
+      ],
+      "p_value": 0.802,
+      "n_pairs": 297
+    },
+    {
+      "model": "stacked_calibrated_test",
+      "baseline": "mechanism_test",
+      "delta_brier": -0.1289,
+      "ci": [
+        -0.1685,
+        -0.0869
+      ],
+      "p_value": 0.0,
+      "n_pairs": 297
+    },
+    {
+      "model": "mechanism_test",
+      "baseline": "always_up_test",
+      "delta_brier": 0.1338,
+      "ci": [
+        0.076,
+        0.1803
+      ],
+      "p_value": 1.0,
+      "n_pairs": 297
+    }
+  ],
+  "by_asset": [
+    {
+      "asset": "SPY",
+      "n": 23,
+      "accuracy": 0.5652,
+      "brier": 0.2511,
+      "mean_car_bps": -71.31
+    },
+    {
+      "asset": "QQQ",
+      "n": 23,
+      "accuracy": 0.4348,
+      "brier": 0.2512,
+      "mean_car_bps": 41.06
+    },
+    {
+      "asset": "TLT",
+      "n": 27,
+      "accuracy": 0.3704,
+      "brier": 0.2538,
+      "mean_car_bps": 29.43
+    },
+    {
+      "asset": "IEF",
+      "n": 24,
+      "accuracy": 0.3333,
+      "brier": 0.2552,
+      "mean_car_bps": 30.7
+    },
+    {
+      "asset": "UUP",
+      "n": 26,
+      "accuracy": 0.3846,
+      "brier": 0.2644,
+      "mean_car_bps": -22.5
+    },
+    {
+      "asset": "GLD",
+      "n": 26,
+      "accuracy": 0.5,
+      "brier": 0.2493,
+      "mean_car_bps": 52.3
+    },
+    {
+      "asset": "XLE",
+      "n": 26,
+      "accuracy": 0.3462,
+      "brier": 0.2555,
+      "mean_car_bps": -90.81
+    },
+    {
+      "asset": "XLU",
+      "n": 24,
+      "accuracy": 0.5417,
+      "brier": 0.245,
+      "mean_car_bps": 38.43
+    },
+    {
+      "asset": "EEM",
+      "n": 25,
+      "accuracy": 0.44,
+      "brier": 0.257,
+      "mean_car_bps": 45.63
+    },
+    {
+      "asset": "HYG",
+      "n": 23,
+      "accuracy": 0.3478,
+      "brier": 0.2615,
+      "mean_car_bps": 8.39
+    },
+    {
+      "asset": "^VIX",
+      "n": 25,
+      "accuracy": 0.3333,
+      "brier": 0.2545,
+      "mean_car_bps": -265.25
+    },
+    {
+      "asset": "FXI",
+      "n": 25,
+      "accuracy": 0.36,
+      "brier": 0.259,
+      "mean_car_bps": 76.24
+    }
+  ],
+  "by_event_type": [
+    {
+      "event_type": "monetary_policy",
+      "n_events": 29,
+      "n_predictions": 297,
+      "accuracy": 0.4122,
+      "brier": 0.2548
+    }
+  ],
+  "calibration": [
+    {
+      "bin_lower": 0.4887,
+      "bin_upper": 0.4964,
+      "n": 37,
+      "mean_predicted": 0.4933,
+      "observed_frequency": 0.5405
+    },
+    {
+      "bin_lower": 0.4967,
+      "bin_upper": 0.4992,
+      "n": 37,
+      "mean_predicted": 0.4981,
+      "observed_frequency": 0.6757
+    },
+    {
+      "bin_lower": 0.4992,
+      "bin_upper": 0.5007,
+      "n": 37,
+      "mean_predicted": 0.4998,
+      "observed_frequency": 0.5946
+    },
+    {
+      "bin_lower": 0.5007,
+      "bin_upper": 0.5028,
+      "n": 37,
+      "mean_predicted": 0.5016,
+      "observed_frequency": 0.6486
+    },
+    {
+      "bin_lower": 0.503,
+      "bin_upper": 0.5117,
+      "n": 37,
+      "mean_predicted": 0.507,
+      "observed_frequency": 0.5676
+    },
+    {
+      "bin_lower": 0.5119,
+      "bin_upper": 0.5273,
+      "n": 37,
+      "mean_predicted": 0.5199,
+      "observed_frequency": 0.4324
+    },
+    {
+      "bin_lower": 0.5274,
+      "bin_upper": 0.5365,
+      "n": 37,
+      "mean_predicted": 0.5326,
+      "observed_frequency": 0.4324
+    },
+    {
+      "bin_lower": 0.5369,
+      "bin_upper": 0.5476,
+      "n": 38,
+      "mean_predicted": 0.5401,
+      "observed_frequency": 0.4211
+    }
+  ],
+  "extraction": {
+    "n": 0,
+    "event_type_accuracy": 0.0,
+    "direction_accuracy": 0.0,
+    "joint_accuracy": 0.0,
+    "confusion": {}
+  },
+  "notes": [
+    "Only the stack weights and Platt calibration are fitted, on the first half of the events; all other components are fixed or walk-forward.",
+    "Analog priors use only prior events whose outcome window has matured before the current event.",
+    "Dataset: fomc.",
+    "The sample is small and event windows overlap; the bootstrap resamples events, not asset rows.",
+    "Mechanism priors were authored by the project, not preregistered, and were not fitted to these outcomes.",
+    "Stack weights fitted on train: mechanism=0.60, analog=0.60, base_rate=0.00.",
+    "Platt parameters (stacked): a=0.16, b=0.08.",
+    "No events were skipped for price history."
+  ],
+  "provenance": {
+    "sources": [
+      "events: backend/data/events/events.yaml",
+      "prices: backend/data/market/prices.csv",
+      "knowledge: mechanisms.yaml v1",
+      "extraction: rules-v1"
+    ],
+    "retrieved_at": "2026-11-25T15:04:57.023116Z",
+    "as_of": "2025-12-10T14:00:00-05:00",
+    "snapshot_version": "local",
+    "notes": [
+      "Adjusted closes are revised after corporate actions; this is not a point-in-time price database.",
+      "Event labels are editorial; market outcomes are computed independently."
+    ]
+  }
+}

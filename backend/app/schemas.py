@@ -284,6 +284,7 @@ class DataSourceInfo(BaseModel):
 
 class BacktestConfig(BaseModel):
     assets: list[str] | None = None
+    dataset: Literal["curated", "fomc", "extended"] = "curated"
     window_start: int = 0
     window_end: int = 1  # primary window: the first session that prices the news
     estimation_start: int = -120
@@ -323,6 +324,15 @@ class EventTypeMetrics(BaseModel):
     brier: float | None
 
 
+class ModelComparison(BaseModel):
+    model: str
+    baseline: str
+    delta_brier: float
+    ci: tuple[float, float] | None = None
+    p_value: float | None = None
+    n_pairs: int
+
+
 class CalibrationBin(BaseModel):
     bin_lower: float
     bin_upper: float
@@ -359,6 +369,7 @@ class BacktestResponse(BaseModel):
     by_asset: list[AssetMetrics]
     by_event_type: list[EventTypeMetrics]
     calibration: list[CalibrationBin]
+    comparisons: list[ModelComparison] = Field(default_factory=list)
     extraction: ExtractionMetrics
     events: list[BacktestEventResult]
     provenance: Provenance

@@ -63,7 +63,11 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
 
 def cmd_backtest(args: argparse.Namespace) -> int:
-    config = BacktestConfig(window_end=args.window_end, bootstrap_samples=args.bootstrap)
+    config = BacktestConfig(
+        window_end=args.window_end,
+        dataset=args.dataset,
+        bootstrap_samples=args.bootstrap,
+    )
     result = BacktestEngine(config=config).run(config)
     if args.out:
         Path(args.out).write_text(
@@ -104,7 +108,7 @@ def cmd_sources(_args: argparse.Namespace) -> int:
 
 
 def cmd_events(args: argparse.Namespace) -> int:
-    events = load_events()
+    events = load_events(dataset=args.dataset)
     if args.json:
         _print_json([event.model_dump(mode="json") for event in events])
         return 0
@@ -130,6 +134,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     backtest = sub.add_parser("backtest", help="run the walk-forward event study")
     backtest.add_argument("--window-end", type=int, default=1)
+    backtest.add_argument("--dataset", choices=["curated", "fomc", "extended"], default="curated")
     backtest.add_argument("--bootstrap", type=int, default=500)
     backtest.add_argument("--out", default="")
     backtest.add_argument("--json", action="store_true")
@@ -138,7 +143,8 @@ def build_parser() -> argparse.ArgumentParser:
     sources = sub.add_parser("sources", help="list data sources")
     sources.set_defaults(func=cmd_sources)
 
-    events = sub.add_parser("events", help="list the curated event sample")
+    events = sub.add_parser("events", help="list an event dataset")
+    events.add_argument("--dataset", choices=["curated", "fomc", "extended"], default="curated")
     events.add_argument("--json", action="store_true")
     events.set_defaults(func=cmd_events)
     return parser

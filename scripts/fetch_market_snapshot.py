@@ -17,7 +17,7 @@ from pathlib import Path
 
 import requests
 
-TICKERS = ["SPY", "QQQ", "TLT", "IEF", "UUP", "GLD", "XLE", "XLU", "EEM", "HYG", "^VIX", "FXI"]
+TICKERS = ["SPY", "QQQ", "TLT", "IEF", "UUP", "GLD", "XLE", "XLU", "EEM", "HYG", "^VIX", "FXI", "SHY"]
 BASE = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
 HEADERS = {
     "User-Agent": (
@@ -54,7 +54,7 @@ def fetch(symbol: str, start: dt.date, end: dt.date) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--start", default="2015-01-01")
+    parser.add_argument("--start", default="2000-01-01")
     parser.add_argument("--end", default=dt.date.today().isoformat())
     parser.add_argument(
         "--out", default=str(Path(__file__).resolve().parents[1] / "backend" / "data" / "market")

@@ -8,6 +8,7 @@ are cached by their config hash.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -106,8 +107,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ]
 
     @app.get("/api/events")
-    def events() -> list[dict]:
-        return [_event_payload(event) for event in load_events(settings=settings)]
+    def events(dataset: Literal["curated", "fomc", "extended"] = "curated") -> list[dict]:
+        return [
+            _event_payload(event)
+            for event in load_events(settings=settings, dataset=dataset)
+        ]
 
     @app.post("/api/analyze", response_model=AnalysisResponse)
     def analyze(request: AnalyzeRequest) -> AnalysisResponse:

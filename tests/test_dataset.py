@@ -12,6 +12,23 @@ def test_event_dataset_loads_and_is_sorted():
     assert len({event.id for event in events}) == len(events)
 
 
+def test_fomc_dataset_loads_and_is_generated():
+    events = load_events(dataset="fomc")
+    assert len(events) == 58
+    assert all(event.event_type == EventType.MONETARY_POLICY for event in events)
+    assert all("generated" in event.tags for event in events)
+    assert all(event.magnitude and event.magnitude.unit == "bps" for event in events)
+    assert min(event.published_at.date().year for event in events) == 2004
+    assert max(event.published_at.date().year for event in events) == 2025
+
+
+def test_extended_dataset_deduplicates_by_type_and_date():
+    events = load_events(dataset="extended")
+    assert len(events) == 92
+    keys = [(event.event_type, event.published_at.date()) for event in events]
+    assert len(keys) == len(set(keys))
+
+
 def test_event_labels_cover_all_types():
     events = load_events()
     types = {event.gold_event_type for event in events}

@@ -6,6 +6,7 @@ import pytest
 
 from backend.app.evaluation.metrics import (
     accuracy,
+    paired_bootstrap_difference,
     apply_platt,
     auc,
     brier,
@@ -84,3 +85,24 @@ def test_summarize_reports_coverage_and_ci():
     assert summary["accuracy"] == 1.0
     assert summary["n"] == 4
     assert summary["brier_ci"] is None  # too few clusters for a stable interval
+
+
+def test_paired_bootstrap_difference_detects_better_model():
+    # Model A predicts perfectly; model B is anti-correlated, on 12 events.
+    rows_a, rows_b = [], []
+    for index in range(24):
+        y = index % 2
+        rows_a.append({"event_id": f"e{index // 2}", "asset": "SPY", "y": y, "p_up": 0.9 if y else 0.1})
+        rows_b.append({"event_id": f"e{index // 2}", "asset": "SPY", "y": y, "p_up": 0.1 if y else 0.9})
+    result = paired_bootstrap_difference(rows_a, rows_b, samples=200)
+    assert result["delta_brier"] < 0
+    assert result["ci"][1] < 0
+    assert result["p_value"] == 0.0
+    assert result["n_pairs"] == 12
+
+
+def test_paired_bootstrap_difference_needs_enough_pairs():
+    rows = [{"event_id": "e1", "asset": "SPY", "y": 1, "p_up": 0.8}]
+    result = paired_bootstrap_difference(rows, rows, samples=10)
+    assert result["delta_brier"] is None
+    assert result["n_pairs"] == 1

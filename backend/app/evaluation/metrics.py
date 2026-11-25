@@ -185,6 +185,68 @@ def summarize(
     }
 
 
+def paired_bootstrap_difference(
+    rows_a: list[dict],
+    rows_b: list[dict],
+    samples: int = 500,
+    seed: int = 7,
+) -> dict:
+    """Paired Brier difference (A - B), clustered by event.
+
+    Negative delta means model A has the lower Brier score. The p-value is the
+    one-sided bootstrap probability that the difference is non-negative
+    (i.e. evidence against A being better).
+    """
+    index_a = {
+        (row.get("event_id"), row.get("asset")): row
+        for row in rows_a
+        if row.get("p_up") is not None and row.get("y") in {0, 1}
+    }
+    index_b = {
+        (row.get("event_id"), row.get("asset")): row
+        for row in rows_b
+        if row.get("p_up") is not None and row.get("y") in {0, 1}
+    }
+    keys = sorted(set(index_a) & set(index_b), key=lambda key: (str(key[0]), str(key[1])))
+    if len(keys) < 10:
+        return {"delta_brier": None, "ci": None, "p_value": None, "n_pairs": len(keys)}
+    pairs = [
+        {
+            "event_id": key[0],
+            "asset": key[1],
+            "y": index_a[key]["y"],
+            "a": index_a[key]["p_up"],
+            "b": index_b[key]["p_up"],
+        }
+        for key in keys
+    ]
+    delta = sum((row["a"] - row["y"]) ** 2 - (row["b"] - row["y"]) ** 2 for row in pairs) / len(pairs)
+    grouped: dict[str, list[dict]] = defaultdict(list)
+    for row in pairs:
+        grouped[row["event_id"]].append(row)
+    event_ids = list(grouped)
+    if len(event_ids) < 5:
+        return {"delta_brier": round(delta, 4), "ci": None, "p_value": None, "n_pairs": len(pairs)}
+    rng = random.Random(seed)
+    deltas = []
+    for _ in range(samples):
+        sampled = [rng.choice(event_ids) for _ in event_ids]
+        rows = [row for event_id in sampled for row in grouped[event_id]]
+        deltas.append(
+            sum((row["a"] - row["y"]) ** 2 - (row["b"] - row["y"]) ** 2 for row in rows) / len(rows)
+        )
+    deltas.sort()
+    low = deltas[int(0.025 * len(deltas))]
+    high = deltas[int(0.975 * len(deltas)) - 1]
+    p_value = sum(value >= 0 for value in deltas) / len(deltas)
+    return {
+        "delta_brier": round(delta, 4),
+        "ci": (round(low, 4), round(high, 4)),
+        "p_value": round(p_value, 4),
+        "n_pairs": len(pairs),
+    }
+
+
 def _round(value: float | None) -> float | None:
     return round(value, 4) if value is not None else None
 

@@ -50,7 +50,17 @@ def test_mechanisms_and_events_catalogs():
     assert events.status_code == 200
     assert len(events.json()) == 50
     assert sources.status_code == 200
-    assert len(sources.json()) == 6
+    assert len(sources.json()) == 7
+
+
+def test_events_endpoint_supports_datasets():
+    client = _client()
+    curated = client.get("/api/events").json()
+    fomc = client.get("/api/events?dataset=fomc").json()
+    extended = client.get("/api/events?dataset=extended").json()
+    assert len(curated) == 50
+    assert len(fomc) == 58
+    assert len(extended) == 92
 
 
 def test_market_snapshot():

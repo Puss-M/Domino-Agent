@@ -4,7 +4,7 @@ This document explains what the engine computes, why each choice was made, and w
 
 ### Why not LLM agents?
 
-The original prototype used two LLM personas, a creative “Detective” and a conservative “Reviewer.” That is a useful demo and a weak control system: the reviewer has no external evidence, no deterministic checks, and no way to fail a build. v0.2 keeps the role separation but turns each role into a typed contract:
+The original prototype used two LLM personas, a creative “Detective” and a conservative “Reviewer.” That is a useful demo and a weak control system: the reviewer has no external evidence, no deterministic checks, and no way to fail a build. v0.3 keeps the role separation but turns each role into a typed contract:
 
 - **Extractor**: deterministic parsing of numbers, units, entities and surprise.
 - **Retriever**: cited mechanism matching with explicit inclusion/exclusion conditions.
@@ -13,6 +13,18 @@ The original prototype used two LLM personas, a creative “Detective” and a c
 - **Reporter**: memo assembled from the structured result.
 
 An LLM is optional and, if added, is confined to narration. It cannot change a number, a sign, an edge or a citation. This is a deliberate trade: less “agent theater,” more auditable financial logic.
+
+---
+
+## 0. Datasets
+
+| Dataset | Events | Period | Role |
+|---|---:|---|---|
+| `curated` | 50 | 2018-03 – 2025-04 | Heterogeneous text + transmission |
+| `fomc` | 58 | 2004-06 – 2025-12 | Systematic action-only stress test |
+| `extended` | 92 | 2004-06 – 2025-12 | Curated + FOMC, deduplicated |
+
+The curated set is the extraction benchmark; the FOMC set is the transmission stress test. The FOMC headlines are templated from the target range, so they are excluded from extraction metrics. The detailed benchmark card is [`benchmark.md`](benchmark.md).
 
 ---
 
@@ -175,7 +187,13 @@ E[CAR_a] = 0.5 * Σ_c s_c L_{c,a} scale_c * strength
 
 Conflicting channels downgrade the asset grade one notch and reduce confidence proportionally to the conflict share. The audit also flags any asset whose only support is C-grade.
 
-### 2.5 Graph semantics
+### 2.5 Where the mechanism fails: action-only FOMC
+
+The FOMC stress test is deliberately homogeneous: 58 target-range changes, no surprise measure. The mechanism prior achieves **41.1%** directional accuracy, while an always-up base rate achieves **56.6%**. The paired Brier difference is **+0.1338** (95% CI 0.076–0.180): the prior is significantly worse than a naive baseline.
+
+The reason is economic, not statistical. A policy action is not a surprise. The same hike sign cannot be right for 2004–2006 normalization, 2007–2008 recession cuts and 2022 inflation-shock hikes. Calibration improves the Brier score but cannot repair the sign. The missing input is high-frequency Fed-funds/SOFR pricing and positioning. The system should abstain or use base rates on action-only FOMC until that input exists.
+
+### 2.6 Graph semantics
 
 ```
 event → channel → asset
@@ -269,7 +287,7 @@ It abstains when `n < 2`.
 - **Stacked**: `sigmoid(w_m logit(p_mech) + w_a logit(p_analog) + w_b logit(p_base))`, with non-negative weights selected on the training half by Brier score.
 - **Calibrated**: Platt scaling `sigmoid(a logit(p) + b)` fitted on the training half.
 
-The final 1-day run selected `w_m=0.60`, `w_a=0.40`, `w_b=0.40`, and `a=0.34`, `b=0.05`. These values are printed in the backtest response and are not hard-coded into the engine.
+The mechanism weight is constrained to `[0.6, 1.2]` by the evidence prior; analog/base weights are fitted on the training half. On the curated 1-day run the stack selected `w_m=0.60`, `w_a=0.40`, `w_b=0.40`, with Platt `a=0.34`, `b=0.05`. On the FOMC stress test it selected `w_m=0.60`, `w_a=0.60`, `w_b=0.00`, and the result is still negative skill. These values are printed in the backtest response; they are not hard-coded into the engine.
 
 ### 5.3 Metrics
 
@@ -279,20 +297,21 @@ The final 1-day run selected `w_m=0.60`, `w_a=0.40`, `w_b=0.40`, and `a=0.34`, `
 - **ECE**: expected calibration error over equal-width bins; the reliability plot uses quantile bins for resolution.
 - **Coverage**: non-abstain share of non-flat outcomes.
 - **Confidence interval**: percentile bootstrap resampling **events**, not asset rows.
+- **Paired Brier comparison**: resample events, compute the Brier difference on paired `(event, asset)` rows, report a 95% interval and a one-sided p-value. Negative means the first model is better.
 
 ---
 
 ## 6. Threats to validity
 
-1. **Small sample.** 50 events, 25 in the held-out half. The confidence interval is wide.
+1. **Small samples.** 50 curated events and 58 FOMC events; 25–29 events in each held-out half. The confidence intervals are wide.
 2. **Curated labels.** Event type/direction labels are editorial. Extraction accuracy is in-sample vocabulary coverage, not an OOD benchmark.
 3. **Authored priors.** The mechanism library was written by the project with knowledge of the literature and history, though not fitted to the test outcomes. It is not preregistered.
 4. **Revised prices.** Adjusted closes are not point-in-time. A production backtest should use CRSP/Compustat or a vendor with vintages.
 5. **Overlapping windows.** Events can cluster (e.g. CPI and FOMC in the same month). The cluster bootstrap helps but does not eliminate cross-event dependence.
-6. **Surprise measurement.** CPI surprises are curated; FOMC surprises are qualitative in most events. A real desk would use high-frequency futures.
+6. **Surprise measurement.** CPI surprises are curated; FOMC surprises are qualitative in most events. A real desk would use high-frequency futures. The FOMC stress test exists to make this limitation measurable: the mechanism prior is significantly worse than a base rate when the action is all you know.
 7. **No execution model.** The event study is an evaluation harness, not a P&L.
 
-The correct claim is: **on this small, curated sample, the cited transmission engine produced better-than-base-rate directional views and better-calibrated probabilities than an overconfident mechanism-only model.** Not: “the model predicts markets.”
+The correct claim is: **on the 50-event curated sample, the calibrated stack produced 60.4% directional views and a Brier of 0.238, but the improvement over the base rate is not statistically significant; on the 58-event action-only FOMC stress test, the mechanism prior is significantly worse than the base rate.** Not: “the model predicts markets.” The FOMC failure is the main research result and the reason the next step is surprise data, not more prompt engineering.
 
 ---
 
@@ -303,3 +322,5 @@ The correct claim is: **on this small, curated sample, the cited transmission en
 - **Add an asset**: add loadings to every relevant channel, add it to `DEFAULT_ASSETS`, fetch its price history, and re-run the backtest.
 - **Replace the analog model**: keep the walk-forward interface (`fit(prior_events, outcomes)`, `predict(event)`) and the no-look-ahead maturation rule.
 - **Add a point-in-time macro source**: use FRED/ALFRED vintages and pass the analysis `as_of` through the pipeline; the audit will fail on look-ahead.
+- **Rebuild the FOMC benchmark**: replace `backend/data/fomc/statements_2000_2025.csv` and run `python scripts/build_fomc_events.py`; then re-run `--dataset fomc`.
+- **Add a surprise provider**: wire Fed-funds/SOFR futures or a consensus feed into `MacroEvent.surprise`; the FOMC benchmark is the acceptance test.
