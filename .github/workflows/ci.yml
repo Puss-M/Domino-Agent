@@ -20,7 +20,7 @@ jobs:
           cache-dependency-path: requirements.txt
       - name: Install
         run: pip install -r requirements.txt
-      - name: Lint (fatal issues: syntax and undefined names)
+      - name: Lint fatal issues (syntax and undefined names)
         run: ruff check . --select E9,F --extend-exclude frontend
       - name: Test
         run: pytest -q
