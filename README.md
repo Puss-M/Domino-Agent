@@ -8,7 +8,7 @@
 
 **An event-driven macro transmission engine with cited mechanisms, deterministic graph construction, and an event-study backtest.**
 
-Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.4 is a rebuild around three questions a macro desk actually asks:
+Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.5 is a rebuild around three questions a macro desk actually asks:
 
 1. **What happened, and how much of it was a surprise?**
    `50bp` is not the same as `50bp more than priced`. `8.6%` CPI is a level; `+0.3pp vs consensus` is the shock.
@@ -25,12 +25,12 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 
 ---
 
-## What v0.4 changes
+## What v0.5 changes
 
-| v0.1 prototype | v0.4 |
+| v0.1 prototype | v0.5 |
 |---|---|
 | 2 LLM personas (Detective / Reviewer), ~300 LOC | 5 typed stages: extract → retrieve → transmit → audit → report |
-| No data layer | 7 data sources (6 live connectors + FOMC snapshot) + provenance, caching, retries, point-in-time notes |
+| No data layer | 8 data sources (6 live connectors + FOMC + BRW snapshots) + provenance, caching, retries, point-in-time notes |
 | Free-form causal edges | 20 cited mechanisms → 14 channels → 12 assets; every edge has a mechanism ID and references |
 | No text normalization | bps/pp/%/$tn/mb/d/Chinese units, surprise vs level, entity linking, LM-style sentiment, near-duplicate clustering |
 | No evaluation | 50 curated + 58 FOMC + 92 extended events; 1-day market-model CAR; walk-forward analog/base rate; stacked ensemble; Platt; event-clustered bootstrap; paired Brier tests; documented FOMC negative skill |
@@ -232,10 +232,11 @@ Full design and citations: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md).
 | Dataset | Events | Period | Purpose |
 |---|---:|---|---|
 | **Curated** | 50 | 2018-03 – 2025-04 | Heterogeneous macro text + transmission |
-| **FOMC** | 58 | 2004-06 – 2025-12 | Systematic action-only policy stress test |
+| **FOMC action-only** | 58 | 2004-06 – 2025-12 | Systematic action-only policy stress test |
+| **FOMC surprise-aware** | 45 | 2004-06 – 2025-12 | Direction = Bu-Rogers-Wu (2021) daily surprise sign; \|surprise\| ≥ 2bp |
 | **Extended** | 92 | 2004-06 – 2025-12 | Curated + FOMC, deduplicated by type/date |
 
-The FOMC benchmark is generated from official statements by `scripts/build_fomc_events.py`; only non-zero target-range changes are included. It is deliberately a **stress test**: the event is the policy action, without a high-frequency surprise/positioning measure. The extended benchmark shows what happens when the two are mixed.
+The action-only FOMC benchmark is generated from official statements by `scripts/build_fomc_events.py`; only non-zero target-range changes are included. The surprise-aware variant joins it with the Bu-Rogers-Wu (2021) daily shock series via `scripts/build_fomc_surprise_events.py`; direction is the surprise sign. The extended benchmark shows what happens when the families are mixed.
 
 The benchmark card is in [`docs/benchmark.md`](docs/benchmark.md); the model card is in [`docs/model_card.md`](docs/model_card.md).
 
@@ -276,6 +277,22 @@ The homogeneous FOMC sample is where the current design fails, and that is the m
 - Why: a policy action is not a surprise. 2004–2006 hikes were telegraphed normalization; 2007–2008 cuts were a recession/funding shock; 2022 hikes were an inflation shock. The same “hike = risk-off” sign cannot be right in all three regimes.
 - Calibration helps the Brier score (0.384 → 0.250) but **cannot fix the sign**. The missing input is high-frequency Fed-funds/SOFR pricing and positioning, not another prompt.
 - This is a **documented failure boundary**, not a hidden backtest. A production version should abstain or use base rates on action-only FOMC until a surprise provider is wired in.
+
+## Surprise-aware FOMC: the information effect remains
+
+The action-only failure raises an obvious question: is the problem just that we ignored the surprise? We tested it with a **published daily shock series** (Bu, Rogers & Wu 2021, JME), which covers all 58 events. Direction is the sign of the surprise, magnitude is |surprise| in bp; events with |surprise| < 2bp are dropped (45 remain).
+
+| Model (held-out) | Coverage | Accuracy | Brier | AUC |
+|---|---:|---:|---:|---:|
+| Always-up base rate | 100% | **52.7%** | 0.255 | 0.509 |
+| Mechanism (surprise direction) | 99.2% | **45.3%** | 0.355 | 0.450 |
+| Stacked + Platt | 99.2% | 45.3% | 0.253 | 0.450 |
+
+Split by surprise sign: **tightening surprises 52.2%**, **easing surprises 43.3%**. A dovish surprise is not automatically risk-on: it can be an *information shock* — the Fed sees a weaker economy than the market does — and equities sell off. This is the **information effect** documented by Nakamura & Steinsson (2018) and separated from pure monetary shocks by Jarociński & Karadi (2020). Daily-frequency surprise signs cannot distinguish the two; that requires the intraday co-movement of rates and equities.
+
+So even a standard, free surprise series does not rescue the 1-day asset-direction task. The missing input is not just "a surprise number"; it is the **decomposition** of that surprise into monetary vs information components. This is a stronger and more useful negative result than the action-only one, and it defines the next experiment precisely.
+
+![Surprise-aware FOMC benchmark](docs/assets/backtest_surprise.png)
 
 ## Extended benchmark
 
@@ -331,7 +348,7 @@ backend/
     market/         # 13 ETFs, 2000–present + provenance
     macro/ sec/ news/  # small public-data snapshots
 frontend/           # zero-build dashboard (HTML/CSS/JS + SVG)
-tests/              # 101 unit/contract tests
+tests/              # 105 unit/contract tests
 docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, paper outline, resume bullets
 ```
 
@@ -339,7 +356,12 @@ docs/               # methodology, evaluation, benchmark/model cards, neuro-symb
 
 ## Related work and what was borrowed
 
+- **TraceMAS** (arXiv 2608.03339): traceable multi-agent forecasting with ideal and data-grounded causal loop diagrams. Closest system in spirit; it does not solver-verify the diagram. Domino adds sign algebra + Z3 proof cores.
+- **FinCARE** (arXiv 2510.20221): SEC 10-K knowledge-graph constraints for causal discovery. Micro/firm-level; Domino is macro transmission.
+- **MechReasoner** (arXiv 2609.34636): a confluence/sign-algebra qualitative simulator that shows LLM mechanistic reasoning collapses with complexity. This is why Domino moves the sign algebra into a solver.
+- **VeriFin** (arXiv 2608.10213): grounds LLM financial claims in XBRL facts and checks arithmetic with Z3. Domino applies the same SMT discipline to signed macro transmission, not statement arithmetic.
 - **FormaFin** (arXiv 2611.28881): trains small models to translate financial rules into SMT formulas and uses a solver for verification. Domino takes the same solver-guided stance but verifies **transmission signs** and returns minimal proof cores, rather than training a rule formalizer.
+- **Logic-LM** (EMNLP 2023) and **LLM-Modulo** (ICML 2024): the canonical "LLM proposes, external verifier disposes" pattern that Domino's perception/symbolic split follows.
 - **Beyond LLM Wrappers / Three-Engine Architecture** (arXiv 2610.39230): financial knowledge graph + deterministic compute engine + LLM layer. Domino's symbolic kernel and policy layer follow this separation.
 - **More Debate, Same Evidence** (arXiv 2608.00243), **The Hallucination Snowball** (arXiv 2608.14588), **The Cost of Consensus** (arXiv 2605.00914): the 2026 evidence that homogeneous multi-agent debate is not a reliable verifier. Domino replaces the "reviewer agent" with a deterministic audit + SMT + policy gates.
 - **FinRobot V2** (AI4Finance): deterministic compute + LLM narration + output-contract gate. Domino's numeric/symbolic path is LLM-free, with a narrator-only role for any future LLM.
@@ -348,7 +370,8 @@ docs/               # methodology, evaluation, benchmark/model cards, neuro-symb
 - **ai-hedge-fund** (virattt): hash-chained paper-trading ledger and approval gates. Domino uses a SHA-256 hash-chained audit ledger for every analysis.
 - **TradingAgents** (TauricResearch): role-separated analysts/researchers/risk team. Domino keeps the separation but makes each role a typed contract instead of a free-form persona.
 - **FinGPT** (AI4Finance): finance-specific sentiment and data pipelines. Domino's lexicon is a small seed plus an optional licensed LM dictionary, not a redistributed copy.
-- **Bauer & Swanson** (NBER Macroeconomics Annual 2023) and **Nakamura & Steinsson** (QJE 2013): high-frequency monetary surprises. Their absence in the free-data path is why Domino's FOMC stress test fails; the project reports it rather than hiding it.
+- **Bauer & Swanson** (NBER Macroeconomics Annual 2023), **Nakamura & Steinsson** (QJE 2013), and **Bu, Rogers & Wu** (JME 2021): high-frequency and daily monetary surprises. Domino's action-only FOMC test fails (41.1% vs 56.6%); joining the BRW (2021) daily surprise still fails (45.3% vs 52.7%), because a daily surprise cannot separate monetary from information shocks.
+- **Jarociński & Karadi** (AEJ:Macro 2020) and **Schmeling & Wagner** (JFQA 2024): monetary/information shock decomposition and tone-change asset effects. These define the next experiment after the surprise-aware negative result.
 - **Kolari & Pynnönen** (RFS 2010): cross-sectional correlation in event studies. Domino uses event-clustered bootstrap; the KP-adjusted BMP statistic is a planned robustness check.
 - **Changing the Narrative** (SSRN 6677954): Fed communication as a narrative-baseline shift with belief objects. This is the right way to replace Domino's failed lexicon tone-delta.
 - **BettaFish / 微舆**: multi-agent public-opinion analysis. Domino is the macro-transmission and evidence-audit counterpart, not another social-listening dashboard.
@@ -366,7 +389,7 @@ See [`docs/resume_bullets.md`](docs/resume_bullets.md) for Chinese and English v
 
 **English (condensed):**
 
-> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC events and 101 tests; runs fully offline with no API key.
+> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC events and 105 tests; runs fully offline with no API key.
 >
 > Implemented finance-aware text normalization (bps vs percentage points vs percent, `$tn`, `mb/d`, Chinese units, surprise vs level), entity linking, LM-style sentiment with negation, and near-duplicate news clustering; added provenance-aware connectors for SEC EDGAR/XBRL, GDELT, Treasury, FRED/ALFRED, World Bank and Yahoo.
 >

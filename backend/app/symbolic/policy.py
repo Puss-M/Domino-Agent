@@ -24,6 +24,10 @@ ADVICE_RE = re.compile(
     r"建议买入|建议卖出|应当买入|应当卖出|推荐买入|推荐卖出)\b",
     re.IGNORECASE,
 )
+MECHANISM_ID_RE = re.compile(
+    r"\b(?:MON|INFL|LABOR|TRADE|OIL|GEO|CHINA|FISCAL|BANK|BOJ|ECB)_[A-Z0-9_]{2,}\b"
+)
+ASSET_RE = re.compile(r"\b(?:SPY|QQQ|TLT|IEF|UUP|GLD|XLE|XLU|EEM|HYG|FXI|VIX)\b")
 NUMBER_RE = re.compile(r"-?\d+(?:\.\d+)?")
 YEAR_RE = re.compile(r"^(19|20)\d{2}$")
 
@@ -35,8 +39,16 @@ class Policy:
     severity: str
     checker: object
 
-    def evaluate(self, response: AnalysisResponse, symbolic: SymbolicReport | None) -> PolicyResult:
-        passed, detail = self.checker(response, symbolic)
+    def evaluate(
+        self,
+        response: AnalysisResponse,
+        symbolic: SymbolicReport | None,
+        knowledge=None,
+    ) -> PolicyResult:
+        if self.id == "P-011":
+            passed, detail = self.checker(response, symbolic, knowledge)
+        else:
+            passed, detail = self.checker(response, symbolic)
         return PolicyResult(
             id=self.id,
             title=self.title,
@@ -166,6 +178,50 @@ def _p009(response, symbolic):
     return True, "Every active asset has a definite symbolic direction."
 
 
+def _used_mechanism_ids(response: AnalysisResponse) -> set[str]:
+    used: set[str] = set()
+    for prediction in response.predictions:
+        used.update(prediction.mechanisms)
+    return used
+
+
+def _p010(response, _symbolic):
+    used = _used_mechanism_ids(response)
+    text = _visible_text(response)
+    mentioned = set(MECHANISM_ID_RE.findall(text))
+    fabricated = sorted(mentioned - used)
+    if fabricated:
+        return False, f"Narrative cites mechanisms that were not used: {fabricated}"
+    return True, "Every mechanism ID in the narrative was actually used."
+
+
+def _p011(response, _symbolic, knowledge=None):
+    if knowledge is None:
+        return True, "Knowledge base not attached to policy engine; citation check skipped."
+    used = _used_mechanism_ids(response)
+    allowed: set[str] = set()
+    for mechanism in knowledge.mechanisms:
+        if mechanism.id in used:
+            allowed.update(mechanism.citations)
+    fabricated = sorted(set(response.memo.citations) - allowed)
+    if fabricated:
+        return False, f"Memo cites sources not attached to a used mechanism: {fabricated}"
+    return True, "Every memo citation belongs to a used mechanism."
+
+
+def _p012(response, _symbolic):
+    allowed = {prediction.asset for prediction in response.predictions}
+    mentioned: set[str] = set()
+    for line in response.memo.asset_views:
+        token = line.strip().split(":", 1)[0].split()[0].strip("(),")
+        if re.fullmatch(r"[A-Z^][A-Z0-9^]{1,6}", token):
+            mentioned.add(token)
+    fabricated = sorted(mentioned - allowed)
+    if fabricated:
+        return False, f"Narrative mentions assets outside the prediction universe: {fabricated}"
+    return True, "Every asset mentioned in the memo is in the prediction universe."
+
+
 DEFAULT_POLICIES = [
     Policy("P-001", "Disclaimer present", "error", _p001),
     Policy("P-002", "No investment advice", "error", _p002),
@@ -176,17 +232,21 @@ DEFAULT_POLICIES = [
     Policy("P-007", "Action-only monetary events warn", "warning", _p007),
     Policy("P-008", "Numeric direction does not contradict a proof", "error", _p008),
     Policy("P-009", "Symbolic ambiguity is surfaced", "warning", _p009),
+    Policy("P-010", "Narrative mechanism IDs are grounded", "error", _p010),
+    Policy("P-011", "Narrative citations are grounded", "error", _p011),
+    Policy("P-012", "Narrative assets are grounded", "error", _p012),
 ]
 
 
 class PolicyEngine:
-    def __init__(self, policies: list[Policy] | None = None):
+    def __init__(self, policies: list[Policy] | None = None, knowledge=None):
         self.policies = policies or DEFAULT_POLICIES
+        self.knowledge = knowledge
 
     def evaluate(
         self, response: AnalysisResponse, symbolic: SymbolicReport | None
     ) -> list[PolicyResult]:
-        return [policy.evaluate(response, symbolic) for policy in self.policies]
+        return [policy.evaluate(response, symbolic, self.knowledge) for policy in self.policies]
 
     @staticmethod
     def failed(results: list[PolicyResult]) -> list[PolicyResult]:

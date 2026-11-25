@@ -4,7 +4,7 @@
 
 **Domino Agent — 事件驱动宏观传导与证据审计引擎**（个人项目，Python / FastAPI / 无前端构建）
 
-- 将“LLM 生成因果链”的原型重构为六阶段事件驱动宏观传导引擎（增加符号验证层）：金融文本抽取 → 带文献引用的机制检索 → 通道/资产传导图 → 证据审计 → 研究备忘录；沉淀 **20 条引用机制、14 个传导通道、50 个标注事件 + 58 个系统化 FOMC 事件、101 个测试**，无 API Key 可离线运行。
+- 将“LLM 生成因果链”的原型重构为六阶段事件驱动宏观传导引擎（增加符号验证层）：金融文本抽取 → 带文献引用的机制检索 → 通道/资产传导图 → 证据审计 → 研究备忘录；沉淀 **20 条引用机制、14 个传导通道、50 个标注事件 + 58 个系统化 FOMC 事件、105 个测试**，无 API Key 可离线运行。
 - 搭建数据与文本处理层：实现 SEC EDGAR/XBRL、GDELT、美国财政部、FRED/ALFRED、世界银行、Yahoo 六类连接器，统一缓存、重试、来源溯源与 point-in-time 说明；完成 **bps/pp/%/$tn/mb/d/中文单位归一、超预期与水平值区分、实体归一、LM 风格金融情感（否定/程度副词）与新闻近重复聚类**。
 - 构建 walk-forward 事件研究：12 只 ETF、市场模型 CAR、盘后/周末事件日对齐、按事件聚类 bootstrap、配对 Brier 检验；样本外 **方向准确率 60.4% vs 53.8% 基线，Brier 0.238 vs 0.244，AUC 0.634，覆盖率 96.4%**；同时用 58 个系统化 FOMC 事件做压力测试，发现机制先验在“只看动作、没有 surprise”时显著为负技能（41.1% vs 56.6% 基线，ΔBrier +0.134，95% CI 0.076–0.180）。
 - 设计证据约束与可审计性：每条图边绑定机制 ID 与文献引用，无匹配则弃权；审计检查引用完整性、证据等级、符号冲突与前视偏差；离线路径不调用 LLM，数字与图结构由确定性代码生成。
@@ -16,7 +16,7 @@
 
 **Domino Agent — Event-driven macro transmission with an evidence audit** (personal project; Python / FastAPI / zero-build frontend)
 
-- Rebuilt an LLM-only causal-chain prototype into a six-stage event-driven macro engine (with a symbolic verification layer): finance-aware extraction → cited mechanism retrieval → channel/asset transmission graph → evidence audit → research memo. **20 cited mechanisms, 14 channels, 50 curated + 58 systematic FOMC events, 101 tests**; fully offline with no API key.
+- Rebuilt an LLM-only causal-chain prototype into a six-stage event-driven macro engine (with a symbolic verification layer): finance-aware extraction → cited mechanism retrieval → channel/asset transmission graph → evidence audit → research memo. **20 cited mechanisms, 14 channels, 50 curated + 58 systematic FOMC events, 105 tests**; fully offline with no API key.
 - Built the data and text layer: six provenance-aware connectors (SEC EDGAR/XBRL, GDELT, US Treasury, FRED/ALFRED, World Bank, Yahoo) with caching, retries and point-in-time notes; implemented **bps/pp/%/$tn/mb/d and Chinese unit normalization, surprise-vs-level separation, entity linking, LM-style financial sentiment with negation/intensifiers, and near-duplicate news clustering**.
 - Built a walk-forward event study on 12 ETFs with market-model CARs, after-close/weekend alignment, event-clustered bootstrap and paired Brier tests: **60.4% accuracy vs 53.8% base rate, Brier 0.238 vs 0.244, AUC 0.634, 96.4% coverage** on the held-out curated half. Added a 58-event systematic FOMC stress test that exposes **negative skill without a surprise measure** (41.1% vs 56.6% base, ΔBrier +0.134, 95% CI 0.076–0.180).
 - Designed evidence gating and auditability: every graph edge carries a mechanism ID and references; the engine abstains when no cited mechanism matches; the audit checks citation completeness, evidence grade, sign conflicts and look-ahead. The offline path is LLM-free — numbers and graph structure are deterministic.
@@ -54,7 +54,8 @@ No. It is a cited transmission hypothesis plus an event-study test. It does not 
 
 ### 8. “What failed?”
 
-- FOMC action-only events: mechanism 41.1% vs base 56.6%; ΔBrier +0.134, significant negative skill. The missing input is surprise/positioning.
+- FOMC action-only events: mechanism 41.1% vs base 56.6%; ΔBrier +0.134, significant negative skill.
+- FOMC surprise-aware events: even with the BRW (2021) daily surprise, mechanism 45.3% vs base 52.7%; tightening 52.2%, easing 43.3%. The missing input is the monetary/information decomposition, not just a surprise number.
 - QQQ and XLU: the engine over-predicts duration-sensitive downside around hikes; growth rallied after several in-line hikes.
 - FXI: two China events; the stimulus transmission is regime-dependent.
 - Geopolitics: two events; the 1-day equity sign is noisy even when the safe-haven direction is right.
@@ -64,6 +65,7 @@ No. It is a cited transmission hypothesis plus an event-study test. It does not 
 ### 9. “What would you do with more time/data?”
 
 - Replace curated CPI/FOMC surprises with high-frequency Fed-funds/SOFR futures and a proper consensus feed.
+- Add the Jarociński–Karadi (2020) monetary/information decomposition or an intraday rate-equity co-movement proxy; the BRW surprise-aware test shows a surprise number alone is not enough.
 - Use CRSP/Compustat or a vendor with point-in-time prices instead of Yahoo adjusted closes.
 - Add high-yield OAS, breakevens, DXY, 2y/10y yields and Brent as conditioning variables, not just outcome assets.
 - Expand the event sample and preregister the mechanism library before the test window.

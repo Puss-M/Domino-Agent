@@ -326,7 +326,7 @@ class DataSourceInfo(BaseModel):
 
 class BacktestConfig(BaseModel):
     assets: list[str] | None = None
-    dataset: Literal["curated", "fomc", "extended"] = "curated"
+    dataset: Literal["curated", "fomc", "fomc_surprise", "extended"] = "curated"
     window_start: int = 0
     window_end: int = 1  # primary window: the first session that prices the news
     estimation_start: int = -120

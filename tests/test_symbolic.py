@@ -164,6 +164,30 @@ def test_policy_catches_injected_hallucination(engine):
 
 
 # -------------------------------------------------------------------- ledger
+def test_policy_catches_fake_mechanism_id(engine):
+    response = engine.analyze_headline("Fed raises rates by 50 basis points")
+    bad = response.model_copy(deep=True)
+    bad.memo.summary += " The effect is driven by MON_FAKE_001."
+    results = PolicyEngine(knowledge=engine.knowledge).evaluate(bad, bad.symbolic)
+    assert any(r.id == "P-010" and not r.passed for r in results)
+
+
+def test_policy_catches_fake_citation(engine):
+    response = engine.analyze_headline("Fed raises rates by 50 basis points")
+    bad = response.model_copy(deep=True)
+    bad.memo.citations.append("Smith (2030), Journal of Fabricated Results.")
+    results = PolicyEngine(knowledge=engine.knowledge).evaluate(bad, bad.symbolic)
+    assert any(r.id == "P-011" and not r.passed for r in results)
+
+
+def test_policy_catches_fake_asset(engine):
+    response = engine.analyze_headline("Fed raises rates by 50 basis points")
+    bad = response.model_copy(deep=True)
+    bad.memo.asset_views.append("AMZN: up, P(up)=0.9")
+    results = PolicyEngine(knowledge=engine.knowledge).evaluate(bad, bad.symbolic)
+    assert any(r.id == "P-012" and not r.passed for r in results)
+
+
 def test_audit_ledger_hash_chain():
     with tempfile.TemporaryDirectory() as tmp:
         ledger = AuditLedger(path=Path(tmp) / "ledger.jsonl")

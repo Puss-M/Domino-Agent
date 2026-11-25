@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-11-25T16:29:29+00:00",
+  "n_clean": 10,
+  "clean_false_positive_rate": 0.0,
+  "clean_failures": [],
+  "n_injected": 50,
+  "overall_detection_rate": 1.0,
+  "by_type": {
+    "fake_number": {
+      "expected_policy": "P-004",
+      "injected": 10,
+      "detected": 10,
+      "detection_rate": 1.0,
+      "misses": []
+    },
+    "advice": {
+      "expected_policy": "P-002",
+      "injected": 10,
+      "detected": 10,
+      "detection_rate": 1.0,
+      "misses": []
+    },
+    "fake_mechanism": {
+      "expected_policy": "P-010",
+      "injected": 10,
+      "detected": 10,
+      "detection_rate": 1.0,
+      "misses": []
+    },
+    "fake_citation": {
+      "expected_policy": "P-011",
+      "injected": 10,
+      "detected": 10,
+      "detection_rate": 1.0,
+      "misses": []
+    },
+    "fake_asset": {
+      "expected_policy": "P-012",
+      "injected": 10,
+      "detected": 10,
+      "detection_rate": 1.0,
+      "misses": []
+    }
+  }
+}

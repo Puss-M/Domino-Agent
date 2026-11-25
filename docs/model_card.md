@@ -1,4 +1,4 @@
-# Model card: Domino Agent v0.4
+# Model card: Domino Agent v0.5
 
 ## Model summary
 
@@ -57,7 +57,8 @@ Primary results (1-day window):
 | Benchmark | Headline model | Accuracy | Brier | AUC | Coverage |
 |---|---|---:|---:|---:|---:|
 | Curated 50 | Stacked + Platt | 0.604 | 0.238 | 0.634 | 96.4% |
-| FOMC 58 (stress) | Stacked + Platt | 0.412 | 0.255 | 0.404 | 93.1% |
+| FOMC 58 (action-only) | Stacked + Platt | 0.412 | 0.255 | 0.404 | 93.1% |
+| FOMC 45 (surprise-aware) | Stacked + Platt | 0.453 | 0.253 | 0.450 | 99.2% |
 | Extended 92 | Stacked + Platt | 0.508 | 0.248 | 0.578 | 96.3% |
 
 The FOMC mechanism-only model is **significantly worse** than the always-up base rate (ΔBrier +0.1338, 95% CI 0.076–0.180). This is the model's most important limitation.
@@ -65,13 +66,14 @@ The FOMC mechanism-only model is **significantly worse** than the always-up base
 ## Failure modes
 
 1. **Action-only policy events.** Without a surprise/positioning measure, the mechanism sign is wrong across regimes (normalization vs recession vs inflation shock).
-2. **Duration-sensitive equities.** QQQ and XLU are over-predicted down around hikes.
-3. **China policy.** Two events; stimulus transmission is regime-dependent.
-4. **Geopolitics.** The 1-day equity sign is noisy even when the safe-haven direction is right.
-5. **Five-day horizon.** The announcement-session edge decays; 5-day accuracy is 54.5%, AUC 0.528.
-6. **Middle-bin calibration.** Noisy with 33 predictions per bin and correlated assets within events.
-7. **Symbolic ambiguity.** TLT/IEF/GLD/XLU are genuinely ambiguous under a hawkish shock (yield vs safe-haven paths). The system reports `?`; it does not resolve it without a regime condition or data.
-8. **Proofs are relative.** A Z3 proof core means the cited mechanisms entail the direction; it does not mean the mechanisms are true or that the effect is causal.
+2. **Surprise-aware policy events.** Even the BRW (2021) daily surprise does not fix the sign (45.3% vs base 52.7%); easing surprises are 43.3%. The information effect requires a monetary/information decomposition, not just a surprise number.
+3. **Duration-sensitive equities.** QQQ and XLU are over-predicted down around hikes.
+4. **China policy.** Two events; stimulus transmission is regime-dependent.
+5. **Geopolitics.** The 1-day equity sign is noisy even when the safe-haven direction is right.
+6. **Five-day horizon.** The announcement-session edge decays; 5-day accuracy is 54.5%, AUC 0.528.
+7. **Middle-bin calibration.** Noisy with 33 predictions per bin and correlated assets within events.
+8. **Symbolic ambiguity.** TLT/IEF/GLD/XLU are genuinely ambiguous under a hawkish shock (yield vs safe-haven paths). The system reports `?`; it does not resolve it without a regime condition or data.
+9. **Proofs are relative.** A Z3 proof core means the cited mechanisms entail the direction; it does not mean the mechanisms are true or that the effect is causal.
 
 ## Symbolic verification and compliance
 

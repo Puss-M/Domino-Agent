@@ -22,6 +22,14 @@ def test_fomc_dataset_loads_and_is_generated():
     assert max(event.published_at.date().year for event in events) == 2025
 
 
+def test_fomc_surprise_dataset_loads():
+    events = load_events(dataset="fomc_surprise")
+    assert len(events) == 45
+    assert all("surprise_aware" in event.tags for event in events)
+    assert all(event.surprise and event.surprise.unit == "bps" for event in events)
+    assert all(event.magnitude and event.magnitude.unit == "bps" for event in events)
+
+
 def test_extended_dataset_deduplicates_by_type_and_date():
     events = load_events(dataset="extended")
     assert len(events) == 92

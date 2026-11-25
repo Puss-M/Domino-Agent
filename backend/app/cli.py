@@ -134,7 +134,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     backtest = sub.add_parser("backtest", help="run the walk-forward event study")
     backtest.add_argument("--window-end", type=int, default=1)
-    backtest.add_argument("--dataset", choices=["curated", "fomc", "extended"], default="curated")
+    backtest.add_argument("--dataset", choices=["curated", "fomc", "fomc_surprise", "extended"], default="curated")
     backtest.add_argument("--bootstrap", type=int, default=500)
     backtest.add_argument("--out", default="")
     backtest.add_argument("--json", action="store_true")
@@ -144,7 +144,7 @@ def build_parser() -> argparse.ArgumentParser:
     sources.set_defaults(func=cmd_sources)
 
     events = sub.add_parser("events", help="list an event dataset")
-    events.add_argument("--dataset", choices=["curated", "fomc", "extended"], default="curated")
+    events.add_argument("--dataset", choices=["curated", "fomc", "fomc_surprise", "extended"], default="curated")
     events.add_argument("--json", action="store_true")
     events.set_defaults(func=cmd_events)
     return parser

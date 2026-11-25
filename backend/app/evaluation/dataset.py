@@ -39,8 +39,8 @@ from ..schemas import (
 )
 
 ET = ZoneInfo("America/New_York")
-DatasetName = Literal["curated", "fomc", "extended"]
-DATASETS: tuple[str, ...] = ("curated", "fomc", "extended")
+DatasetName = Literal["curated", "fomc", "fomc_surprise", "extended"]
+DATASETS: tuple[str, ...] = ("curated", "fomc", "fomc_surprise", "extended")
 
 
 class DatasetError(RuntimeError):
@@ -114,6 +114,11 @@ def fomc_events_path(settings: Settings | None = None) -> Path:
     return settings.data_dir / "events" / "fomc_generated.yaml"
 
 
+def fomc_surprise_events_path(settings: Settings | None = None) -> Path:
+    settings = settings or get_settings()
+    return settings.data_dir / "events" / "fomc_surprise.yaml"
+
+
 def load_events(
     path: Path | None = None,
     settings: Settings | None = None,
@@ -129,6 +134,8 @@ def load_events(
         events = _load_file(settings.events_path)
     elif dataset == "fomc":
         events = _load_file(fomc_events_path(settings))
+    elif dataset == "fomc_surprise":
+        events = _load_file(fomc_surprise_events_path(settings))
     else:
         curated = _load_file(settings.events_path)
         generated = _load_file(fomc_events_path(settings))

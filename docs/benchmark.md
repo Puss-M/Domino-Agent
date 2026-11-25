@@ -10,6 +10,7 @@ DMB is a small, reproducible event-study benchmark for testing whether a signed 
 |---|---:|---|---|---|
 | `curated` | 50 | 2018-03 – 2025-04 | Hand-curated headlines and editorial type/direction labels | Primary text + transmission benchmark |
 | `fomc` | 58 | 2004-06 – 2025-12 | Generated from official FOMC statements; only non-zero target-range changes | Homogeneous action-only stress test |
+| `fomc_surprise` | 45 | 2004-06 – 2025-12 | Same events joined with Bu-Rogers-Wu (2021) daily surprises; direction = surprise sign; \|surprise\| ≥ 2bp | Surprise-aware information-effect test |
 | `extended` | 92 | 2004-06 – 2025-12 | Curated + FOMC, deduplicated by `(event_type, date)` | Mixed-family robustness check |
 
 ### Curated split
@@ -122,6 +123,7 @@ Compact summaries: `docs/results/backtest_*_summary.json`.
 - DMB v1: curated 50.
 - DMB v1.1: adds FOMC 58 and extended 92.
 - DMB v1.2: adds symbolic proof coverage and ambiguity reporting (v0.4).
+- DMB v1.3: adds the surprise-aware FOMC subset (BRW 2021) and the information-effect negative result.
 - Future: add CPI/payrolls surprise series, high-frequency Fed-funds/SOFR pricing, and a larger heterogeneous sample.
 
 ## License and provenance

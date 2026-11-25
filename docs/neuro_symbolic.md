@@ -1,6 +1,6 @@
 # Neuro-symbolic layer
 
-This document describes the v0.4 symbolic kernel: what it formalizes, what it proves, and what it explicitly cannot prove.
+This document describes the v0.4+ symbolic kernel: what it formalizes, what it proves, and what it explicitly cannot prove.
 
 ## Why a symbolic layer
 
@@ -135,7 +135,19 @@ The policies are not generic "AI safety" fluff; they map onto obligations a fina
 
 This is a design sketch, not legal advice. A production deployment needs counsel, a formal model inventory, and independent validation. But the architecture is pointed in the right direction: every output has a policy result, a proof status, and a ledger hash.
 
-## 10. References
+## 10. Novelty position
+
+A 2026 sweep across arXiv, PaperDaily and the finance venues found no paper that combines **LLM-perceived signed macro influence graphs**, **solver-verified sign consistency**, and **macro event-study evaluation**. The nearest components:
+
+- **TraceMAS** (arXiv 2608.03339) keeps ideal and data-grounded causal loop diagrams for traceable forecasting, but does not solver-verify them.
+- **MechReasoner** (arXiv 2609.34636) operationalizes confluence/sign algebra as a qualitative simulator and shows LLM mechanistic reasoning degrades with complexity; it does not use a solver to certify an LLM's claim.
+- **FinCARE** (arXiv 2510.20221) uses 10-K knowledge graphs to constrain causal discovery at the firm level.
+- **VeriFin** (arXiv 2608.10213) grounds financial claims in XBRL and checks arithmetic with Z3; **FormaFin** (arXiv 2611.28881) trains models to formalize rules for SMT; neither models macro transmission.
+- **VerifiQuant** (arXiv 2611.26649) and **Solver-Aided Policy Compliance** (arXiv 2603.20449) enforce executable contracts / SMT policies for financial workflows; Domino's P-001–P-012 are the same idea applied to macro analysis output.
+
+The intersection is the contribution: a signed macro transmission graph, structured event perception, Z3 proof cores, ambiguity as a first-class output, and policy-as-code compliance — with a public benchmark that reports where it fails.
+
+## 11. References
 
 - FormaFin, arXiv 2611.28881 (2026).
 - SOVER, arXiv 2609.00728 (2026).

@@ -112,7 +112,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         ]
 
     @app.get("/api/events")
-    def events(dataset: Literal["curated", "fomc", "extended"] = "curated") -> list[dict]:
+    def events(dataset: Literal["curated", "fomc", "fomc_surprise", "extended"] = "curated") -> list[dict]:
         return [
             _event_payload(event)
             for event in load_events(settings=settings, dataset=dataset)

@@ -12,16 +12,33 @@ Target venues, in order:
 
 ## Abstract (draft)
 
-> Macro event analysis with LLMs usually stops at prompt orchestration: an LLM proposes a causal chain and another LLM reviews it. We argue that this architecture has a structural verification problem, and build a neuro-symbolic alternative. A cited mechanism library is compiled into a signed influence graph; qualitative sign algebra and an SMT solver certify (or refute) each asset direction, returning a minimal proof core and treating ambiguity as a first-class output. A policy-as-code layer enforces numeric grounding, no-advice language, abstention, and a hash-chained audit trail. We release a 92-event benchmark (50 curated macro events + 58 systematic FOMC decisions, deduplicated to 92) with paired event-clustered Brier tests. On the curated benchmark the calibrated stack reaches 60.4% directional accuracy (Brier 0.238, AUC 0.634, 95% CI 0.537–0.668), but the improvement over a base rate is not statistically significant. On the systematic FOMC benchmark the mechanism prior is **significantly worse** than a base rate (41.1% vs 56.6%, ΔBrier +0.134, 95% CI 0.076–0.180). A lexicon tone-delta proxy does not rescue it. We conclude that action-only policy events require high-frequency surprise/positioning data, not better prompt engineering, and that symbolic verification is the right place to put the reliability budget.
+> Macro event analysis with LLMs usually stops at prompt orchestration: an LLM proposes a causal chain and another LLM reviews it. We argue that this architecture has a structural verification problem, and build a neuro-symbolic alternative. A cited mechanism library is compiled into a signed influence graph; qualitative sign algebra and an SMT solver certify (or refute) each asset direction, returning a minimal proof core and treating ambiguity as a first-class output. A policy-as-code layer enforces numeric grounding, no-advice language, abstention, and a hash-chained audit trail. We release a 92-event benchmark (50 curated macro events + 58 systematic FOMC decisions, deduplicated to 92) with paired event-clustered Brier tests. On the curated benchmark the calibrated stack reaches 60.4% directional accuracy (Brier 0.238, AUC 0.634, 95% CI 0.537–0.668), but the improvement over a base rate is not statistically significant. On the systematic FOMC benchmark the mechanism prior is **significantly worse** than a base rate (41.1% vs 56.6%, ΔBrier +0.134, 95% CI 0.076–0.180). A lexicon tone-delta proxy does not rescue it. Even joining the events with the Bu-Rogers-Wu (2021) daily surprise series leaves the mechanism below the base rate (45.3% vs 52.7%; tightening surprises 52.2%, easing surprises 43.3%), consistent with the information effect: a dovish surprise can be bad news. The missing input is not a surprise number but a monetary/information decomposition. We conclude that action-only policy events require high-frequency surprise/positioning data, not better prompt engineering, and that symbolic verification is the right place to put the reliability budget.
 
 ## Contributions
 
 1. **Formalization.** Macro transmission as a signed influence digraph with qualitative algebra; an SMT encoding that returns minimal proof cores; ambiguity as a first-class output rather than a confidence score. (Novel combination; closest work is FormaFin/SOVER for SMT verification of financial rules, and Three-Engine for the architecture.)
 2. **Benchmark.** DMB: 50 curated macro events, 58 systematic FOMC target-range changes generated from official statements (2004–2025), and a 92-event deduplicated mixed set; paired event-clustered Brier tests, calibration, coverage, and a documented negative result.
 3. **Architecture.** A three-engine neuro-symbolic pipeline: LLM perception (optional) → deterministic sign/transmission engine → policy-gated output with a hash-chained audit ledger.
-4. **Negative result.** Action-only FOMC asset direction is not predictable from free daily data; a lexicon tone-delta proxy fails; the missing input is high-frequency surprise. This is a benchmark finding, not a footnote.
+4. **Negative results.** Action-only FOMC asset direction is not predictable from free daily data; a lexicon tone-delta proxy fails; a published daily surprise series (BRW 2021) still fails (45.3% vs 52.7%, with easing surprises at 43.3%). The missing input is the monetary/information decomposition, not just a surprise number. This is a benchmark finding, not a footnote.
 
 ## Related work (with the citations we actually verified)
+
+**The gap (our positioning)**
+
+A 2026 literature sweep across arXiv, PaperDaily, and the major finance venues found **no paper that combines** (a) LLM-extracted signed influence structures over macro variables, (b) a solver-verified sign-consistency layer, and (c) macro transmission evaluation. The components exist separately:
+
+- **TraceMAS** (arXiv 2608.03339): traceable multi-agent forecasting with an "Ideal CLD" and a "Data-Grounded CLD"; signed causal-loop diagrams as an inspectable intermediate representation, but no solver verification.
+- **AI Economist Agent** (arXiv 2606.20041): LLM agents constrained to registered quantitative models and statistical tests.
+- **FinCARE** (arXiv 2510.20221): SEC 10-K knowledge-graph constraints guiding causal discovery; micro, not macro transmission.
+- **MechReasoner** (arXiv 2609.34636): a confluence/sign-algebra qualitative simulator and benchmark; shows frontier LLMs collapse as mechanistic complexity rises — motivation for moving the sign algebra into a solver.
+- **D2D** (arXiv 2508.05659): compiles causal loop diagrams into executable system-dynamics models; no LLM or verification.
+- **VeriFin** (arXiv 2608.10213): grounds LLM financial claims in XBRL facts and checks arithmetic with Z3; 100% observed precision among accepted answers.
+- **VeNRA** (arXiv 2603.04663): typed fact ledger + deterministic executor for financial reasoning.
+- **VerifiQuant** (arXiv 2611.26649): executable diagnostic contracts so a financial workflow must ground a number, clarify, or refuse.
+- **Solver-Aided Policy Compliance** (arXiv 2603.20449): compiles tool-use policies to SMT and intercepts planned calls with runtime Z3 checks.
+- **Logic-LM** (EMNLP 2023 Findings) and **LLM-Modulo** (ICML 2024): the canonical "LLM proposes, external verifier disposes" design pattern.
+
+Our contribution is the intersection: a signed macro transmission graph, LLM-perceived events, Z3 proof cores, ambiguity as a first-class output, and a policy-as-code compliance layer — evaluated on a public macro benchmark.
 
 **Neuro-symbolic verification**
 - FormaFin, *Verifiable Financial Analysis with Solver-Guided Reinforcement Learning*, arXiv 2611.28881 (2026-11-24). Trains small models to translate financial rules into SMT formulas; solver computes rewards.
@@ -41,6 +58,12 @@ Target venues, in order:
 - TradingAgents (TauricResearch) — role-separated agents; used as the baseline "multi-agent debate" architecture.
 
 **FOMC text and surprises**
+- Bu, Rogers & Wu, *A unified measure of Fed monetary policy shocks*, JME 118:331–349 (2021). The daily shock series used in the surprise-aware benchmark.
+- Jarociński & Karadi, *Deconstructing Monetary Policy Surprises: The Role of Information Shocks*, AEJ:Macro 12(1) (2020). Monetary vs information shock decomposition.
+- Schmeling & Wagner, *Does Central Bank Tone Move Asset Prices?*, JFQA 60:36–67 (2024). Tone changes move asset prices beyond policy actions.
+- Doh, Song & Yang, *Deciphering Federal Reserve Communication via Text Analysis of Alternative FOMC Statements*, AEJ:Macro 18(3) (2026). Text stance decomposed into expected/surprise.
+- Tang & Yang, *Mind the Shift: Decoding Monetary Policy Stance from FOMC Statements with LLMs*, arXiv 2603.14313 (2026). Delta-consistent tone scoring.
+- Acosta, Ajello, Bauer, Loria & Miranda-Agrippino, *Financial Market Effects of FOMC Communication*, FRBSF WP 2025-30 / SSRN 5944756. USMPD public event-study database.
 - Bauer & Swanson, *A Reassessment of Monetary Policy Surprises and High-Frequency Identification*, NBER Macroeconomics Annual 2023 (364 citations).
 - Nakamura & Steinsson, *High Frequency Identification of Monetary Non-Neutrality: The Information Effect*, QJE 2013 (691 citations).
 - *Changing the Narrative: Macro-Financial Federal Reserve Communication Shocks*, SSRN 6677954 (2026-04-29). Belief objects and narrative-baseline departure.
@@ -55,6 +78,9 @@ Target venues, in order:
 - *Efficient Causal Graph Discovery Using Large Language Models*, arXiv 2402.01207 (BFS, linear queries, SOTA on real graphs).
 - *Large Language Models for Constrained-Based Causal Discovery*, 2024 (LLM answers conditional-independence queries for PC).
 - *CauTion: Knowing When to Trust LLMs for Ensemble Causal Discovery*, arXiv 2606.03602.
+- Kıcıman, Ness, Sharma & Tan, *Causal Reasoning and Large Language Models: Opening a New Frontier for Causality*, TMLR 2024 (arXiv 2305.00050).
+- *Scaling Point-in-Time Language Models*, arXiv 2607.11889 — temporal filtering to eliminate lookahead bias.
+- *Ideological Bias in LLMs' Economic Causal Reasoning*, arXiv 2604.21334 — a warning for LLM-perceived macro causal structure.
 
 ## Method
 
@@ -77,13 +103,15 @@ Target venues, in order:
 | E6 | Ablation: numeric-only vs symbolic-only vs both | todo | Ambiguity catch rate; proof coverage |
 | E7 | Kolari–Pynnönen cross-correlation-adjusted CAR test | todo | Robustness table |
 | E8 | LLM perception vs rule extraction (optional) | todo, needs API key | Extraction accuracy / cost |
-| E9 | High-frequency surprise adapter (if data available) | todo | FOMC accuracy/Brier after surprise conditioning |
+| E9 | Surprise-aware FOMC with BRW (2021) daily shocks | done (negative) | Table 3b (45.3% vs 52.7%; easing 43.3%) |
+| E10 | Monetary vs information shock decomposition (Jarociński–Karadi 2020) | todo | FOMC accuracy/Brier after decomposition; needs intraday rate-equity co-movement |
 
 ## Results to report now
 
 - Curated: 60.4% accuracy, Brier 0.238, AUC 0.634, coverage 96.4%, 95% CI 0.537–0.668; vs base ΔBrier −0.0082 (CI −0.0235–0.0055, p=0.128, not significant); vs mechanism ΔBrier −0.0212 (p=0.048).
 - FOMC: mechanism 41.1%, Brier 0.384; base 56.6%, Brier 0.250; ΔBrier +0.134 (CI 0.076–0.180).
 - 5-day curated: 54.5%, Brier 0.252, AUC 0.528.
+- Surprise-aware FOMC (BRW 2021, 45 events): 45.3% vs base 52.7%; tightening 52.2%, easing 43.3%.
 - Symbolic: 19 nodes/78 edges/acyclic for a hawkish shock; 8 proved, 4 ambiguous; proof core for QQQ = {MON_TIGHTEN}.
 - Policy injection: advice language and three fake numbers detected.
 
@@ -103,7 +131,7 @@ Target venues, in order:
 2. **Hallucination injection at scale** (E5) — 50–100 injected memos, report detection by policy and false-positive rate on clean memos. This directly supports the "reduce hallucination" claim.
 3. **Ablation** (E6) — show that symbolic verification catches ambiguity that the numeric model hides; quantify how often.
 4. **Optional LLM perception** (E8) — one open model or API, schema-constrained, with the rule extractor as fallback. Report extraction accuracy and cost. This makes the "neuro-symbolic" claim concrete rather than architectural.
-5. **High-frequency surprise** (E9) — even a small vendor sample or a public intraday proxy would turn the FOMC negative result into a positive one. If unavailable, the negative result stands as a benchmark contribution.
+5. **Monetary/information decomposition** (E10) — the BRW surprise test shows a surprise number is not enough; use Jarociński–Karadi (2020) or a high-frequency rate-equity co-movement proxy. If unavailable, the negative result stands as a benchmark contribution.
 6. **A cleaner related-work positioning** — FormaFin verifies rules; we verify transmission signs and expose ambiguity. Three-Engine is an architecture paper; we add a benchmark and a negative result. Neither does both.
 
 ## Suggested timeline

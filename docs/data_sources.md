@@ -13,6 +13,7 @@ The repository is designed to run offline from small, redistributable snapshots.
 | `worldbank` | World Bank Indicators API | Annual regime context | No key | Annual/quarterly | Yes | No |
 | `yahoo` | Yahoo Finance chart API | Event-window ETF outcomes | No key; convenience endpoint | Daily | Adjusted prices revised after splits/dividends | No |
 | `fomc` | FOMC Dataset (HusseinKh90) + Federal Reserve statements | Systematic FOMC rate-change benchmark | No key; static snapshot | Event-driven | Statements are immutable | Archive the snapshot; no live vintage feed |
+| `brw` | Bu, Rogers & Wu (2021) monetary policy shocks | Daily policy surprise for the surprise-aware FOMC benchmark | No key; static snapshot | Event-driven | Series can be revised/updated | Snapshot; archive the CSV |
 
 The machine-readable version is served at `GET /api/data-sources`.
 
@@ -45,6 +46,13 @@ The event labels and the mechanism library are curated, not downloaded:
 - 2000–2003 statements are excluded because their single-value phrasing produced parsing artefacts; the systematic benchmark starts with the 2004–2006 hiking cycle.
 - Headlines are templated from the parsed range; summaries are statement excerpts. Surprise is `neutral` because no Fed-funds/SOFR futures series is bundled.
 - This is the source of the negative result in `docs/evaluation.md`: action-only policy events need a surprise/positioning measure.
+
+### BRW monetary policy shocks
+
+- Source: Bu, Rogers & Wu (2021), *A unified measure of Fed monetary policy shocks*, JME 118:331–349; snapshot via `https://github.com/paulbousquet/MPsurprise` (`BRW/BRW_update.csv`).
+- Units: percentage points; multiply by 100 for basis points. Positive = rates higher than expected (hawkish).
+- Used by `scripts/build_fomc_surprise_events.py` to turn the FOMC benchmark into a surprise-aware test (direction = surprise sign, |surprise| ≥ 2bp).
+- This is a daily series; it cannot separate monetary from information shocks. That is why the surprise-aware result is still negative (see `docs/evaluation.md`).
 
 ### GDELT
 

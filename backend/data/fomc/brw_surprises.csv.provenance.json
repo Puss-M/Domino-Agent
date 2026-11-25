@@ -1,0 +1,13 @@
+{
+  "source": "Bu, Rogers & Wu (2021), A unified measure of Fed monetary policy shocks, JME 118:331-349",
+  "repository": "https://github.com/paulbousquet/MPsurprise",
+  "file": "BRW/BRW_update.csv",
+  "columns": {"date": "FOMC announcement date", "brw_rep": "replication series", "brw_ext": "extended series"},
+  "units": "percentage points; multiply by 100 for basis points",
+  "retrieved_at": "2026-11-26",
+  "notes": [
+    "Daily-frequency shock series, designed for users without intraday futures feeds.",
+    "Positive = rates higher than expected (hawkish surprise); negative = dovish surprise.",
+    "The file is a snapshot; refresh from the upstream repository."
+  ]
+}

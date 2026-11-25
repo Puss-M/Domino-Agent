@@ -49,7 +49,7 @@ class AnalysisEngine:
         self.transmission = TransmissionModel(self.knowledge, assets=assets)
         self.memo_builder = MemoBuilder(self.knowledge)
         self.symbolic = SymbolicVerifier(self.knowledge, self.settings)
-        self.policy_engine = PolicyEngine()
+        self.policy_engine = PolicyEngine(knowledge=self.knowledge)
         self.ledger = AuditLedger(self.settings)
 
     def analyze_news(
