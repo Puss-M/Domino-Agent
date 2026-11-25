@@ -2,6 +2,18 @@
 
 This document explains what the engine computes, why each choice was made, and where the result should not be trusted. The short version: **the language model is not the model**. The model is a cited transmission library plus a small, evaluated statistical layer.
 
+### Why not LLM agents?
+
+The original prototype used two LLM personas, a creative “Detective” and a conservative “Reviewer.” That is a useful demo and a weak control system: the reviewer has no external evidence, no deterministic checks, and no way to fail a build. v0.2 keeps the role separation but turns each role into a typed contract:
+
+- **Extractor**: deterministic parsing of numbers, units, entities and surprise.
+- **Retriever**: cited mechanism matching with explicit inclusion/exclusion conditions.
+- **Auditor**: citation, grade, sign-conflict and look-ahead checks that can fail a run.
+- **Quantifier**: channel/loading aggregation and probability construction.
+- **Reporter**: memo assembled from the structured result.
+
+An LLM is optional and, if added, is confined to narration. It cannot change a number, a sign, an edge or a citation. This is a deliberate trade: less “agent theater,” more auditable financial logic.
+
 ---
 
 ## 1. Event extraction

@@ -37,6 +37,10 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 | "Reviewer agent" prompt | Deterministic audit: citations, evidence grades, sign conflicts, abstention, look-ahead check |
 | Empty frontend | Zero-build dashboard served by FastAPI; run it with one command |
 
+### Why the agents are not LLM personas
+
+The v0.1 Detective/Reviewer debate is easy to demo and hard to audit. v0.2 keeps the role separation as typed contracts: extractor, retriever, auditor, quantifier, reporter. A language model can be added as a narrator, but it cannot write a number, choose a sign, or invent a mechanism. The moat is the data, text, evidence and evaluation layer — not the prompt.
+
 ---
 
 ## Quick start
