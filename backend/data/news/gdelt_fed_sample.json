@@ -1,0 +1,409 @@
+{
+  "retrieved_at": "2026-11-25T12:45:28+00:00",
+  "source": "GDELT 2.0 DOC API",
+  "query": "federal reserve",
+  "n_items": 20,
+  "n_clusters": 10,
+  "clusters": [
+    {
+      "representative": {
+        "id": "https://wflanews.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+        "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points",
+        "summary": "",
+        "url": "https://wflanews.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+        "source_name": "wflanews.iheart.com",
+        "source_tier": "media",
+        "published_at": "2026-11-19T23:30:00Z",
+        "language": "english",
+        "entities": []
+      },
+      "duplicate_count": 9,
+      "source_diversity": 10,
+      "novelty": 0.1,
+      "members": [
+        {
+          "id": "https://wflanews.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points",
+          "summary": "",
+          "url": "https://wflanews.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "wflanews.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-19T23:30:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://knrs.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points | Talk Radio 105 . 9",
+          "summary": "",
+          "url": "https://knrs.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "knrs.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-19T23:30:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://wbex.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points",
+          "summary": "",
+          "url": "https://wbex.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "wbex.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-19T23:30:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://1019bigwaax.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points | News Radio 101 . 9 Big WAAX",
+          "summary": "",
+          "url": "https://1019bigwaax.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "1019bigwaax.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-19T23:45:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://wjdx.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points",
+          "summary": "",
+          "url": "https://wjdx.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "wjdx.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T00:15:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://jetradio1400.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points",
+          "summary": "",
+          "url": "https://jetradio1400.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "jetradio1400.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T00:15:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://960weli.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points",
+          "summary": "",
+          "url": "https://960weli.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "960weli.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T00:15:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://wspd.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points | NewsRadio 1370 AM & 92 . 9 FM WSPD",
+          "summary": "",
+          "url": "https://wspd.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "wspd.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T00:15:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://talk1200boston.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points",
+          "summary": "",
+          "url": "https://talk1200boston.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "talk1200boston.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T00:15:00Z",
+          "language": "english",
+          "entities": []
+        },
+        {
+          "id": "https://newsradio1170.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "title": "Wall Street Slump Continues as Dow Falls Over 1 , 100 Points",
+          "summary": "",
+          "url": "https://newsradio1170.iheart.com/content/2026-11-19-wall-street-slump-continues-as-dow-falls-over-1100-points/",
+          "source_name": "newsradio1170.iheart.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T00:15:00Z",
+          "language": "english",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://economictimes.indiatimes.com/markets/bonds/rbi-probes-suspicious-off-market-trades-in-illiquid-state-bonds/articleshow/136008880.cms",
+        "title": "RBI flags suspicious off - market deals in state bonds",
+        "summary": "",
+        "url": "https://economictimes.indiatimes.com/markets/bonds/rbi-probes-suspicious-off-market-trades-in-illiquid-state-bonds/articleshow/136008880.cms",
+        "source_name": "economictimes.indiatimes.com",
+        "source_tier": "media",
+        "published_at": "2026-11-20T01:15:00Z",
+        "language": "english",
+        "entities": []
+      },
+      "duplicate_count": 0,
+      "source_diversity": 1,
+      "novelty": 0.6667,
+      "members": [
+        {
+          "id": "https://economictimes.indiatimes.com/markets/bonds/rbi-probes-suspicious-off-market-trades-in-illiquid-state-bonds/articleshow/136008880.cms",
+          "title": "RBI flags suspicious off - market deals in state bonds",
+          "summary": "",
+          "url": "https://economictimes.indiatimes.com/markets/bonds/rbi-probes-suspicious-off-market-trades-in-illiquid-state-bonds/articleshow/136008880.cms",
+          "source_name": "economictimes.indiatimes.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T01:15:00Z",
+          "language": "english",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://econotimes.com/Gold-Slips-Below-3-700-as-Fed-Signals-More-Rate-Hikes-1779983",
+        "title": "Gold Slips Below $3 , 700 as Fed Signals More Rate Hikes",
+        "summary": "",
+        "url": "https://econotimes.com/Gold-Slips-Below-3-700-as-Fed-Signals-More-Rate-Hikes-1779983",
+        "source_name": "econotimes.com",
+        "source_tier": "media",
+        "published_at": "2026-11-20T02:30:00Z",
+        "language": "english",
+        "entities": []
+      },
+      "duplicate_count": 0,
+      "source_diversity": 1,
+      "novelty": 0.6667,
+      "members": [
+        {
+          "id": "https://econotimes.com/Gold-Slips-Below-3-700-as-Fed-Signals-More-Rate-Hikes-1779983",
+          "title": "Gold Slips Below $3 , 700 as Fed Signals More Rate Hikes",
+          "summary": "",
+          "url": "https://econotimes.com/Gold-Slips-Below-3-700-as-Fed-Signals-More-Rate-Hikes-1779983",
+          "source_name": "econotimes.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T02:30:00Z",
+          "language": "english",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://econotimes.com/Indian-Jewellery-Stocks-Extend-Slide-as-Gold-Silver-Prices-Fall-1780044",
+        "title": "Indian Jewellery Stocks Extend Slide as Gold , Silver Prices Fall",
+        "summary": "",
+        "url": "https://econotimes.com/Indian-Jewellery-Stocks-Extend-Slide-as-Gold-Silver-Prices-Fall-1780044",
+        "source_name": "econotimes.com",
+        "source_tier": "media",
+        "published_at": "2026-11-20T06:30:00Z",
+        "language": "english",
+        "entities": []
+      },
+      "duplicate_count": 0,
+      "source_diversity": 1,
+      "novelty": 0.6667,
+      "members": [
+        {
+          "id": "https://econotimes.com/Indian-Jewellery-Stocks-Extend-Slide-as-Gold-Silver-Prices-Fall-1780044",
+          "title": "Indian Jewellery Stocks Extend Slide as Gold , Silver Prices Fall",
+          "summary": "",
+          "url": "https://econotimes.com/Indian-Jewellery-Stocks-Extend-Slide-as-Gold-Silver-Prices-Fall-1780044",
+          "source_name": "econotimes.com",
+          "source_tier": "media",
+          "published_at": "2026-11-20T06:30:00Z",
+          "language": "english",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://www.oneindia.com/international/look-at-india-trump-says-us-economy-can-grow-15-20-percent-if-fed-cuts-interest-rates-8265783.html",
+        "title": "Look At India : Trump Says US Economy Can Grow 15 - 20 % If Fed Cuts Interest Rates",
+        "summary": "",
+        "url": "https://www.oneindia.com/international/look-at-india-trump-says-us-economy-can-grow-15-20-percent-if-fed-cuts-interest-rates-8265783.html",
+        "source_name": "oneindia.com",
+        "source_tier": "media",
+        "published_at": "2026-11-21T06:45:00Z",
+        "language": "english",
+        "entities": []
+      },
+      "duplicate_count": 0,
+      "source_diversity": 1,
+      "novelty": 0.6667,
+      "members": [
+        {
+          "id": "https://www.oneindia.com/international/look-at-india-trump-says-us-economy-can-grow-15-20-percent-if-fed-cuts-interest-rates-8265783.html",
+          "title": "Look At India : Trump Says US Economy Can Grow 15 - 20 % If Fed Cuts Interest Rates",
+          "summary": "",
+          "url": "https://www.oneindia.com/international/look-at-india-trump-says-us-economy-can-grow-15-20-percent-if-fed-cuts-interest-rates-8265783.html",
+          "source_name": "oneindia.com",
+          "source_tier": "media",
+          "published_at": "2026-11-21T06:45:00Z",
+          "language": "english",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://www.ibtimes.co.in/look-india-trump-cites-indias-7-gdp-growth-slam-us-fed-over-high-interest-rates-908551",
+        "title": "Look at India : Trump cites India 7 % GDP growth to slam US Fed over high interest rates",
+        "summary": "",
+        "url": "https://www.ibtimes.co.in/look-india-trump-cites-indias-7-gdp-growth-slam-us-fed-over-high-interest-rates-908551",
+        "source_name": "ibtimes.co.in",
+        "source_tier": "media",
+        "published_at": "2026-11-21T12:30:00Z",
+        "language": "english",
+        "entities": []
+      },
+      "duplicate_count": 0,
+      "source_diversity": 1,
+      "novelty": 0.6667,
+      "members": [
+        {
+          "id": "https://www.ibtimes.co.in/look-india-trump-cites-indias-7-gdp-growth-slam-us-fed-over-high-interest-rates-908551",
+          "title": "Look at India : Trump cites India 7 % GDP growth to slam US Fed over high interest rates",
+          "summary": "",
+          "url": "https://www.ibtimes.co.in/look-india-trump-cites-indias-7-gdp-growth-slam-us-fed-over-high-interest-rates-908551",
+          "source_name": "ibtimes.co.in",
+          "source_tier": "media",
+          "published_at": "2026-11-21T12:30:00Z",
+          "language": "english",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://www.tribuneindia.com/news/india/president-donald-trump-cites-indias-growth-slams-us-high-interest-rates/",
+        "title": "President Donald Trump cites India growth , slams US high interest rates",
+        "summary": "",
+        "url": "https://www.tribuneindia.com/news/india/president-donald-trump-cites-indias-growth-slams-us-high-interest-rates/",
+        "source_name": "tribuneindia.com",
+        "source_tier": "media",
+        "published_at": "2026-11-21T20:30:00Z",
+        "language": "english",
+        "entities": []
+      },
+      "duplicate_count": 0,
+      "source_diversity": 1,
+      "novelty": 0.6667,
+      "members": [
+        {
+          "id": "https://www.tribuneindia.com/news/india/president-donald-trump-cites-indias-growth-slams-us-high-interest-rates/",
+          "title": "President Donald Trump cites India growth , slams US high interest rates",
+          "summary": "",
+          "url": "https://www.tribuneindia.com/news/india/president-donald-trump-cites-indias-growth-slams-us-high-interest-rates/",
+          "source_name": "tribuneindia.com",
+          "source_tier": "media",
+          "published_at": "2026-11-21T20:30:00Z",
+          "language": "english",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://www.koreatimes.com/article/11632751",
+        "title": "미국 연은 3분의 2가 10월 회의 때 금리인상 지지",
+        "summary": "",
+        "url": "https://www.koreatimes.com/article/11632751",
+        "source_name": "koreatimes.com",
+        "source_tier": "media",
+        "published_at": "2026-11-25T00:30:00Z",
+        "language": "korean",
+        "entities": []
+      },
+      "duplicate_count": 1,
+      "source_diversity": 2,
+      "novelty": 0.4167,
+      "members": [
+        {
+          "id": "https://www.koreatimes.com/article/11632751",
+          "title": "미국 연은 3분의 2가 10월 회의 때 금리인상 지지",
+          "summary": "",
+          "url": "https://www.koreatimes.com/article/11632751",
+          "source_name": "koreatimes.com",
+          "source_tier": "media",
+          "published_at": "2026-11-25T00:30:00Z",
+          "language": "korean",
+          "entities": []
+        },
+        {
+          "id": "https://www.fnnews.com/news/202611250809522393",
+          "title": "미국 연은 3분의 2가 10월 회의 때 금리인상 지지",
+          "summary": "",
+          "url": "https://www.fnnews.com/news/202611250809522393",
+          "source_name": "fnnews.com",
+          "source_tier": "media",
+          "published_at": "2026-11-25T03:15:00Z",
+          "language": "korean",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://www.divyabhaskar.co.in/bhaskar-khaas/bhaskar-explainer/news/gold-price-forecast-2026-market-trend-analysis-india-139788078.html",
+        "title": "Gold Price Forecast 2026 ; Market Trends | India Gold Outlook & Analysis",
+        "summary": "",
+        "url": "https://www.divyabhaskar.co.in/bhaskar-khaas/bhaskar-explainer/news/gold-price-forecast-2026-market-trend-analysis-india-139788078.html",
+        "source_name": "divyabhaskar.co.in",
+        "source_tier": "media",
+        "published_at": "2026-11-25T01:45:00Z",
+        "language": "gujarati",
+        "entities": []
+      },
+      "duplicate_count": 0,
+      "source_diversity": 1,
+      "novelty": 0.6667,
+      "members": [
+        {
+          "id": "https://www.divyabhaskar.co.in/bhaskar-khaas/bhaskar-explainer/news/gold-price-forecast-2026-market-trend-analysis-india-139788078.html",
+          "title": "Gold Price Forecast 2026 ; Market Trends | India Gold Outlook & Analysis",
+          "summary": "",
+          "url": "https://www.divyabhaskar.co.in/bhaskar-khaas/bhaskar-explainer/news/gold-price-forecast-2026-market-trend-analysis-india-139788078.html",
+          "source_name": "divyabhaskar.co.in",
+          "source_tier": "media",
+          "published_at": "2026-11-25T01:45:00Z",
+          "language": "gujarati",
+          "entities": []
+        }
+      ]
+    },
+    {
+      "representative": {
+        "id": "https://www.marketplace.org/story/2026/11/24/data-center-construction-keeps-driving-us-manufacturing",
+        "title": "Data center construction keeps driving U . S . manufacturing",
+        "summary": "",
+        "url": "https://www.marketplace.org/story/2026/11/24/data-center-construction-keeps-driving-us-manufacturing",
+        "source_name": "marketplace.org",
+        "source_tier": "media",
+        "published_at": "2026-11-25T03:15:00Z",
+        "language": "english",
+        "entities": []
+      },
+      "duplicate_count": 0,
+      "source_diversity": 1,
+      "novelty": 0.6667,
+      "members": [
+        {
+          "id": "https://www.marketplace.org/story/2026/11/24/data-center-construction-keeps-driving-us-manufacturing",
+          "title": "Data center construction keeps driving U . S . manufacturing",
+          "summary": "",
+          "url": "https://www.marketplace.org/story/2026/11/24/data-center-construction-keeps-driving-us-manufacturing",
+          "source_name": "marketplace.org",
+          "source_tier": "media",
+          "published_at": "2026-11-25T03:15:00Z",
+          "language": "english",
+          "entities": []
+        }
+      ]
+    }
+  ]
+}

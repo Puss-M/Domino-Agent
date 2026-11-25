@@ -1,0 +1,456 @@
+{
+  "generated_at": "2026-11-25T12:57:15+00:00",
+  "config": {
+    "assets": null,
+    "window_start": 0,
+    "window_end": 1,
+    "estimation_start": -120,
+    "estimation_end": -21,
+    "flat_threshold_bps": 10.0,
+    "train_fraction": 0.5,
+    "bootstrap_samples": 500,
+    "include_events": null
+  },
+  "n_events": 50,
+  "n_outcome_observations": 556,
+  "metrics": [
+    {
+      "model": "always_up_test",
+      "n": 275,
+      "coverage": 1.0,
+      "accuracy": 0.5382,
+      "brier": 0.2437,
+      "log_loss": 0.6802,
+      "auc": 0.5611,
+      "ece": 0.0856,
+      "accuracy_ci": [
+        0.4657,
+        0.6136
+      ],
+      "brier_ci": [
+        0.2315,
+        0.2576
+      ]
+    },
+    {
+      "model": "coin_flip_test",
+      "n": 275,
+      "coverage": 1.0,
+      "accuracy": null,
+      "brier": 0.25,
+      "log_loss": 0.6931,
+      "auc": 0.5,
+      "ece": 0.0418,
+      "accuracy_ci": null,
+      "brier_ci": [
+        0.25,
+        0.25
+      ]
+    },
+    {
+      "model": "mechanism_test",
+      "n": 254,
+      "coverage": 0.9236,
+      "accuracy": 0.6142,
+      "brier": 0.2586,
+      "log_loss": 0.7262,
+      "auc": 0.6132,
+      "ece": 0.1173,
+      "accuracy_ci": [
+        0.5525,
+        0.6753
+      ],
+      "brier_ci": [
+        0.2289,
+        0.2908
+      ]
+    },
+    {
+      "model": "analog_test",
+      "n": 192,
+      "coverage": 0.6982,
+      "accuracy": 0.5855,
+      "brier": 0.2481,
+      "log_loss": 0.6912,
+      "auc": 0.5812,
+      "ece": 0.1119,
+      "accuracy_ci": [
+        0.4777,
+        0.6735
+      ],
+      "brier_ci": [
+        0.2238,
+        0.274
+      ]
+    },
+    {
+      "model": "hybrid_test",
+      "n": 265,
+      "coverage": 0.9636,
+      "accuracy": 0.6212,
+      "brier": 0.2576,
+      "log_loss": 0.7233,
+      "auc": 0.6248,
+      "ece": 0.1349,
+      "accuracy_ci": [
+        0.5627,
+        0.6822
+      ],
+      "brier_ci": [
+        0.2269,
+        0.2882
+      ]
+    },
+    {
+      "model": "stacked_test",
+      "n": 265,
+      "coverage": 0.9636,
+      "accuracy": 0.5962,
+      "brier": 0.2379,
+      "log_loss": 0.6701,
+      "auc": 0.6338,
+      "ece": 0.0936,
+      "accuracy_ci": [
+        0.5311,
+        0.6513
+      ],
+      "brier_ci": [
+        0.2158,
+        0.2563
+      ]
+    },
+    {
+      "model": "mechanism_calibrated_test",
+      "n": 254,
+      "coverage": 0.9236,
+      "accuracy": 0.6063,
+      "brier": 0.2432,
+      "log_loss": 0.6795,
+      "auc": 0.6133,
+      "ece": 0.0711,
+      "accuracy_ci": [
+        0.5413,
+        0.668
+      ],
+      "brier_ci": [
+        0.2382,
+        0.2482
+      ]
+    },
+    {
+      "model": "analog_calibrated_test",
+      "n": 192,
+      "coverage": 0.6982,
+      "accuracy": 0.5417,
+      "brier": 0.245,
+      "log_loss": 0.683,
+      "auc": 0.5812,
+      "ece": 0.0616,
+      "accuracy_ci": [
+        0.4503,
+        0.6154
+      ],
+      "brier_ci": [
+        0.2364,
+        0.2541
+      ]
+    },
+    {
+      "model": "hybrid_calibrated_test",
+      "n": 265,
+      "coverage": 0.9636,
+      "accuracy": 0.5962,
+      "brier": 0.2409,
+      "log_loss": 0.6748,
+      "auc": 0.6248,
+      "ece": 0.0517,
+      "accuracy_ci": [
+        0.5296,
+        0.6628
+      ],
+      "brier_ci": [
+        0.2341,
+        0.2469
+      ]
+    },
+    {
+      "model": "stacked_calibrated_test",
+      "n": 265,
+      "coverage": 0.9636,
+      "accuracy": 0.6038,
+      "brier": 0.2376,
+      "log_loss": 0.6682,
+      "auc": 0.6338,
+      "ece": 0.0516,
+      "accuracy_ci": [
+        0.5368,
+        0.6679
+      ],
+      "brier_ci": [
+        0.2285,
+        0.2454
+      ]
+    }
+  ],
+  "by_asset": [
+    {
+      "asset": "SPY",
+      "n": 23,
+      "accuracy": 0.7826,
+      "brier": 0.2137,
+      "mean_car_bps": 6.84
+    },
+    {
+      "asset": "QQQ",
+      "n": 21,
+      "accuracy": 0.4286,
+      "brier": 0.2497,
+      "mean_car_bps": 48.3
+    },
+    {
+      "asset": "TLT",
+      "n": 25,
+      "accuracy": 0.72,
+      "brier": 0.2288,
+      "mean_car_bps": 58.55
+    },
+    {
+      "asset": "IEF",
+      "n": 24,
+      "accuracy": 0.7083,
+      "brier": 0.2369,
+      "mean_car_bps": 48.5
+    },
+    {
+      "asset": "UUP",
+      "n": 24,
+      "accuracy": 0.75,
+      "brier": 0.2191,
+      "mean_car_bps": -41.15
+    },
+    {
+      "asset": "GLD",
+      "n": 20,
+      "accuracy": 0.65,
+      "brier": 0.2354,
+      "mean_car_bps": 88.03
+    },
+    {
+      "asset": "XLE",
+      "n": 23,
+      "accuracy": 0.5652,
+      "brier": 0.2443,
+      "mean_car_bps": -112.17
+    },
+    {
+      "asset": "XLU",
+      "n": 21,
+      "accuracy": 0.4286,
+      "brier": 0.2575,
+      "mean_car_bps": -0.86
+    },
+    {
+      "asset": "EEM",
+      "n": 21,
+      "accuracy": 0.5714,
+      "brier": 0.2343,
+      "mean_car_bps": 43.39
+    },
+    {
+      "asset": "HYG",
+      "n": 20,
+      "accuracy": 0.55,
+      "brier": 0.2432,
+      "mean_car_bps": 5.06
+    },
+    {
+      "asset": "^VIX",
+      "n": 19,
+      "accuracy": 0.5263,
+      "brier": 0.2353,
+      "mean_car_bps": 470.7
+    },
+    {
+      "asset": "FXI",
+      "n": 24,
+      "accuracy": 0.5,
+      "brier": 0.2565,
+      "mean_car_bps": 91.89
+    }
+  ],
+  "by_event_type": [
+    {
+      "event_type": "china_policy",
+      "n_events": 2,
+      "n_predictions": 21,
+      "accuracy": 0.5714,
+      "brier": 0.2302
+    },
+    {
+      "event_type": "energy_supply",
+      "n_events": 2,
+      "n_predictions": 23,
+      "accuracy": 0.5652,
+      "brier": 0.2521
+    },
+    {
+      "event_type": "financial_stability",
+      "n_events": 1,
+      "n_predictions": 10,
+      "accuracy": 0.8,
+      "brier": 0.207
+    },
+    {
+      "event_type": "geopolitics",
+      "n_events": 2,
+      "n_predictions": 22,
+      "accuracy": 0.4091,
+      "brier": 0.2552
+    },
+    {
+      "event_type": "inflation",
+      "n_events": 5,
+      "n_predictions": 53,
+      "accuracy": 0.6415,
+      "brier": 0.234
+    },
+    {
+      "event_type": "labor_market",
+      "n_events": 1,
+      "n_predictions": 6,
+      "accuracy": 0.6667,
+      "brier": 0.2287
+    },
+    {
+      "event_type": "monetary_policy",
+      "n_events": 10,
+      "n_predictions": 107,
+      "accuracy": 0.5981,
+      "brier": 0.2373
+    },
+    {
+      "event_type": "trade_policy",
+      "n_events": 2,
+      "n_predictions": 23,
+      "accuracy": 0.6957,
+      "brier": 0.2386
+    }
+  ],
+  "calibration": [
+    {
+      "bin_lower": 0.4249,
+      "bin_upper": 0.4536,
+      "n": 33,
+      "mean_predicted": 0.4377,
+      "observed_frequency": 0.4242
+    },
+    {
+      "bin_lower": 0.4537,
+      "bin_upper": 0.4691,
+      "n": 33,
+      "mean_predicted": 0.4621,
+      "observed_frequency": 0.5152
+    },
+    {
+      "bin_lower": 0.4699,
+      "bin_upper": 0.4906,
+      "n": 33,
+      "mean_predicted": 0.4794,
+      "observed_frequency": 0.3939
+    },
+    {
+      "bin_lower": 0.4908,
+      "bin_upper": 0.5086,
+      "n": 33,
+      "mean_predicted": 0.4977,
+      "observed_frequency": 0.3333
+    },
+    {
+      "bin_lower": 0.5119,
+      "bin_upper": 0.5427,
+      "n": 33,
+      "mean_predicted": 0.5295,
+      "observed_frequency": 0.5758
+    },
+    {
+      "bin_lower": 0.5427,
+      "bin_upper": 0.5598,
+      "n": 33,
+      "mean_predicted": 0.5531,
+      "observed_frequency": 0.6364
+    },
+    {
+      "bin_lower": 0.5599,
+      "bin_upper": 0.5718,
+      "n": 33,
+      "mean_predicted": 0.566,
+      "observed_frequency": 0.697
+    },
+    {
+      "bin_lower": 0.5721,
+      "bin_upper": 0.5902,
+      "n": 34,
+      "mean_predicted": 0.5807,
+      "observed_frequency": 0.7059
+    }
+  ],
+  "extraction": {
+    "n": 50,
+    "event_type_accuracy": 1.0,
+    "direction_accuracy": 1.0,
+    "joint_accuracy": 1.0,
+    "confusion": {
+      "trade_policy": {
+        "trade_policy": 6
+      },
+      "geopolitics": {
+        "geopolitics": 4
+      },
+      "monetary_policy": {
+        "monetary_policy": 21
+      },
+      "fiscal_policy": {
+        "fiscal_policy": 1
+      },
+      "inflation": {
+        "inflation": 9
+      },
+      "energy_supply": {
+        "energy_supply": 3
+      },
+      "labor_market": {
+        "labor_market": 2
+      },
+      "financial_stability": {
+        "financial_stability": 2
+      },
+      "china_policy": {
+        "china_policy": 2
+      }
+    }
+  },
+  "notes": [
+    "Only the stack weights and Platt calibration are fitted, on the first half of the events; all other components are fixed or walk-forward.",
+    "Analog priors use only prior events whose outcome window has matured before the current event.",
+    "The sample is small and event windows overlap; the bootstrap resamples events, not asset rows.",
+    "Mechanism priors were authored by the project, not preregistered, and were not fitted to these outcomes.",
+    "Stack weights fitted on train: mechanism=0.60, analog=0.40, base_rate=0.40.",
+    "Platt parameters (stacked): a=0.34, b=0.05.",
+    "No events were skipped for price history."
+  ],
+  "provenance": {
+    "sources": [
+      "events: backend/data/events/events.yaml",
+      "prices: backend/data/market/prices.csv",
+      "knowledge: mechanisms.yaml v1",
+      "extraction: rules-v1"
+    ],
+    "retrieved_at": "2026-11-25T12:57:15.628506Z",
+    "as_of": "2025-04-09T13:30:00-04:00",
+    "snapshot_version": "local",
+    "notes": [
+      "Adjusted closes are revised after corporate actions; this is not a point-in-time price database.",
+      "Event labels are editorial; market outcomes are computed independently."
+    ]
+  }
+}

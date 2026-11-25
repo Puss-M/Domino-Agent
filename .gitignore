@@ -4,9 +4,14 @@
 
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
 venv/
 .venv/
+backend/.cache/
+.server.log
+/backtest*.json
 
 # Node
 node_modules/

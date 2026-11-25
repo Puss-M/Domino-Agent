@@ -1,0 +1,667 @@
+# Domino Agent transmission library.
+#
+# This file is the "moat" layer: a curated, cited map from event types to
+# transmission channels to asset loadings. It is intentionally small and
+# auditable. An LLM may retrieve from it and narrate it, but may not invent a
+# channel, a citation, or a sign.
+#
+# Conventions
+# - channel score > 0 means "the channel variable rises" (e.g. real yields up).
+# - loading > 0 means the asset tends to rise when the channel rises.
+# - scale_bps is an illustrative 5-day magnitude, not an estimated elasticity.
+#   It is used to produce an order-of-magnitude expected CAR, never a price target.
+# - evidence_grade: A = peer-reviewed/official and directly applicable;
+#   B = empirical support with regime/condition uncertainty; C = weak;
+#   D = speculative (must never drive a headline prediction).
+
+version: 1
+
+channels:
+  - id: real_yields
+    name: Real yields & term premium
+    description: Inflation-adjusted discount rates and the compensation for holding duration.
+    scale_bps: 120
+    loadings:
+      TLT: -1.0
+      IEF: -0.7
+      QQQ: -0.75
+      SPY: -0.35
+      XLU: -0.65
+      GLD: -0.55
+      UUP: 0.45
+      EEM: -0.35
+      HYG: -0.2
+      FXI: -0.15
+      "^VIX": 0.2
+      XLE: -0.1
+    citations:
+      - "Bernanke & Kuttner (2005), Journal of Finance 60(3)"
+      - "Nakamura & Steinsson (2018), Quarterly Journal of Economics 133(3)"
+
+  - id: nominal_yields
+    name: Nominal Treasury yields
+    description: The discount-rate and mark-to-market channel for fixed income.
+    scale_bps: 100
+    loadings:
+      TLT: -0.9
+      IEF: -0.8
+      HYG: -0.35
+      XLU: -0.4
+      SPY: -0.15
+      QQQ: -0.25
+      UUP: 0.2
+      GLD: -0.15
+      "^VIX": 0.1
+      EEM: -0.1
+      FXI: -0.1
+      XLE: 0.0
+    citations:
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+
+  - id: discount_rates
+    name: Equity discount rates
+    description: The duration-sensitive equity valuation channel; growth equities have longer duration.
+    scale_bps: 140
+    loadings:
+      QQQ: -1.0
+      SPY: -0.6
+      XLU: -0.6
+      EEM: -0.4
+      FXI: -0.3
+      HYG: -0.2
+      "^VIX": 0.3
+      GLD: -0.1
+      TLT: 0.0
+      IEF: 0.0
+      UUP: 0.0
+      XLE: -0.1
+    citations:
+      - "Bernanke & Kuttner (2005), Journal of Finance 60(3)"
+
+  - id: usd
+    name: US dollar
+    description: Trade-weighted dollar; a funding currency and terms-of-trade shock for the rest of the world.
+    scale_bps: 90
+    loadings:
+      UUP: 1.0
+      EEM: -0.8
+      FXI: -0.6
+      GLD: -0.5
+      SPY: -0.25
+      QQQ: -0.2
+      XLE: -0.1
+      HYG: -0.15
+      "^VIX": 0.1
+      TLT: 0.0
+      IEF: 0.0
+      XLU: 0.0
+    citations:
+      - "Bruno & Shin (2015), Review of Economic Studies 82(2)"
+
+  - id: risk_premium
+    name: Global risk premium
+    description: Compensation for aggregate uncertainty; the dominant short-horizon channel in risk-off events.
+    scale_bps: 250
+    loadings:
+      SPY: -0.9
+      QQQ: -0.9
+      EEM: -0.9
+      FXI: -0.8
+      HYG: -0.8
+      "^VIX": 1.1
+      GLD: 0.45
+      TLT: 0.4
+      UUP: 0.4
+      XLE: -0.3
+      XLU: 0.1
+      IEF: 0.25
+    citations:
+      - "Caldara & Iacoviello (2022), American Economic Review 112(4)"
+      - "Baker, Bloom & Davis (2016), Quarterly Journal of Economics 131(4)"
+
+  - id: credit_spreads
+    name: Credit spreads
+    description: Default-risk compensation and the bank-lending channel.
+    scale_bps: 180
+    loadings:
+      HYG: -1.0
+      EEM: -0.6
+      SPY: -0.4
+      QQQ: -0.3
+      XLE: -0.3
+      FXI: -0.4
+      "^VIX": 0.35
+      TLT: 0.15
+      GLD: 0.1
+      UUP: 0.1
+      XLU: 0.0
+      IEF: 0.1
+    citations:
+      - "Bernanke, Gertler & Gilchrist (1999), Handbook of Macroeconomics"
+
+  - id: oil_price
+    name: Crude oil price
+    description: Supply/demand balance for crude; energy equities have direct revenue exposure.
+    scale_bps: 200
+    loadings:
+      XLE: 1.0
+      SPY: -0.1
+      EEM: -0.2
+      FXI: -0.15
+      GLD: 0.1
+      TLT: -0.1
+      "^VIX": 0.05
+      UUP: 0.0
+      QQQ: -0.05
+      HYG: -0.1
+      XLU: -0.1
+      IEF: -0.05
+    citations:
+      - "Kilian (2009), American Economic Review 99(3)"
+
+  - id: inflation_expectations
+    name: Inflation expectations
+    description: Expected inflation embedded in nominal assets and real assets.
+    scale_bps: 110
+    loadings:
+      TLT: -0.7
+      IEF: -0.6
+      GLD: 0.4
+      XLE: 0.3
+      SPY: -0.15
+      QQQ: -0.15
+      UUP: -0.1
+      XLU: -0.3
+      HYG: -0.1
+      EEM: -0.1
+      FXI: -0.05
+      "^VIX": 0.1
+    citations:
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+
+  - id: growth_expectations
+    name: Growth expectations
+    description: Expected real activity; the main earnings channel.
+    scale_bps: 150
+    loadings:
+      SPY: 0.7
+      QQQ: 0.6
+      EEM: 0.6
+      FXI: 0.5
+      HYG: 0.5
+      XLE: 0.3
+      XLU: 0.2
+      UUP: 0.15
+      GLD: -0.15
+      TLT: -0.2
+      IEF: -0.15
+      "^VIX": -0.3
+    citations:
+      - "MacKinlay (1997), Journal of Economic Literature 35(1)"
+
+  - id: policy_support
+    name: Policy support / liquidity
+    description: Fiscal, monetary and regulatory support that compresses risk premia.
+    scale_bps: 160
+    loadings:
+      SPY: 0.6
+      QQQ: 0.6
+      HYG: 0.5
+      EEM: 0.5
+      FXI: 0.6
+      "^VIX": -0.4
+      TLT: -0.2
+      GLD: 0.1
+      UUP: -0.2
+      XLE: 0.2
+      XLU: 0.2
+      IEF: -0.15
+    citations:
+      - "Bernanke, Gertler & Gilchrist (1999), Handbook of Macroeconomics"
+
+  - id: china_demand
+    name: China demand impulse
+    description: Chinese credit, property and fiscal impulse transmitted to commodities and EM.
+    scale_bps: 160
+    loadings:
+      FXI: 1.0
+      EEM: 0.7
+      XLE: 0.3
+      GLD: 0.15
+      SPY: 0.15
+      HYG: 0.2
+      UUP: -0.15
+      QQQ: 0.05
+      TLT: 0.0
+      IEF: 0.0
+      XLU: 0.0
+      "^VIX": -0.1
+    citations:
+      - "BIS (2019), Monetary policy frameworks in emerging market economies"
+      - "IMF (2018), People's Republic of China: Article IV Consultation"
+
+  - id: funding_liquidity
+    name: Funding liquidity stress
+    description: Dollar/yen funding stress, margin calls and balance-sheet constraints.
+    scale_bps: 220
+    loadings:
+      HYG: -0.7
+      SPY: -0.6
+      QQQ: -0.6
+      EEM: -0.7
+      FXI: -0.6
+      "^VIX": 0.9
+      TLT: 0.35
+      GLD: 0.35
+      UUP: 0.4
+      XLE: -0.2
+      XLU: 0.0
+      IEF: 0.2
+    citations:
+      - "Bruno & Shin (2015), Review of Economic Studies 82(2)"
+      - "Bernanke, Gertler & Gilchrist (1999), Handbook of Macroeconomics"
+
+  - id: safe_haven
+    name: Flight to safety
+    description: Demand for assets with low or negative beta to the growth shock.
+    scale_bps: 200
+    loadings:
+      TLT: 0.8
+      GLD: 0.8
+      UUP: 0.6
+      "^VIX": 0.5
+      SPY: -0.6
+      QQQ: -0.5
+      EEM: -0.7
+      FXI: -0.5
+      HYG: -0.4
+      XLE: -0.2
+      XLU: 0.15
+      IEF: 0.6
+    citations:
+      - "Baur & Lucey (2010), Financial Review 45(2)"
+      - "Caldara & Iacoviello (2022), American Economic Review 112(4)"
+
+  - id: energy_costs
+    name: Energy input costs
+    description: Operating-cost pass-through for non-energy firms and households.
+    scale_bps: 130
+    loadings:
+      SPY: -0.35
+      XLU: -0.4
+      HYG: -0.2
+      EEM: -0.2
+      TLT: -0.1
+      XLE: 0.0
+      QQQ: -0.15
+      FXI: -0.1
+      GLD: 0.05
+      UUP: 0.0
+      IEF: -0.05
+      "^VIX": 0.1
+    citations:
+      - "Kilian (2009), American Economic Review 99(3)"
+
+mechanisms:
+  - id: MON_TIGHTEN
+    title: Hawkish policy surprise lifts real yields and discount rates
+    event_types: [monetary_policy]
+    directions: [tightening, hawkish_hold]
+    none_keywords: [emergency, bank failure, bank run, banking stress, financial stability, credit crunch, svb, recession]
+    confidence: 0.82
+    evidence_grade: A
+    horizon_days: 5
+    rationale: A policy surprise raises the expected path of real rates, lifts the dollar, and compresses long-duration equity valuations. Credit spreads widen modestly as refinancing conditions tighten.
+    channels:
+      real_yields: 0.9
+      nominal_yields: 0.7
+      discount_rates: 0.8
+      usd: 0.6
+      credit_spreads: 0.3
+      risk_premium: 0.2
+    citations:
+      - "Bernanke & Kuttner (2005), Journal of Finance 60(3)"
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+      - "Nakamura & Steinsson (2018), Quarterly Journal of Economics 133(3)"
+
+  - id: MON_TIGHTEN_STRESS
+    title: Tightening into a fragile banking system
+    event_types: [monetary_policy]
+    directions: [tightening, hawkish_hold]
+    any_keywords: [bank failure, bank run, banking stress, financial stability, credit crunch, svb, crisis]
+    confidence: 0.66
+    evidence_grade: B
+    horizon_days: 5
+    rationale: When a hike lands alongside bank stress, the rate channel and the funding-liquidity channel push in opposite directions for some assets; safe havens and credit spreads dominate the cross-section.
+    channels:
+      real_yields: 0.5
+      discount_rates: 0.4
+      risk_premium: 0.6
+      safe_haven: 0.5
+      credit_spreads: 0.5
+      funding_liquidity: 0.5
+    citations:
+      - "Bernanke, Gertler & Gilchrist (1999), Handbook of Macroeconomics"
+      - "Caldara & Iacoviello (2022), American Economic Review 112(4)"
+
+  - id: MON_EASE_INSURANCE
+    title: Insurance easing supports duration and risk assets
+    event_types: [monetary_policy]
+    directions: [easing, dovish_hold]
+    none_keywords: [emergency, crisis, recession, bank failure, bank run, financial stability, pandemic, unemployment, fewer cuts, higher for longer, hawkish, sticky inflation, slower easing]
+    confidence: 0.72
+    evidence_grade: B
+    horizon_days: 5
+    rationale: A cut that is not forced by a growth or funding shock lowers the expected policy path, compresses discount rates, and weakens the dollar. The risk premium channel is mildly supportive.
+    channels:
+      real_yields: -0.8
+      nominal_yields: -0.6
+      discount_rates: -0.7
+      usd: -0.5
+      credit_spreads: -0.3
+      risk_premium: -0.3
+      growth_expectations: 0.2
+    citations:
+      - "Bernanke & Kuttner (2005), Journal of Finance 60(3)"
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+
+  - id: MON_EASE_STRESS
+    title: Emergency easing signals a growth or funding shock
+    event_types: [monetary_policy]
+    directions: [easing]
+    any_keywords: [emergency, crisis, recession, bank failure, bank run, financial stability, pandemic, unemployment, credit crunch]
+    confidence: 0.78
+    evidence_grade: B
+    horizon_days: 5
+    rationale: An emergency cut is a signal that the central bank sees a shock. The rate cut helps duration, but the funding-liquidity and risk-premium channels dominate equities and credit at short horizons.
+    channels:
+      real_yields: -0.7
+      funding_liquidity: 0.9
+      safe_haven: 0.6
+      risk_premium: 0.6
+      credit_spreads: 0.5
+      discount_rates: -0.3
+    citations:
+      - "Bernanke, Gertler & Gilchrist (1999), Handbook of Macroeconomics"
+      - "Caldara & Iacoviello (2022), American Economic Review 112(4)"
+
+  - id: HAWKISH_CUT
+    title: A cut with hawkish guidance is a de facto tightening signal
+    event_types: [monetary_policy]
+    directions: [easing]
+    any_keywords: [fewer cuts, higher for longer, hawkish, sticky inflation, slower easing]
+    confidence: 0.62
+    evidence_grade: B
+    horizon_days: 5
+    rationale: "The policy action is a cut, but the guidance raises the expected future path. Markets trade the path, not the announcement; duration and growth equities can sell off even as the spot rate falls."
+    channels:
+      real_yields: 0.5
+      discount_rates: 0.4
+      usd: 0.4
+      risk_premium: 0.3
+      credit_spreads: 0.2
+    citations:
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+      - "Nakamura & Steinsson (2018), Quarterly Journal of Economics 133(3)"
+
+  - id: INFL_HOT
+    title: Upside inflation surprise lifts yields and the dollar
+    event_types: [inflation]
+    directions: [upside]
+    confidence: 0.74
+    evidence_grade: A
+    horizon_days: 5
+    rationale: A hotter-than-expected CPI print raises the expected policy path, nominal and real yields, and the dollar, while pressuring duration-sensitive equities and gold.
+    channels:
+      nominal_yields: 0.9
+      real_yields: 0.6
+      discount_rates: 0.5
+      usd: 0.4
+      inflation_expectations: 0.6
+    citations:
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+      - "Nakamura & Steinsson (2018), Quarterly Journal of Economics 133(3)"
+
+  - id: INFL_COOL
+    title: Downside inflation surprise lowers yields and the dollar
+    event_types: [inflation]
+    directions: [downside]
+    confidence: 0.7
+    evidence_grade: A
+    horizon_days: 5
+    rationale: A cooler-than-expected CPI print lowers the expected policy path and yields, supports duration and gold, and weakens the dollar.
+    channels:
+      nominal_yields: -0.9
+      real_yields: -0.6
+      discount_rates: -0.5
+      usd: -0.4
+      inflation_expectations: -0.6
+    citations:
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+      - "Nakamura & Steinsson (2018), Quarterly Journal of Economics 133(3)"
+
+  - id: LABOR_HOT
+    title: Hot labour data raises the policy path
+    event_types: [labor_market]
+    directions: [upside]
+    confidence: 0.6
+    evidence_grade: B
+    horizon_days: 5
+    rationale: Strong payrolls raise growth expectations but also the expected policy path; the net equity effect is regime-dependent, so the evidence grade is lower.
+    channels:
+      nominal_yields: 0.7
+      discount_rates: 0.5
+      usd: 0.4
+      growth_expectations: 0.2
+    citations:
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+
+  - id: LABOR_COOL
+    title: Weak labour data lowers the policy path
+    event_types: [labor_market]
+    directions: [downside]
+    confidence: 0.6
+    evidence_grade: B
+    horizon_days: 5
+    rationale: Weak payrolls lower the expected policy path and yields, but also lower growth expectations; the sign for equities depends on whether the market is trading rates or recession.
+    channels:
+      nominal_yields: -0.6
+      discount_rates: -0.4
+      usd: -0.3
+      growth_expectations: -0.4
+    citations:
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+
+  - id: TRADE_ESCALATION
+    title: Tariff escalation raises risk premia and hits China-exposed assets
+    event_types: [trade_policy]
+    directions: [escalation]
+    confidence: 0.72
+    evidence_grade: B
+    horizon_days: 5
+    rationale: A tariff escalation is a negative terms-of-trade and uncertainty shock. It raises the dollar and safe-haven demand, widens credit spreads, and hits EM/China-exposed equities hardest.
+    channels:
+      risk_premium: 0.8
+      usd: 0.4
+      safe_haven: 0.4
+      growth_expectations: -0.5
+      credit_spreads: 0.4
+      china_demand: -0.5
+    citations:
+      - "Caldara, Iacoviello, Molligo, Prestipino & Raffo (2020), Journal of Monetary Economics"
+      - "Amiti, Redding & Weinstein (2019), Journal of Economic Perspectives 33(4)"
+
+  - id: TRADE_DEESCALATION
+    title: Tariff relief compresses risk premia
+    event_types: [trade_policy]
+    directions: [deescalation]
+    confidence: 0.7
+    evidence_grade: B
+    horizon_days: 5
+    rationale: "A pause, exemption or rollback reverses the uncertainty shock: risk premia compress, the dollar softens, and China/EM equities lead."
+    channels:
+      risk_premium: -0.7
+      usd: -0.3
+      safe_haven: -0.3
+      growth_expectations: 0.5
+      credit_spreads: -0.3
+      china_demand: 0.5
+    citations:
+      - "Caldara, Iacoviello, Molligo, Prestipino & Raffo (2020), Journal of Monetary Economics"
+
+  - id: OIL_SUPPLY_CUT
+    title: Supply cut lifts crude, energy equities and inflation expectations
+    event_types: [energy_supply]
+    directions: [supply_cut]
+    confidence: 0.78
+    evidence_grade: A
+    horizon_days: 5
+    rationale: A credible output cut shifts the crude supply curve. Energy equities re-rate, inflation expectations rise, and energy-importing equities face a margin squeeze.
+    channels:
+      oil_price: 0.9
+      inflation_expectations: 0.4
+      energy_costs: 0.4
+      growth_expectations: -0.2
+    citations:
+      - "Kilian (2009), American Economic Review 99(3)"
+
+  - id: OIL_SUPPLY_INCREASE
+    title: Supply increase lowers crude and inflation expectations
+    event_types: [energy_supply]
+    directions: [supply_increase]
+    confidence: 0.72
+    evidence_grade: A
+    horizon_days: 5
+    rationale: An output increase shifts the crude supply curve down, pressuring energy equities while easing input costs and inflation expectations.
+    channels:
+      oil_price: -0.9
+      inflation_expectations: -0.4
+      energy_costs: -0.4
+      growth_expectations: 0.2
+    citations:
+      - "Kilian (2009), American Economic Review 99(3)"
+
+  - id: GEOPOLITICAL_RISK
+    title: Geopolitical shock lifts safe havens and the oil risk premium
+    event_types: [geopolitics]
+    directions: [risk_off]
+    confidence: 0.75
+    evidence_grade: B
+    horizon_days: 5
+    rationale: A military or political shock raises the global risk premium and the oil risk premium while bid-to-quality flows support Treasuries, gold and the dollar.
+    channels:
+      safe_haven: 0.7
+      oil_price: 0.5
+      risk_premium: 0.7
+      usd: 0.4
+      growth_expectations: -0.4
+    citations:
+      - "Caldara & Iacoviello (2022), American Economic Review 112(4)"
+      - "Kilian (2009), American Economic Review 99(3)"
+
+  - id: GEOPOLITICAL_DEESCALATION
+    title: De-escalation compresses the geopolitical risk premium
+    event_types: [geopolitics]
+    directions: [risk_on]
+    confidence: 0.68
+    evidence_grade: B
+    horizon_days: 5
+    rationale: A ceasefire or de-escalation reverses the safe-haven bid and the oil risk premium; cyclical and EM assets lead.
+    channels:
+      safe_haven: -0.6
+      oil_price: -0.4
+      risk_premium: -0.6
+      usd: -0.3
+      growth_expectations: 0.4
+    citations:
+      - "Caldara & Iacoviello (2022), American Economic Review 112(4)"
+
+  - id: CHINA_STIMULUS
+    title: China policy stimulus lifts China/EM and commodity demand
+    event_types: [china_policy]
+    directions: [stimulus]
+    confidence: 0.74
+    evidence_grade: B
+    horizon_days: 5
+    rationale: A credible PBOC/fiscal impulse lowers China risk premia, supports EM and commodity demand, and softens the dollar at the margin.
+    channels:
+      china_demand: 0.9
+      policy_support: 0.6
+      risk_premium: -0.4
+      usd: -0.2
+      growth_expectations: 0.3
+    citations:
+      - "BIS (2019), Monetary policy frameworks in emerging market economies"
+      - "IMF (2018), People's Republic of China: Article IV Consultation"
+
+  - id: FISCAL_STIMULUS
+    title: Fiscal stimulus supports growth but steepens the curve
+    event_types: [fiscal_policy]
+    directions: [stimulus]
+    confidence: 0.65
+    evidence_grade: B
+    horizon_days: 5
+    rationale: A spending or tax impulse raises growth expectations and policy support, but also raises issuance, yields and inflation expectations; duration can lose even as equities gain.
+    channels:
+      growth_expectations: 0.7
+      policy_support: 0.5
+      nominal_yields: 0.5
+      inflation_expectations: 0.3
+    citations:
+      - "Baker, Bloom & Davis (2016), Quarterly Journal of Economics 131(4)"
+
+  - id: BANK_STRESS
+    title: Bank stress tightens funding and credit conditions
+    event_types: [financial_stability]
+    directions: [stress]
+    confidence: 0.78
+    evidence_grade: B
+    horizon_days: 5
+    rationale: A bank failure or run raises funding-liquidity and credit-spread channels, drives a flight to quality, and lowers growth expectations.
+    channels:
+      funding_liquidity: 0.9
+      credit_spreads: 0.8
+      risk_premium: 0.7
+      safe_haven: 0.6
+      growth_expectations: -0.5
+    citations:
+      - "Bernanke, Gertler & Gilchrist (1999), Handbook of Macroeconomics"
+      - "Bruno & Shin (2015), Review of Economic Studies 82(2)"
+
+  - id: ECB_HIKE
+    title: ECB tightening supports the euro and global duration
+    event_types: [monetary_policy]
+    directions: [tightening, hawkish_hold]
+    actors: [ECB]
+    confidence: 0.66
+    evidence_grade: B
+    horizon_days: 5
+    rationale: "An ECB hike raises euro-area rates and typically supports the euro against the dollar. The global duration channel is positive but smaller than for a Fed surprise because the US curve is the pricing anchor for the asset universe."
+    channels:
+      real_yields: 0.4
+      discount_rates: 0.3
+      usd: -0.6
+      risk_premium: 0.2
+      credit_spreads: 0.2
+    citations:
+      - "Gürkaynak, Sack & Swanson (2005), International Journal of Central Banking"
+      - "BIS (2019), Monetary policy frameworks in emerging market economies"
+
+  - id: BOJ_HIKE
+    title: BOJ tightening exports funding-liquidity stress
+    event_types: [monetary_policy]
+    directions: [tightening, hawkish_hold]
+    actors: [BOJ]
+    confidence: 0.68
+    evidence_grade: B
+    horizon_days: 5
+    rationale: "A BOJ hike is primarily a yen-funding shock: it can force carry-trade unwinds, raise global risk premia and hit long-duration equities, even as Japanese yields rise."
+    channels:
+      funding_liquidity: 0.8
+      risk_premium: 0.6
+      usd: -0.5
+      real_yields: 0.3
+      growth_expectations: -0.3
+    citations:
+      - "Bruno & Shin (2015), Review of Economic Studies 82(2)"
+      - "BIS (2019), Monetary policy frameworks in emerging market economies"

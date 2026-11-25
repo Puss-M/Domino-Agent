@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Domino Agent — Event Transmission Research</title>
+    <meta
+      name="description"
+      content="Auditable event-driven macro transmission: extraction, cited mechanisms, deterministic channels and event-study calibration."
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">D</div>
+        <div>
+          <div class="brand-name">Domino Agent</div>
+          <div class="brand-sub">Event → transmission channel → asset</div>
+        </div>
+      </div>
+      <div class="topbar-meta" id="healthChips" aria-live="polite"></div>
+      <div class="topbar-actions">
+        <button class="button ghost" id="sourcesBtn" type="button">Data sources</button>
+        <button class="button ghost" id="backtestBtn" type="button">Backtest</button>
+        <button class="button solid" id="downloadBtn" type="button">Export JSON</button>
+      </div>
+    </header>
+
+    <section class="composer" aria-label="Event input">
+      <div class="composer-label">
+        <span class="eyebrow">Event input</span>
+        <span class="hint">Rule-first extraction · cited mechanism retrieval · deterministic graph</span>
+      </div>
+      <div class="composer-row">
+        <textarea id="headline" rows="2" spellcheck="false">Fed raises rates by 50 basis points</textarea>
+        <button class="button run" id="analyzeBtn" type="button">
+          <span id="analyzeLabel">Run transmission</span>
+          <span class="run-arrow" aria-hidden="true">→</span>
+        </button>
+      </div>
+      <div class="examples" id="examples" aria-label="Example events"></div>
+      <div class="composer-status">
+        <span id="statusLine">Offline engine · no API key required</span>
+        <span id="latencyLine"></span>
+      </div>
+    </section>
+
+    <main class="layout">
+      <aside class="note-panel" aria-label="Research note">
+        <div class="panel-head">
+          <span class="eyebrow">Research note</span>
+          <span class="mono" id="eventDate"></span>
+        </div>
+
+        <div class="event-card" id="eventCard">
+          <div class="placeholder">Run an event to extract its type, direction and surprise.</div>
+        </div>
+
+        <section class="block">
+          <div class="block-head">
+            <h2>Asset views</h2>
+            <span class="mono" id="assetCount"></span>
+          </div>
+          <div id="assetTable" class="asset-table">
+            <div class="placeholder">No transmission yet.</div>
+          </div>
+        </section>
+
+        <section class="block">
+          <div class="block-head">
+            <h2>Memo</h2>
+            <span class="mono">5-day prior</span>
+          </div>
+          <div id="memo" class="memo">
+            <div class="placeholder">The memo appears after a run.</div>
+          </div>
+        </section>
+
+        <section class="block">
+          <div class="block-head">
+            <h2>Evidence audit</h2>
+            <span class="mono" id="auditBadge"></span>
+          </div>
+          <div id="audit" class="audit">
+            <div class="placeholder">No audit yet.</div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="graph-panel" aria-label="Transmission graph">
+        <div class="graph-head">
+          <div>
+            <span class="eyebrow">Transmission map</span>
+            <div class="graph-title">Signed, cited, two-layer graph</div>
+          </div>
+          <div class="legend" aria-label="Legend">
+            <span><i class="swatch pos"></i>asset ↑</span>
+            <span><i class="swatch neg"></i>asset ↓</span>
+            <span><i class="swatch flow"></i>channel link</span>
+          </div>
+        </div>
+        <div class="graph-wrap">
+          <svg id="graph" viewBox="0 0 1120 760" role="img" aria-label="Event to transmission channel to asset graph"></svg>
+          <div id="tooltip" class="tooltip" hidden></div>
+        </div>
+        <div class="selection" id="selection">
+          <span class="placeholder">Hover an edge or select a node to inspect the mechanism.</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Research prototype.</span>
+      <span>Not investment advice. Mechanism priors are not identified causal effects.</span>
+      <span class="mono" id="footerMeta"></span>
+    </footer>
+
+    <div class="modal" id="backtestModal" hidden>
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="backtestTitle">
+        <div class="modal-head">
+          <div>
+            <span class="eyebrow">Walk-forward evaluation</span>
+            <h2 id="backtestTitle">Event-study backtest</h2>
+          </div>
+          <button class="button ghost" id="closeBacktest" type="button">Close</button>
+        </div>
+        <div id="backtestBody" class="modal-body">
+          <div class="placeholder">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="sourcesModal" hidden>
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="sourcesTitle">
+        <div class="modal-head">
+          <div>
+            <span class="eyebrow">Provenance</span>
+            <h2 id="sourcesTitle">Data sources</h2>
+          </div>
+          <button class="button ghost" id="closeSources" type="button">Close</button>
+        </div>
+        <div id="sourcesBody" class="modal-body">
+          <div class="placeholder">Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

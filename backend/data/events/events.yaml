@@ -1,0 +1,777 @@
+# Dated event sample.
+#
+# Labels (event_type / direction) are editorial and come from the official
+# action plus the published consensus. They are *not* inferred from the market
+# reaction. Outcomes are computed separately in evaluation/event_study.py.
+#
+# session:
+#   before_open  -> event day is the same trading day
+#   during       -> event day is the same trading day
+#   after_close  -> event day is the next trading day
+#   non_trading  -> event day is the next trading day (weekend/holiday)
+#
+# surprise.sign uses "positive = more of the event direction than expected"
+# (a surprise cut and a surprise hike can both be positive).
+
+version: 1
+
+events:
+  # ---------------------------------------------------------------- FOMC
+  - id: fomc-2022-03-16
+    date: 2022-03-16
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 25 basis points to 0.25%-0.50%"
+    summary: "The FOMC lifts the target range for the first time since 2018 and signals a faster hiking path."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20220316a.htm"
+    source_tier: official
+    magnitude: {value: 25, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2022]
+
+  - id: fomc-2022-05-04
+    date: 2022-05-04
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 50 basis points to 0.75%-1.00%"
+    summary: "The FOMC accelerates tightening and announces balance-sheet runoff starting in June."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20220504a.htm"
+    source_tier: official
+    magnitude: {value: 50, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2022]
+
+  - id: fomc-2022-06-15
+    date: 2022-06-15
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 75 basis points to 1.50%-1.75%"
+    summary: "The FOMC delivers its largest hike since 1994 after the May CPI print."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20220615a.htm"
+    source_tier: official
+    magnitude: {value: 75, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2022]
+
+  - id: fomc-2022-07-27
+    date: 2022-07-27
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 75 basis points to 2.25%-2.50%"
+    summary: "The FOMC repeats a 75bp hike and says it remains highly attentive to inflation risks."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20220727a.htm"
+    source_tier: official
+    magnitude: {value: 75, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2022]
+
+  - id: fomc-2022-09-21
+    date: 2022-09-21
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 75 basis points to 3.00%-3.25%"
+    summary: "The FOMC raises rates by 75bp and projects a higher terminal rate in the dot plot."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20220921a.htm"
+    source_tier: official
+    magnitude: {value: 75, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2022]
+
+  - id: fomc-2022-11-02
+    date: 2022-11-02
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 75 basis points to 3.75%-4.00%"
+    summary: "The FOMC delivers a fourth consecutive 75bp hike and hints at a slower pace."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20221102a.htm"
+    source_tier: official
+    magnitude: {value: 75, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2022]
+
+  - id: fomc-2022-12-14
+    date: 2022-12-14
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 50 basis points and signals higher for longer"
+    summary: "The FOMC slows the pace to 50bp but raises the projected terminal rate above 5%."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20221214a.htm"
+    source_tier: official
+    magnitude: {value: 50, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2022]
+
+  - id: fomc-2023-02-01
+    date: 2023-02-01
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 25 basis points to 4.50%-4.75%"
+    summary: "The FOMC slows to a quarter-point hike and says inflation remains elevated."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230201a.htm"
+    source_tier: official
+    magnitude: {value: 25, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2023]
+
+  - id: fomc-2023-03-22
+    date: 2023-03-22
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 25 basis points despite banking stress"
+    summary: "The FOMC continues tightening during the SVB-led regional-bank stress and says the banking system is sound."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230322a.htm"
+    source_tier: official
+    magnitude: {value: 25, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2023, banking-stress]
+
+  - id: fomc-2023-05-03
+    date: 2023-05-03
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 25 basis points and hints at a pause"
+    summary: "The FOMC lifts the target range to 5.00%-5.25% and removes language that further hikes are warranted."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230503a.htm"
+    source_tier: official
+    magnitude: {value: 25, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2023]
+
+  - id: fomc-2023-07-26
+    date: 2023-07-26
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: tightening
+    actor: US_FED
+    headline: "Fed raises rates by 25 basis points to 5.25%-5.50%"
+    summary: "The FOMC returns to hiking after a pause and leaves the door open to further tightening."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230726a.htm"
+    source_tier: official
+    magnitude: {value: 25, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2023]
+
+  - id: fomc-2023-09-20
+    date: 2023-09-20
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: hawkish_hold
+    actor: US_FED
+    headline: "Fed holds rates steady but signals higher for longer"
+    summary: "The FOMC leaves rates unchanged at 5.25%-5.50% while projecting one more hike in 2023."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20230920a.htm"
+    source_tier: official
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2023]
+
+  - id: fomc-2023-11-01
+    date: 2023-11-01
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: dovish_hold
+    actor: US_FED
+    headline: "Fed holds rates steady as inflation cools"
+    summary: "The FOMC keeps rates at 5.25%-5.50% and acknowledges tighter financial conditions."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20231101a.htm"
+    source_tier: official
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2023]
+
+  - id: fomc-2023-12-13
+    date: 2023-12-13
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: dovish_hold
+    actor: US_FED
+    headline: "Fed holds rates and signals three cuts in 2024"
+    summary: "The FOMC keeps rates unchanged and the dot plot shows 75bp of cuts in 2024."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20231213a.htm"
+    source_tier: official
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2023]
+
+  - id: fomc-2024-09-18
+    date: 2024-09-18
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: easing
+    actor: US_FED
+    headline: "Fed cuts rates by 50 basis points to 4.75%-5.00%"
+    summary: "The FOMC begins its easing cycle with a half-point cut and says it has greater confidence inflation is moving to 2%."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20240918a.htm"
+    source_tier: official
+    magnitude: {value: 50, unit: bps}
+    surprise: {value: 25, unit: bps, sign: positive}
+    tags: [fomc, 2024, easing]
+
+  - id: fomc-2024-11-07
+    date: 2024-11-07
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: easing
+    actor: US_FED
+    headline: "Fed cuts rates by 25 basis points to 4.50%-4.75%"
+    summary: "The FOMC continues its easing cycle with a quarter-point cut."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20241107a.htm"
+    source_tier: official
+    magnitude: {value: 25, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2024, easing]
+
+  - id: fomc-2024-12-18
+    date: 2024-12-18
+    time_et: "14:00"
+    session: during
+    event_type: monetary_policy
+    direction: easing
+    actor: US_FED
+    headline: "Fed cuts rates by 25 basis points and signals fewer cuts in 2025"
+    summary: "The FOMC cuts by a quarter point but the dot plot implies only two cuts in 2025, a hawkish surprise."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20241218a.htm"
+    source_tier: official
+    magnitude: {value: 25, unit: bps}
+    surprise: {value: 0, unit: qualitative, sign: neutral}
+    tags: [fomc, 2024, hawkish-cut]
+
+  # ---------------------------------------------------------------- CPI
+  - id: cpi-2022-06-10
+    date: 2022-06-10
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: upside
+    headline: "US CPI rises 8.6% in May, hotter than expected"
+    summary: "Headline CPI comes in at 8.6% y/y versus 8.3% expected, a new cycle high."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_06102022.htm"
+    source_tier: official
+    magnitude: {value: 8.6, unit: pct}
+    surprise: {value: 0.3, unit: pp, sign: positive}
+    tags: [cpi, 2022]
+
+  - id: cpi-2022-07-13
+    date: 2022-07-13
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: upside
+    headline: "US CPI rises 9.1% in June, above consensus"
+    summary: "Headline CPI reaches 9.1% y/y versus 8.8% expected, driven by energy and shelter."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_07132022.htm"
+    source_tier: official
+    magnitude: {value: 9.1, unit: pct}
+    surprise: {value: 0.3, unit: pp, sign: positive}
+    tags: [cpi, 2022]
+
+  - id: cpi-2022-10-13
+    date: 2022-10-13
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: upside
+    headline: "US CPI rises 8.2% in September, above expectations"
+    summary: "Headline CPI comes in at 8.2% y/y versus 8.1% expected; core inflation accelerates."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_10132022.htm"
+    source_tier: official
+    magnitude: {value: 8.2, unit: pct}
+    surprise: {value: 0.1, unit: pp, sign: positive}
+    tags: [cpi, 2022]
+
+  - id: cpi-2022-11-10
+    date: 2022-11-10
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: downside
+    headline: "US CPI rises 7.7% in October, below expectations"
+    summary: "Headline CPI comes in at 7.7% y/y versus 7.9% expected, the first downside surprise in months."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_11102022.htm"
+    source_tier: official
+    magnitude: {value: 7.7, unit: pct}
+    surprise: {value: 0.2, unit: pp, sign: positive}
+    tags: [cpi, 2022]
+
+  - id: cpi-2023-06-13
+    date: 2023-06-13
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: downside
+    headline: "US CPI rises 4.0% in May, below expectations"
+    summary: "Headline CPI comes in at 4.0% y/y versus 4.1% expected, the lowest since March 2021."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_06132023.htm"
+    source_tier: official
+    magnitude: {value: 4.0, unit: pct}
+    surprise: {value: 0.1, unit: pp, sign: positive}
+    tags: [cpi, 2023]
+
+  - id: cpi-2023-07-12
+    date: 2023-07-12
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: downside
+    headline: "US CPI rises 3.0% in June, below expectations"
+    summary: "Headline CPI comes in at 3.0% y/y versus 3.1% expected, a sharp disinflation print."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_07122023.htm"
+    source_tier: official
+    magnitude: {value: 3.0, unit: pct}
+    surprise: {value: 0.1, unit: pp, sign: positive}
+    tags: [cpi, 2023]
+
+  - id: cpi-2023-09-13
+    date: 2023-09-13
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: upside
+    headline: "US CPI rises 3.7% in August, above expectations"
+    summary: "Headline CPI comes in at 3.7% y/y versus 3.6% expected on higher energy prices."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_09132023.htm"
+    source_tier: official
+    magnitude: {value: 3.7, unit: pct}
+    surprise: {value: 0.1, unit: pp, sign: positive}
+    tags: [cpi, 2023]
+
+  - id: cpi-2024-04-10
+    date: 2024-04-10
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: upside
+    headline: "US CPI rises 3.5% in March, above expectations"
+    summary: "Headline CPI comes in at 3.5% y/y versus 3.4% expected; core inflation stays sticky."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_04102024.htm"
+    source_tier: official
+    magnitude: {value: 3.5, unit: pct}
+    surprise: {value: 0.1, unit: pp, sign: positive}
+    tags: [cpi, 2024]
+
+  - id: cpi-2024-09-11
+    date: 2024-09-11
+    time_et: "08:30"
+    session: before_open
+    event_type: inflation
+    direction: downside
+    headline: "US CPI rises 2.5% in August, below expectations"
+    summary: "Headline CPI comes in at 2.5% y/y versus 2.6% expected, supporting the case for Fed cuts."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/cpi_09112024.htm"
+    source_tier: official
+    magnitude: {value: 2.5, unit: pct}
+    surprise: {value: 0.1, unit: pp, sign: positive}
+    tags: [cpi, 2024]
+
+  # ---------------------------------------------------------------- trade
+  - id: trade-2018-03-22
+    date: 2018-03-22
+    time_et: "12:30"
+    session: during
+    event_type: trade_policy
+    direction: escalation
+    actor: US_GOV
+    headline: "Trump signs memorandum imposing tariffs on $60 billion of Chinese goods"
+    summary: "The administration invokes Section 301 and directs tariffs on Chinese imports."
+    source_name: "US Trade Representative"
+    source_url: "https://ustr.gov/about-us/policy-offices/press-office/press-releases"
+    source_tier: official
+    magnitude: {value: 60, unit: usd_bn}
+    tags: [trade, 2018]
+
+  - id: trade-2018-07-06
+    date: 2018-07-06
+    time_et: "00:01"
+    session: before_open
+    event_type: trade_policy
+    direction: escalation
+    actor: US_GOV
+    headline: "US tariffs on $34 billion of Chinese goods take effect"
+    summary: "The first tranche of Section 301 tariffs takes effect; China retaliates immediately."
+    source_name: "US Trade Representative"
+    source_url: "https://ustr.gov/about-us/policy-offices/press-office/press-releases"
+    source_tier: official
+    magnitude: {value: 34, unit: usd_bn}
+    tags: [trade, 2018]
+
+  - id: trade-2019-08-01
+    date: 2019-08-01
+    time_et: "13:30"
+    session: during
+    event_type: trade_policy
+    direction: escalation
+    actor: US_GOV
+    headline: "Trump announces 10% tariffs on $300 billion of Chinese imports"
+    summary: "The administration expands tariffs to essentially all remaining Chinese imports."
+    source_name: "White House"
+    source_url: "https://trumpwhitehouse.archives.gov/briefings-statements/"
+    source_tier: official
+    magnitude: {value: 300, unit: usd_bn}
+    tags: [trade, 2019]
+
+  - id: trade-2019-08-23
+    date: 2019-08-23
+    time_et: "12:00"
+    session: during
+    event_type: trade_policy
+    direction: escalation
+    actor: CHINA_GOV
+    headline: "China retaliates with tariffs on $75 billion of US goods"
+    summary: "Beijing announces retaliatory tariffs and Trump orders US companies to look for alternatives to China."
+    source_name: "Reuters"
+    source_url: "https://www.reuters.com/world/"
+    source_tier: media
+    magnitude: {value: 75, unit: usd_bn}
+    tags: [trade, 2019]
+
+  - id: trade-2025-04-02
+    date: 2025-04-02
+    time_et: "16:00"
+    session: after_close
+    event_type: trade_policy
+    direction: escalation
+    actor: US_GOV
+    headline: "Trump announces sweeping reciprocal tariffs on US imports"
+    summary: "The administration announces a broad tariff regime, including a 10% baseline and higher rates on major trading partners."
+    source_name: "White House"
+    source_url: "https://www.whitehouse.gov/briefing-room/"
+    source_tier: official
+    tags: [trade, 2025]
+
+  - id: trade-2025-04-09
+    date: 2025-04-09
+    time_et: "13:30"
+    session: during
+    event_type: trade_policy
+    direction: deescalation
+    actor: US_GOV
+    headline: "Trump pauses reciprocal tariffs for 90 days"
+    summary: "The administration pauses the reciprocal tariffs for most trading partners, excluding China."
+    source_name: "White House"
+    source_url: "https://www.whitehouse.gov/briefing-room/"
+    source_tier: official
+    tags: [trade, 2025]
+
+  # ---------------------------------------------------------------- energy
+  - id: opec-2022-10-05
+    date: 2022-10-05
+    time_et: "12:00"
+    session: during
+    event_type: energy_supply
+    direction: supply_cut
+    actor: OPEC_PLUS
+    headline: "OPEC+ agrees to cut oil production by 2 million barrels per day"
+    summary: "OPEC+ announces its largest output cut since 2020, ignoring US pressure."
+    source_name: "OPEC"
+    source_url: "https://www.opec.org/opec_web/en/press_room/"
+    source_tier: official
+    magnitude: {value: 2.0, unit: mbpd}
+    tags: [opec, 2022]
+
+  - id: opec-2023-04-02
+    date: 2023-04-02
+    time_et: "12:00"
+    session: non_trading
+    event_type: energy_supply
+    direction: supply_cut
+    actor: OPEC_PLUS
+    headline: "OPEC+ announces surprise voluntary production cuts of 1.16 million barrels per day"
+    summary: "Several OPEC+ members announce voluntary cuts outside the formal meeting, a surprise to the market."
+    source_name: "OPEC"
+    source_url: "https://www.opec.org/opec_web/en/press_room/"
+    source_tier: official
+    magnitude: {value: 1.16, unit: mbpd}
+    surprise: {value: 1.16, unit: qualitative, sign: positive}
+    tags: [opec, 2023]
+
+  - id: opec-2024-06-02
+    date: 2024-06-02
+    time_et: "12:00"
+    session: non_trading
+    event_type: energy_supply
+    direction: supply_cut
+    actor: OPEC_PLUS
+    headline: "OPEC+ extends production cuts through 2025"
+    summary: "OPEC+ extends voluntary cuts and sets a timetable for gradually unwinding them."
+    source_name: "OPEC"
+    source_url: "https://www.opec.org/opec_web/en/press_room/"
+    source_tier: official
+    tags: [opec, 2024]
+
+  # ---------------------------------------------------------------- geopolitics
+  - id: geo-2020-01-03
+    date: 2020-01-03
+    time_et: "07:00"
+    session: before_open
+    event_type: geopolitics
+    direction: risk_off
+    headline: "US kills Iranian general Qasem Soleimani in Baghdad strike"
+    summary: "A US drone strike kills Iran's top general, raising the risk of a Middle East escalation."
+    source_name: "Reuters"
+    source_url: "https://www.reuters.com/world/"
+    source_tier: media
+    tags: [geopolitics, 2020]
+
+  - id: geo-2022-02-24
+    date: 2022-02-24
+    time_et: "05:00"
+    session: before_open
+    event_type: geopolitics
+    direction: risk_off
+    headline: "Russia invades Ukraine"
+    summary: "Russian forces launch a full-scale invasion of Ukraine, triggering a global risk-off move."
+    source_name: "Reuters"
+    source_url: "https://www.reuters.com/world/"
+    source_tier: media
+    tags: [geopolitics, 2022]
+
+  - id: geo-2023-10-07
+    date: 2023-10-07
+    time_et: "06:00"
+    session: non_trading
+    event_type: geopolitics
+    direction: risk_off
+    headline: "Hamas attacks Israel, killing hundreds"
+    summary: "Hamas launches a surprise attack on Israel, raising the risk of a wider regional conflict."
+    source_name: "Reuters"
+    source_url: "https://www.reuters.com/world/"
+    source_tier: media
+    tags: [geopolitics, 2023]
+
+  - id: geo-2024-04-13
+    date: 2024-04-13
+    time_et: "20:00"
+    session: non_trading
+    event_type: geopolitics
+    direction: risk_off
+    headline: "Iran launches missile and drone attack on Israel"
+    summary: "Iran launches an unprecedented direct attack on Israel, increasing regional war risk."
+    source_name: "Reuters"
+    source_url: "https://www.reuters.com/world/"
+    source_tier: media
+    tags: [geopolitics, 2024]
+
+  # ---------------------------------------------------------------- financial stability
+  - id: bank-2023-03-12
+    date: 2023-03-12
+    time_et: "18:00"
+    session: non_trading
+    event_type: financial_stability
+    direction: stress
+    headline: "Regulators seize Silicon Valley Bank after bank run"
+    summary: "SVB is closed by regulators after a deposit run; the Fed announces an emergency lending facility."
+    source_name: "FDIC"
+    source_url: "https://www.fdic.gov/news/press-releases/"
+    source_tier: official
+    tags: [banking, 2023]
+
+  - id: bank-2023-03-15
+    date: 2023-03-15
+    time_et: "03:00"
+    session: before_open
+    event_type: financial_stability
+    direction: stress
+    headline: "Credit Suisse shares collapse as bank stress spreads"
+    summary: "Credit Suisse comes under severe pressure and the SNB provides a liquidity backstop."
+    source_name: "Reuters"
+    source_url: "https://www.reuters.com/business/finance/"
+    source_tier: media
+    tags: [banking, 2023]
+
+  - id: fed-2020-03-03
+    date: 2020-03-03
+    time_et: "10:00"
+    session: during
+    event_type: monetary_policy
+    direction: easing
+    actor: US_FED
+    headline: "Fed cuts rates by 50 basis points in emergency move"
+    summary: "The FOMC cuts rates by half a point between meetings in response to the coronavirus."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200303a.htm"
+    source_tier: official
+    magnitude: {value: 50, unit: bps}
+    surprise: {value: 50, unit: bps, sign: positive}
+    tags: [fomc, 2020, emergency]
+
+  - id: fed-2020-03-15
+    date: 2020-03-15
+    time_et: "17:00"
+    session: non_trading
+    event_type: monetary_policy
+    direction: easing
+    actor: US_FED
+    headline: "Fed cuts rates to zero and launches QE in emergency move"
+    summary: "The FOMC cuts the target range to 0%-0.25% and announces large-scale asset purchases."
+    source_name: "Federal Reserve"
+    source_url: "https://www.federalreserve.gov/newsevents/pressreleases/monetary20200315a.htm"
+    source_tier: official
+    magnitude: {value: 100, unit: bps}
+    surprise: {value: 100, unit: bps, sign: positive}
+    tags: [fomc, 2020, emergency]
+
+  # ---------------------------------------------------------------- China
+  - id: china-2023-08-27
+    date: 2023-08-27
+    time_et: "12:00"
+    session: non_trading
+    event_type: china_policy
+    direction: stimulus
+    actor: CHINA_GOV
+    headline: "China cuts stamp duty on stock trading to support the market"
+    summary: "Beijing halves the stamp duty on stock trading, one of several measures to stabilise equities."
+    source_name: "Reuters"
+    source_url: "https://www.reuters.com/world/china/"
+    source_tier: media
+    tags: [china, 2023]
+
+  - id: china-2024-09-24
+    date: 2024-09-24
+    time_et: "03:00"
+    session: before_open
+    event_type: china_policy
+    direction: stimulus
+    actor: PBOC
+    headline: "China's central bank unveils stimulus package and cuts reserve requirement ratio"
+    summary: "The PBOC announces rate cuts, a reserve-requirement cut and support for equities and property."
+    source_name: "Reuters"
+    source_url: "https://www.reuters.com/world/china/"
+    source_tier: media
+    tags: [china, 2024]
+
+  # ---------------------------------------------------------------- BOJ / ECB / fiscal / labour
+  - id: boj-2024-07-31
+    date: 2024-07-31
+    time_et: "00:00"
+    session: before_open
+    event_type: monetary_policy
+    direction: tightening
+    actor: BOJ
+    headline: "Bank of Japan raises its policy rate to 0.25%"
+    summary: "The BOJ raises rates and announces a plan to halve bond purchases, signalling policy normalisation."
+    source_name: "Bank of Japan"
+    source_url: "https://www.boj.or.jp/en/mopo/mpmdeci/mpr_2024/"
+    source_tier: official
+    magnitude: {value: 15, unit: bps}
+    surprise: {value: 15, unit: bps, sign: positive}
+    tags: [boj, 2024]
+
+  - id: ecb-2022-07-21
+    date: 2022-07-21
+    time_et: "08:15"
+    session: before_open
+    event_type: monetary_policy
+    direction: tightening
+    actor: ECB
+    headline: "ECB raises rates by 50 basis points, its first hike in 11 years"
+    summary: "The ECB surprises with a 50bp hike and unveils an anti-fragmentation tool."
+    source_name: "European Central Bank"
+    source_url: "https://www.ecb.europa.eu/press/pr/date/2022/html/index.en.html"
+    source_tier: official
+    magnitude: {value: 50, unit: bps}
+    surprise: {value: 25, unit: bps, sign: positive}
+    tags: [ecb, 2022]
+
+  - id: fiscal-2021-03-11
+    date: 2021-03-11
+    time_et: "14:00"
+    session: during
+    event_type: fiscal_policy
+    direction: stimulus
+    actor: US_GOV
+    headline: "Biden signs $1.9 trillion American Rescue Plan"
+    summary: "The president signs a large fiscal package including stimulus checks and state aid."
+    source_name: "White House"
+    source_url: "https://www.whitehouse.gov/briefing-room/"
+    source_tier: official
+    magnitude: {value: 1900, unit: usd_bn}
+    tags: [fiscal, 2021]
+
+  - id: labor-2022-10-07
+    date: 2022-10-07
+    time_et: "08:30"
+    session: before_open
+    event_type: labor_market
+    direction: upside
+    headline: "US payrolls rise by 263,000, beating expectations"
+    summary: "Nonfarm payrolls come in above consensus and the unemployment rate falls to 3.5%."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/empsit_10072022.htm"
+    source_tier: official
+    magnitude: {value: 263000, unit: count}
+    surprise: {value: 13000, unit: qualitative, sign: positive}
+    tags: [labour, 2022]
+
+  - id: labor-2024-08-02
+    date: 2024-08-02
+    time_et: "08:30"
+    session: before_open
+    event_type: labor_market
+    direction: downside
+    headline: "US payrolls rise by 114,000, much weaker than expected; unemployment rises to 4.3%"
+    summary: "Payrolls miss consensus and the unemployment rate triggers the Sahm rule, sparking recession fears."
+    source_name: "BLS"
+    source_url: "https://www.bls.gov/news.release/archives/empsit_08022024.htm"
+    source_tier: official
+    magnitude: {value: 114000, unit: count}
+    surprise: {value: 61000, unit: qualitative, sign: positive}
+    tags: [labour, 2024]

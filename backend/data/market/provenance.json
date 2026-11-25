@@ -1,0 +1,89 @@
+{
+  "source": "Yahoo Finance chart API",
+  "endpoint": "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}",
+  "retrieved_at_utc": "2026-11-25T11:35:04+00:00",
+  "requested_window": {
+    "start": "2015-01-01",
+    "end": "2026-11-25"
+  },
+  "price_field": "adjusted close (dividends and splits reinvested)",
+  "tickers": {
+    "SPY": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "QQQ": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "TLT": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "IEF": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "UUP": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "GLD": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "XLE": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "XLU": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "EEM": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "HYG": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "^VIX": {
+      "rows": 2995,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    },
+    "FXI": {
+      "rows": 2993,
+      "first_date": "2014-12-31",
+      "last_date": "2026-11-24",
+      "currency": "USD"
+    }
+  },
+  "caveats": [
+    "Yahoo Finance is a convenience endpoint, not an exchange feed.",
+    "Adjusted close can be revised after corporate actions; do not treat as point-in-time.",
+    "Survivorship and listing changes are not modelled."
+  ]
+}

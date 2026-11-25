@@ -1,68 +1,126 @@
-# Contributing to Domino-Agent
+# Contributing to Domino Agent
 
-Thank you for your interest in contributing to Domino-Agent! 🎉
+Thanks for taking the project seriously. This is a research prototype, so the bar is not “it runs” — it is “the claim is still true after your change.”
 
-## 🚀 Getting Started
+## Setup
 
-1. **Fork the repository**
-2. **Clone your fork**: `git clone https://github.com/YOUR_USERNAME/Domino-Agent.git`
-3. **Create a branch**: `git checkout -b feature/your-feature-name`
-4. **Make your changes**
-5. **Test thoroughly**
-6. **Commit**: `git commit -m "feat: add amazing feature"`
-7. **Push**: `git push origin feature/your-feature-name`
-8. **Open a Pull Request**
+```bash
+git clone https://github.com/Puss-M/Domino-Agent.git
+cd Domino-Agent
+py -3.12 -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-## 📝 Commit Convention
+Run the checks:
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/):
+```bash
+ruff check . --select E9,F --extend-exclude frontend
+pytest -q
+```
 
-- `feat:` New feature
-- `fix:` Bug fix
-- `docs:` Documentation changes
-- `style:` Code style changes (formatting, etc.)
-- `refactor:` Code refactoring
-- `test:` Adding or updating tests
-- `chore:` Maintenance tasks
+Start the app:
 
-## 🐛 Reporting Bugs
+```bash
+uvicorn backend.main:app --reload
+```
 
-Please include:
+## Adding a mechanism
 
-- Clear description of the issue
-- Steps to reproduce
-- Expected vs actual behavior
-- Screenshots if applicable
-- Environment details (OS, Python version, Node version)
+A mechanism is a hypothesis, not a prompt. Before adding one, answer:
 
-## 💡 Feature Requests
+1. What event type and direction triggers it?
+2. Which conditions must hold, and which conditions exclude it?
+3. Which transmission channels does it activate, with what sign?
+4. What is the evidence grade, and why?
+5. Which paper or official source supports the direction?
 
-We love new ideas! Please:
+Add the entry to `backend/data/knowledge/mechanisms.yaml`:
 
-- Check existing issues first
-- Describe the use case
-- Explain why it's valuable
-- Suggest implementation if possible
+```yaml
+- id: UNIQUE_ID
+  title: Short, falsifiable description
+  event_types: [monetary_policy]
+  directions: [tightening]
+  actors: [US_FED]          # optional
+  any_keywords: [ ... ]     # optional, all must have at least one hit
+  none_keywords: [ ... ]    # optional, any hit excludes the mechanism
+  confidence: 0.7
+  evidence_grade: B
+  horizon_days: 5
+  rationale: "Why the channel signs follow."
+  channels:
+    real_yields: 0.8
+    usd: 0.4
+  citations:
+    - "Author (Year), Journal"
+```
 
-## 🧪 Testing
+Then:
 
-Before submitting:
+- add a retrieval test in `tests/test_knowledge.py`;
+- add a transmission assertion in `tests/test_transmission.py` if it changes an important asset;
+- run `pytest`;
+- run the backtest and update `docs/evaluation.md` if the numbers change.
 
-- Test backend: `cd backend && pytest`
-- Test frontend: `cd frontend && npm test`
-- Manual testing: Run both servers and verify UI
+Do **not** add a mechanism without a citation. Do not tune a mechanism against the test outcomes and then report the same test as out-of-sample.
 
-## 📚 Code Style
+## Adding an event
 
-- **Python**: Follow PEP 8
-- **TypeScript**: Use ESLint/Prettier
-- **Comments**: Explain "why", not "what"
-- **Naming**: Descriptive and consistent
+Add a dated entry to `backend/data/events/events.yaml` with:
 
-## 🤝 Code of Conduct
+- `date`, `time_et`, `session` (`before_open`, `during`, `after_close`, `non_trading`);
+- `event_type`, `direction`, `actor`;
+- a real headline and summary;
+- `source_name`, `source_url`, `source_tier`;
+- `magnitude` and `surprise` where applicable;
+- `tags`.
 
-Be respectful, inclusive, and constructive. We're all here to learn and build together.
+Then add it to `tests/test_extractor.py` if it exercises a new pattern. Run the backtest and inspect whether the event has enough price history and whether the outcome window overlaps other events.
 
----
+## Data refresh
 
-**Questions?** Open a [Discussion](https://github.com/yourusername/Domino-Agent/discussions)
+```bash
+python scripts/fetch_market_snapshot.py --start 2015-01-01
+python scripts/fetch_public_snapshots.py
+```
+
+- Yahoo adjusted closes are revised. Re-running the backtest after a refresh can change historical CARs.
+- SEC asks for a contact string. Set `DOMINO_USER_AGENT` before bulk work.
+- GDELT articles are a discovery layer; deduplicate before counting.
+
+## Code style
+
+- Python 3.10+, type hints where they clarify a contract.
+- Prefer deterministic code for numbers. An LLM must never produce a numeric field that enters the graph.
+- Keep the offline path working without an API key.
+- Comments explain *why*, not *what*.
+- Frontend is zero-build: no CDN, no bundler, no framework. Keep it that way unless there is a strong reason.
+
+## Commit convention
+
+Conventional Commits:
+
+- `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
+
+## Pull request checklist
+
+- [ ] `ruff check . --select E9,F --extend-exclude frontend` passes.
+- [ ] `pytest -q` passes.
+- [ ] The offline demo still runs with no API key.
+- [ ] If a number in the README changed, `docs/evaluation.md` was updated with the new value and the same protocol.
+- [ ] New mechanisms have citations and a retrieval test.
+- [ ] New events have a source URL and a session.
+- [ ] No claim of causal identification or trading alpha was added.
+
+## Research integrity
+
+- Report failures. The QQQ/XLU/FXI and 5-day results are in `docs/evaluation.md` for a reason.
+- Do not cherry-pick the test window.
+- Do not call a curated label “ground truth” without qualification.
+- Do not call a cited transmission hypothesis “causal inference” without an identification strategy.
+
+## Reporting bugs
+
+Include the command, the expected behavior, the actual behavior, and the Python version. If it is a data issue, include the snapshot date and the source.
