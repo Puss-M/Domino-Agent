@@ -14,7 +14,7 @@ from dataclasses import dataclass
 
 from ..schemas import Magnitude, Surprise
 
-_NUM = r"(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)"
+_NUM = r"[+-]?(?:\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)"
 
 _PATTERNS: list[tuple[str, re.Pattern[str], float]] = [
     (

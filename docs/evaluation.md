@@ -22,8 +22,9 @@ The benchmark card is [`docs/benchmark.md`](benchmark.md); the model card is [`d
 - **Flat threshold**: 10bp (100bp for ^VIX); flat outcomes are excluded from directional accuracy.
 - **Split**: first 50% of events for stack weights and Platt calibration; last 50% held out.
 - **Analog maturation**: a prior event enters the analog pool only after its outcome window ends before the current event day.
-- **Uncertainty**: 500 bootstrap resamples of **events**; paired Brier comparisons use the same event clusters.
+- **Uncertainty**: 500 bootstrap resamples of **events**; paired Brier comparisons use the same event clusters. The event-study CARs also carry a Kolari–Pynnönen (2010) cross-sectional correlation adjustment; see below.
 - **Mechanism anchor**: the stack search allows mechanism weights `0.6–1.2`, analog/base weights `0–0.6`. The anchor is a deliberate prior; the FOMC stress test shows its cost.
+- **Temporal integrity**: no LLM sits in the metric path, so the benchmark is not exposed to parametric lookahead (Gao et al., arXiv 2512.23847; Zhang & Stadie, arXiv 2608.02985). It is still exposed to revised Yahoo adjusted closes; the point-in-time contract (E11) is the missing audit.
 
 ## Curated benchmark (primary)
 
@@ -103,6 +104,52 @@ No model dominates. The mechanism has an accuracy advantage but is overconfident
 | Stacked + Platt | 277 | 96.5% | 0.545 | 0.252 | 0.528 |
 
 The five-day horizon is materially weaker than the one-day announcement window. Macro information is largely priced in the first session; subsequent drift is dominated by other news. The project does not claim a five-day trading signal.
+
+## Cross-sectional correlation and clustering (E7)
+
+Macro events hit all assets at once. A naive event-study t-statistic that treats
+the 12 assets as independent cross-sectional observations overstates precision.
+We implement the Kolari–Pynnönen (2010) adjustment of the Boehmer–Musumeci–
+Poulsen standardized CAR test:
+
+`KP_t = BMP_t / sqrt(1 + (N - 1) * rho_bar)`
+
+where `N` is the number of assets in the event cross-section and `rho_bar` is
+the average pairwise correlation of market-model residuals over `[-120, -21]`.
+SPY is excluded from the cross-section because its market-model residual is zero
+by construction. Critical values are two-sided 5% t with `N - 1` degrees of
+freedom, not 1.96.
+
+| Dataset | Events | Mean rho | Inflation | Mean \|BMP\| | Mean \|KP\| | Sig. BMP | Sig. KP | Pooled t (naive → KP) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Curated | 50 | 0.043 | 1.19 | 1.18 | 1.01 | 6.0% | 6.0% | 1.92 → 1.65 |
+| FOMC action-only | 58 | 0.059 | 1.23 | 1.24 | 1.01 | 6.9% | 3.5% | 0.25 → 0.21 |
+| FOMC surprise-aware | 45 | 0.057 | 1.22 | 1.29 | 1.06 | 8.9% | 4.4% | −0.38 → −0.33 |
+| Extended | 92 | 0.054 | 1.22 | 1.23 | 1.02 | 7.6% | 5.4% | 1.35 → 1.14 |
+
+Raw numbers: [`docs/results/kp_test.json`](results/kp_test.json).
+
+The adjustment is modest because residual correlation after the market model is
+low (0.04–0.06), not because the correction is unnecessary. It still moves the
+FOMC significant-event share from 6.9% to 3.5%. More importantly, **no pooled
+equal-weighted CAR is significant in any benchmark** after adjustment. Macro
+events do not produce a common one-day cross-asset move in this sample; their
+effects are heterogeneous by asset. That is consistent with the per-asset
+pattern below and with the paper's claim that the useful object is the signed
+transmission path, not an average market reaction.
+
+The primary directional inference does **not** rely on these CAR t-statistics.
+It uses event-clustered bootstrap intervals over Brier scores and accuracy,
+which already preserve within-event cross-asset correlation. E7 is a robustness
+check on the event-study layer, not a second test of the model's skill.
+
+Per-asset means also get a cluster-robust t that collapses same-day events. The
+largest curated values are QQQ **+43.5bp** (t=3.22), XLE **−120.8bp** (t=−2.98),
+GLD **+62.7bp** (t=2.56) and UUP **−32.6bp** (t=−2.39). XLE is negative and
+significant in all four datasets (curated t=−2.98, FOMC t=−2.23, surprise-aware
+t=−2.49, extended t=−3.17). These are unconditional sample means, not
+multiple-testing-adjusted discoveries; they describe which assets moved, not
+what the model predicted.
 
 ## Per-asset (curated, headline model, held-out)
 

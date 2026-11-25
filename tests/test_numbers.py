@@ -11,6 +11,12 @@ def test_basis_points():
     assert parsed[0].value == 50
 
 
+def test_signed_numbers_keep_their_sign():
+    parsed = parse_numbers("The prior is -234bp and the score is +0.42")
+    assert parsed[0].unit == "bps"
+    assert parsed[0].value == pytest.approx(-234.0)
+
+
 def test_percentage_points_vs_percent():
     parsed = parse_numbers("CPI rose 0.3 percentage points, or 8.6% year over year")
     units = [item.unit for item in parsed]

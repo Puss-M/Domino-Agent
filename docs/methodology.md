@@ -246,8 +246,12 @@ Policies are executable predicates over the final response:
 | P-007 | warning | Action-only monetary events warn that the level may be priced |
 | P-008 | error | No numeric prediction contradicts a formal proof |
 | P-009 | warning | Symbolic ambiguity is surfaced |
+| P-010 | error | Every mechanism ID in the narrative was actually used |
+| P-011 | error | Every memo citation belongs to a used mechanism |
+| P-012 | error | Every asset in the narrative is in the prediction universe |
+| P-013 | error | Every unit-bearing number matches the structured unit |
 
-P-004 is the anti-hallucination contract for a narrator: injected fake numbers and advice language fail in `tests/test_symbolic.py`. Every analysis appends a SHA-256 hash-chained record (`seq`, timestamp, `prev_hash`, canonical payload) to an append-only ledger; the response carries the record hash and `verify_chain()` recomputes the chain.
+P-004 is the anti-hallucination contract for a narrator: injected fake numbers and advice language fail in `tests/test_symbolic.py`; the scaled audit detects 60/60 corruptions with 0/10 clean false positives. P-013 covers the NumTrace-style failure that a value-only check misses: a grounded number with the wrong unit (50bp written as 50%). Every analysis appends a SHA-256 hash-chained record (`seq`, timestamp, `prev_hash`, canonical payload) to an append-only ledger; the response carries the record hash and `verify_chain()` recomputes the chain.
 
 ### 3.4 Typed ontology
 

@@ -78,7 +78,7 @@ The FOMC mechanism-only model is **significantly worse** than the always-up base
 ## Symbolic verification and compliance
 
 - The matched mechanisms compile to a signed influence graph; Z3 returns a minimal proof core or an ambiguity status per asset.
-- Policies P-001–P-009 enforce disclaimer, no-advice, evidence citations, numeric grounding, abstention, audit pass, surprise warnings and proof consistency.
+- Policies P-001–P-013 enforce disclaimer, no-advice, evidence citations, numeric and unit grounding, abstention, audit pass, surprise warnings, proof consistency, and grounding of mechanism IDs, citations and assets.
 - Every analysis is committed to a SHA-256 hash-chained ledger (`backend/.cache/audit/ledger.jsonl`); the response carries the record hash.
 - Compliance mapping is documented in [`neuro_symbolic.md`](neuro_symbolic.md): SEC Marketing Rule / AI-washing substantiation, Fed SR 11-7 independent validation, MiFID II accountability, EU AI Act logging/human oversight.
 

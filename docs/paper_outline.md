@@ -17,7 +17,7 @@ Target venues, in order:
 ## Contributions
 
 1. **Formalization.** Macro transmission as a signed influence digraph with qualitative algebra; an SMT encoding that returns minimal proof cores; ambiguity as a first-class output rather than a confidence score. (Novel combination; closest work is FormaFin/SOVER for SMT verification of financial rules, and Three-Engine for the architecture.)
-2. **Benchmark.** DMB: 50 curated macro events, 58 systematic FOMC target-range changes generated from official statements (2004–2025), and a 92-event deduplicated mixed set; paired event-clustered Brier tests, calibration, coverage, and a documented negative result.
+2. **Benchmark.** DMB: 50 curated macro events, 58 systematic FOMC target-range changes generated from official statements (2004–2025), a 45-event surprise-aware subset joined with the Bu–Rogers–Wu (2021) series, and a 92-event deduplicated mixed set; paired event-clustered Brier tests, calibration, coverage, a Kolari–Pynnönen cross-correlation adjustment, and a documented negative result.
 3. **Architecture.** A three-engine neuro-symbolic pipeline: LLM perception (optional) → deterministic sign/transmission engine → policy-gated output with a hash-chained audit ledger.
 4. **Negative results.** Action-only FOMC asset direction is not predictable from free daily data; a lexicon tone-delta proxy fails; a published daily surprise series (BRW 2021) still fails (45.3% vs 52.7%, with easing surprises at 43.3%). The missing input is the monetary/information decomposition, not just a surprise number. This is a benchmark finding, not a footnote.
 
@@ -25,7 +25,7 @@ Target venues, in order:
 
 **The gap (our positioning)**
 
-A 2026 literature sweep across arXiv, PaperDaily, and the major finance venues found **no paper that combines** (a) LLM-extracted signed influence structures over macro variables, (b) a solver-verified sign-consistency layer, and (c) macro transmission evaluation. The components exist separately:
+A 2026 literature sweep across arXiv, PaperDaily, and the major finance venues found **no paper that combines** (a) LLM-extracted signed influence structures over macro variables, (b) a solver-verified sign-consistency layer, and (c) macro transmission evaluation. A follow-up sweep on 2026-11-26 found closer neighbors (FCM forecasting, event-graph stock scoring, financial-agent verification, temporal-leakage benchmarks), but still no system that joins all three. The components exist separately:
 
 - **TraceMAS** (arXiv 2608.03339): traceable multi-agent forecasting with an "Ideal CLD" and a "Data-Grounded CLD"; signed causal-loop diagrams as an inspectable intermediate representation, but no solver verification.
 - **AI Economist Agent** (arXiv 2606.20041): LLM agents constrained to registered quantitative models and statistical tests.
@@ -39,6 +39,14 @@ A 2026 literature sweep across arXiv, PaperDaily, and the major finance venues f
 - **Logic-LM** (EMNLP 2023 Findings) and **LLM-Modulo** (ICML 2024): the canonical "LLM proposes, external verifier disposes" design pattern.
 
 Our contribution is the intersection: a signed macro transmission graph, LLM-perceived events, Z3 proof cores, ambiguity as a first-class output, and a policy-as-code compliance layer — evaluated on a public macro benchmark.
+
+**Closest 2026-11 neighbors (follow-up sweep)**
+
+- **Fuzzy cognitive maps (FCMs).** *Online-Adaptive Fuzzy Cognitive Maps for Neuro-symbolic Financial Forecasting* (arXiv 2611.13388, 2026-11-10; Brandon Rodriguez, Abel Deulofeu, Olaoluwa Adigun, et al.) pairs an online-adaptive FCM with an LSTM for regime-shifting financial series. The same group builds FCMs from LLM-extracted causal feedback (*The Agentic Leash*, arXiv 2601.00097; *Causal Autoencoder-like Generation of Feedback FCMs with an LLM Agent*, arXiv 2509.25593). This is the closest symbolic-graph line: interpretable causal edges with learned weights and dynamics, but no solver-certified sign consistency or ambiguity output. Our graph is a qualitative FCM with proof cores.
+- **Event graphs for stock scoring.** *RICE-Alpha: Reliability-Informed Correction with Event Graphs for LLM-Agent Stock Forecasting* (arXiv 2609.34004, 2026-09-27) is a point-in-time stock-scoring framework that separates a history-aware multi-agent component from event-graph correction. *Structured Event Representation and Stock Return Predictability* (arXiv 2512.19484, 2025-12-22; Gang Li, Dandan Qiao, Mingxuan Zheng) finds LLM-extracted event features predict returns. These validate the event-driven premise but forecast cross-sectional scores, not macro transmission signs with a formal audit.
+- **Financial-agent verification.** *FinVerify: A Verification Framework for Financial Agents* (arXiv 2611.20423, 2026-11-16) operationalizes source fidelity, comparability, accounting integrity and financial-model fidelity as verification protocols. *NumTrace* (arXiv 2610.34887, 2026-10-26) audits number provenance and catches numbers that are in the filing but refer to the wrong entity, concept, period, unit or scope. *GURU* (arXiv 2611.01001, 2026-10-31) is a hierarchical neuro-symbolic multi-agent system whose framing — an AI may find a safe action, but must never decide what counts as safe — matches our policy gate. *NSVIF* (arXiv 2601.17789) verifies instruction following with neuro-symbolic checks. These verify answers, requirements or transactions; we verify transmission signs and return a minimal proof core.
+- **Temporal integrity.** *Detecting Lookahead Bias in LLM Forecasts* (arXiv 2512.23847, 2025-12-29; Zhenyu Gao, Wenxi Jiang, Yutong Yan), *Temporal Leakage in LLM Backtesting* (arXiv 2608.02985, 2026-08-04; Zeyu Zhang, Bradly C. Stadie), *FinCutBench* (arXiv 2611.11588, 2026-11-08), *When Does Post-Call Begin?* (arXiv 2610.21659, 2026-10-15) and *LLMs Don't Know What They Know* (arXiv 2611.06808, 2026-11-04) make parametric lookahead a first-class benchmark problem. Our offline path has no LLM in the metric path, which removes parametric leakage by construction; the remaining exposure is revised market data, discussed in Threats.
+- **Financial-agent benchmarks.** *Fin-RATE* (arXiv 2602.07294, 2026-02; SEC filings), *FinFIRST* (arXiv 2609.25192), *FinHopper* (arXiv 2610.26036), *AgenticFinBench* (arXiv 2611.04813) and *FinAutoRubric* (arXiv 2609.35744) evaluate QA, retrieval, multi-hop and rubric following. DMB is complementary: its unit is a macro event and a realised asset return, not a question-answer pair.
 
 **Neuro-symbolic verification**
 - FormaFin, *Verifiable Financial Analysis with Solver-Guided Reinforcement Learning*, arXiv 2611.28881 (2026-11-24). Trains small models to translate financial rules into SMT formulas; solver computes rewards.
@@ -88,8 +96,8 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 2. **Retrieval.** Cited mechanism library (20 mechanisms, 14 channels); actor/condition filtering; abstain when no match.
 3. **Symbolic kernel.** Signed influence graph; qualitative path composition; Z3 proof cores; ambiguity output; typed units.
 4. **Numeric transmission.** Channel/loading aggregation; expected CAR prior; audit.
-5. **Compliance.** Policy-as-code P-001–P-009; hash-chained ledger.
-6. **Evaluation.** Event study (market model, CAR[0,+1], event-day alignment), walk-forward stack (mechanism/analog/base), Platt calibration, paired event-clustered Brier tests, coverage.
+5. **Compliance.** Policy-as-code P-001–P-013; hash-chained ledger.
+6. **Evaluation.** Event study (market model, CAR[0,+1], event-day alignment), Kolari–Pynnönen cross-correlation adjustment, walk-forward stack (mechanism/analog/base), Platt calibration, paired event-clustered Brier tests, coverage.
 
 ## Experiments
 
@@ -99,12 +107,14 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 | E2 | System FOMC benchmark (58 events) | done | Table 2 (41.1% vs 56.6%, ΔBrier +0.134) |
 | E3 | Tone-delta surprise proxy | done (negative) | Table 3 (44–50%, base 52.6%) |
 | E4 | Symbolic proof coverage / ambiguity | done | Table 4 (66.7% coverage on hawkish hike; TLT/GLD ambiguous) |
-| E5 | Hallucination injection: N memos with fake numbers/advice | partial (1 case) | Detection rate by policy; need N=50–100 |
+| E5 | Hallucination injection: 10 clean memos × 6 corruption types | done | Table 5 (60/60 detected; 0/10 clean false positives) |
 | E6 | Ablation: numeric-only vs symbolic-only vs both | todo | Ambiguity catch rate; proof coverage |
-| E7 | Kolari–Pynnönen cross-correlation-adjusted CAR test | todo | Robustness table |
+| E7 | Kolari–Pynnönen cross-correlation-adjusted CAR test | done | Table 6 (rho 0.04–0.06; FOMC sig. events 6.9% → 3.5%) |
 | E8 | LLM perception vs rule extraction (optional) | todo, needs API key | Extraction accuracy / cost |
 | E9 | Surprise-aware FOMC with BRW (2021) daily shocks | done (negative) | Table 3b (45.3% vs 52.7%; easing 43.3%) |
 | E10 | Monetary vs information shock decomposition (Jarociński–Karadi 2020) | todo | FOMC accuracy/Brier after decomposition; needs intraday rate-equity co-movement |
+| E11 | Point-in-time contract and lookahead audit | todo | Per-source availability table; share of revised series |
+| E12 | Period/entity/scope provenance (NumTrace agenda) | partial (P-013 units done) | Provenance failure taxonomy; 60/60 unit injections |
 
 ## Results to report now
 
@@ -113,30 +123,33 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 - 5-day curated: 54.5%, Brier 0.252, AUC 0.528.
 - Surprise-aware FOMC (BRW 2021, 45 events): 45.3% vs base 52.7%; tightening 52.2%, easing 43.3%.
 - Symbolic: 19 nodes/78 edges/acyclic for a hawkish shock; 8 proved, 4 ambiguous; proof core for QQQ = {MON_TIGHTEN}.
-- Policy injection: advice language and three fake numbers detected.
+- Policy injection (E5): 60/60 injected corruptions detected across fake numbers, advice, fake mechanism IDs, fake citations, out-of-universe assets and right-number/wrong-unit claims; 0/10 clean memos raised an error policy.
+- Cross-sectional correlation (E7): mean residual rho 0.043–0.059; KP inflation 1.19–1.23. Mean |BMP| falls from 1.18–1.29 to 1.01–1.06. FOMC significant-event share falls 6.9% → 3.5% (surprise-aware 8.9% → 4.4%). Pooled equal-weighted CAR: curated t 1.92 → 1.65, FOMC 0.25 → 0.21, surprise-aware −0.38 → −0.33, extended 1.35 → 1.14. No pooled CAR is significant.
 
 ## Threats to validity
 
 - 50 curated events and 58 FOMC events; wide intervals.
 - Curated labels are editorial; extraction accuracy is in-sample vocabulary coverage.
 - FOMC headlines are templated; extraction metrics exclude them.
-- Yahoo adjusted closes are not point-in-time.
+- Yahoo adjusted closes are not point-in-time. The offline path has no LLM in the metric path, so it avoids the parametric lookahead documented by Gao et al. (2512.23847) and Zhang & Stadie (2608.02985); it does not avoid revised-price leakage. E11 is the missing audit.
 - Mechanism library is authored, not preregistered.
 - Symbolic proofs are relative to the library; they do not establish real-world causality.
 - Tone-delta is a lexicon proxy; a belief-object or LLM-based measure might do better (Changing the Narrative).
+- The event-study cross-section is only 11 assets (SPY excluded), so the KP adjustment has limited power; residual correlation is estimated over a 100-day window and treated as constant.
+- Per-asset CAR t-statistics are not multiple-testing adjusted; they are descriptive.
 
 ## What is missing for a strong submission
 
-1. **Kolari–Pynnönen test** (E7) — a standard event-study robustness check; low effort, high credibility.
-2. **Hallucination injection at scale** (E5) — 50–100 injected memos, report detection by policy and false-positive rate on clean memos. This directly supports the "reduce hallucination" claim.
-3. **Ablation** (E6) — show that symbolic verification catches ambiguity that the numeric model hides; quantify how often.
+1. **Ablation** (E6) — show that symbolic verification catches ambiguity that the numeric model hides; quantify how often.
+2. **Point-in-time contract** (E11) — per source, record when the value became public and whether the benchmark uses a revised value. Cite Gao et al. (2512.23847), Zhang & Stadie (2608.02985), FinCutBench (2611.11588) and the availability-contract paper (2610.21659). This is now a reviewer-level expectation, not a nicety.
+3. **Period/entity/scope provenance** (E12) — extend P-013 beyond units, following NumTrace (2610.34887): each memo number should reference the structured field's entity, concept, period and scope.
 4. **Optional LLM perception** (E8) — one open model or API, schema-constrained, with the rule extractor as fallback. Report extraction accuracy and cost. This makes the "neuro-symbolic" claim concrete rather than architectural.
 5. **Monetary/information decomposition** (E10) — the BRW surprise test shows a surprise number is not enough; use Jarociński–Karadi (2020) or a high-frequency rate-equity co-movement proxy. If unavailable, the negative result stands as a benchmark contribution.
-6. **A cleaner related-work positioning** — FormaFin verifies rules; we verify transmission signs and expose ambiguity. Three-Engine is an architecture paper; we add a benchmark and a negative result. Neither does both.
+6. **A cleaner related-work positioning** — FinVerify verifies answers, NumTrace verifies number provenance, GURU verifies actions; we verify transmission signs and expose ambiguity. FCM/RICE-Alpha build event graphs; we add solver proof cores and a public negative result. No single neighbor does both.
 
 ## Suggested timeline
 
-- Week 1: E5 (injection at scale), E7 (KP test), E6 (ablation).
+- Week 1: E6 (ablation), E10 (shock decomposition), optional E8.
 - Week 2: paper draft (8 pages), figures from `docs/results/`, artifact appendix.
 - Week 3: internal review, reproduction from a clean clone, submission.
 - Optional parallel: high-frequency surprise adapter; if it works, promote E9 to a main result.

@@ -88,8 +88,13 @@ def test_event_study_endpoint():
     assert response.status_code == 200
     payload = response.json()
     assert payload["window_end"] == 1
+    assert payload["dataset"] == "curated"
     assert payload["n_events"] > 0
     assert len(payload["summary"]) == 12
+    cross_sectional = payload["cross_sectional"]
+    assert cross_sectional["n_events"] > 0
+    assert 0.0 <= cross_sectional["mean_rho_bar"] < 1.0
+    assert cross_sectional["mean_abs_kp_t"] <= cross_sectional["mean_abs_bmp_t"]
 
 
 def test_backtest_endpoint_small_subset():

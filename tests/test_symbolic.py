@@ -188,6 +188,16 @@ def test_policy_catches_fake_asset(engine):
     assert any(r.id == "P-012" and not r.passed for r in results)
 
 
+def test_policy_catches_right_number_wrong_unit(engine):
+    response = engine.analyze_headline("Fed raises rates by 50 basis points")
+    bad = response.model_copy(deep=True)
+    bad.memo.summary += " The move was 50 percent."
+    results = PolicyEngine().evaluate(bad, bad.symbolic)
+    assert any(r.id == "P-013" and not r.passed for r in results)
+    # The value itself is grounded, so P-004 should not be the one catching it.
+    assert all(r.passed for r in results if r.id == "P-004")
+
+
 def test_audit_ledger_hash_chain():
     with tempfile.TemporaryDirectory() as tmp:
         ledger = AuditLedger(path=Path(tmp) / "ledger.jsonl")

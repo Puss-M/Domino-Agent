@@ -17,7 +17,7 @@ Domino's v0.4 follows the same principle: **LLMs, if used at all, are perception
 ```
 optional LLM perception          symbolic kernel (mandatory)          compliance
 ────────────────────────         ───────────────────────────          ──────────
-schema-constrained extraction -> typed event + dimension check   ->   P-001..P-009
+schema-constrained extraction -> typed event + dimension check   ->   P-001..P-013
 claim / belief-object parsing -> sign algebra over influence graph ->  numeric grounding
 narration (no arithmetic)     -> SMT proof cores / ambiguity     ->   hash-chained ledger
 ```
@@ -79,8 +79,12 @@ Policies are executable predicates over the final response, not prompt instructi
 | P-007 | warning | Action-only monetary events warn that the level may be priced |
 | P-008 | error | No numeric prediction contradicts a formal proof |
 | P-009 | warning | Symbolic ambiguity is surfaced |
+| P-010 | error | Every mechanism ID in the narrative was actually used |
+| P-011 | error | Every memo citation belongs to a used mechanism |
+| P-012 | error | Every asset in the narrative is in the prediction universe |
+| P-013 | error | Every unit-bearing number matches the structured unit |
 
-P-004 is the anti-hallucination contract for any future LLM narrator: an injected memo claiming "SPY will fall 3.2%, gold +12.5%, 95.7% confident, we recommend you buy gold" fails P-002 and P-004. This is verified in `tests/test_symbolic.py`.
+P-004 is the anti-hallucination contract for any future LLM narrator: an injected memo claiming "SPY will fall 3.2%, gold +12.5%, 95.7% confident, we recommend you buy gold" fails P-002 and P-004. This is verified in `tests/test_symbolic.py`, and the scaled audit (`scripts/hallucination_audit.py`) detects 60/60 injected corruptions across six types with 0/10 clean-memo false positives. P-013 adds the dimensional check: the number 50 is grounded, but "50 percent" is not the event's "50 basis points" (NumTrace, arXiv 2610.34887).
 
 The audit ledger (`backend/app/symbolic/policy.py`) appends a hash-chained record for every analysis: `hash = SHA256(seq, timestamp, prev_hash, payload)`. The response carries the record hash; `verify_chain()` recomputes the chain. It is a minimal compliance artifact: every published analysis is committed to an append-only log.
 
@@ -111,7 +115,7 @@ The best systems no longer rely on "another LLM reviews it". The convergent patt
 |---|---|---|
 | Deterministic compute separated from narration | FinRobot V2: 32 pure-Python operators, provenance-tracked artifacts, output-contract gate | Numeric transmission + sign algebra + SMT are deterministic; a narrator may only narrate |
 | Backtest / execution as the verifier | RD-Agent(Q): LLM proposes, Docker backtest disposes | Event-study evaluation is the final arbiter; no LLM in the metric path |
-| Policy compiled to executable code | GuardAgent (ICML 2025): natural-language policy → code, deterministic enforcement | P-001..P-009 are predicates over the response, not prompts |
+| Policy compiled to executable code | GuardAgent (ICML 2025): natural-language policy → code, deterministic enforcement | P-001..P-013 are predicates over the response, not prompts |
 | Deterministic rails at tool boundaries | NeMo Guardrails IORails: regex/CEL rules at input/output/tool call/tool result | P-004 numeric grounding plus the hash-chained ledger |
 | Tamper-evident session ledger | ai-hedge-fund paper-trading: hash-chained ledger, approval gates | `AuditLedger` hash chain in `symbolic/policy.py` |
 | Structured output contracts | OpenAI CFG decoding: 100% schema conformance vs 93% fine-tuned and <40% prompting-only | Pydantic contracts + rule-first extraction; optional LLM must emit schema-valid JSON |
@@ -137,13 +141,16 @@ This is a design sketch, not legal advice. A production deployment needs counsel
 
 ## 10. Novelty position
 
-A 2026 sweep across arXiv, PaperDaily and the finance venues found no paper that combines **LLM-perceived signed macro influence graphs**, **solver-verified sign consistency**, and **macro event-study evaluation**. The nearest components:
+A 2026 sweep across arXiv, PaperDaily and the finance venues found no paper that combines **LLM-perceived signed macro influence graphs**, **solver-verified sign consistency**, and **macro event-study evaluation**. A follow-up sweep on 2026-11-26 found closer neighbors, but still no system that joins all three. The nearest components:
 
 - **TraceMAS** (arXiv 2608.03339) keeps ideal and data-grounded causal loop diagrams for traceable forecasting, but does not solver-verify them.
 - **MechReasoner** (arXiv 2609.34636) operationalizes confluence/sign algebra as a qualitative simulator and shows LLM mechanistic reasoning degrades with complexity; it does not use a solver to certify an LLM's claim.
+- **Fuzzy cognitive maps** (arXiv 2611.13388; 2601.00097; 2509.25593) learn interpretable causal graphs with weights and dynamics, sometimes generated by an LLM. This is the closest symbolic-graph line; it does not return a solver proof core or treat ambiguity as a structural output.
+- **RICE-Alpha** (arXiv 2609.34004) and **Structured Event Representation** (arXiv 2512.19484) use event graphs/features for point-in-time stock scoring; they forecast cross-sectional scores, not macro transmission signs with a formal audit.
 - **FinCARE** (arXiv 2510.20221) uses 10-K knowledge graphs to constrain causal discovery at the firm level.
 - **VeriFin** (arXiv 2608.10213) grounds financial claims in XBRL and checks arithmetic with Z3; **FormaFin** (arXiv 2611.28881) trains models to formalize rules for SMT; neither models macro transmission.
-- **VerifiQuant** (arXiv 2611.26649) and **Solver-Aided Policy Compliance** (arXiv 2603.20449) enforce executable contracts / SMT policies for financial workflows; Domino's P-001–P-012 are the same idea applied to macro analysis output.
+- **FinVerify** (arXiv 2611.20423), **NumTrace** (arXiv 2610.34887), **GURU** (arXiv 2611.01001) and **NSVIF** (arXiv 2601.17789) verify financial answers, number provenance, mission-critical actions and instruction following. Domino verifies the signed transmission structure and returns a minimal proof core; NumTrace's entity/period/unit taxonomy motivates P-013.
+- **VerifiQuant** (arXiv 2611.26649) and **Solver-Aided Policy Compliance** (arXiv 2603.20449) enforce executable contracts / SMT policies for financial workflows; Domino's P-001–P-013 are the same idea applied to macro analysis output.
 
 The intersection is the contribution: a signed macro transmission graph, structured event perception, Z3 proof cores, ambiguity as a first-class output, and policy-as-code compliance — with a public benchmark that reports where it fails.
 
@@ -161,3 +168,11 @@ The intersection is the contribution: a signed macro transmission graph, structu
 - Bauer & Swanson, NBER Macroeconomics Annual 2023; Nakamura & Steinsson, QJE 2013.
 - Kolari & Pynnönen, RFS 2010.
 - *Changing the Narrative*, SSRN 6677954 (2026); *Identifying Monetary Policy Shocks with LLMs*, SSRN 7560498 (2026).
+- Rodriguez, Deulofeu, Adigun et al., *Online-Adaptive Fuzzy Cognitive Maps for Neuro-symbolic Financial Forecasting*, arXiv 2611.13388 (2026-11-10).
+- Panda, Adigun & Kosko, *Causal Autoencoder-like Generation of Feedback Fuzzy Cognitive Maps with an LLM Agent*, arXiv 2509.25593 (2025); *The Agentic Leash*, arXiv 2601.00097 (2025-12-31).
+- *RICE-Alpha: Reliability-Informed Correction with Event Graphs for LLM-Agent Stock Forecasting*, arXiv 2609.34004 (2026-09-27).
+- Li, Qiao & Zheng, *Structured Event Representation and Stock Return Predictability*, arXiv 2512.19484 (2025-12-22).
+- *FinVerify: A Verification Framework for Financial Agents*, arXiv 2611.20423 (2026-11-16); *NumTrace: Auditing the Number Provenance of Financial Analyst Agents*, arXiv 2610.34887 (2026-10-26).
+- *GURU: A Hierarchical Neuro-Symbolic Multi-Agent System for Verification-Aware Automation*, arXiv 2611.01001 (2026-10-31); *NSVIF: Neuro-Symbolic Verification on Instruction Following of LLMs*, arXiv 2601.17789 (2026-01-25).
+- Gao, Jiang & Yan, *Detecting Lookahead Bias in LLM Forecasts*, arXiv 2512.23847 (2025-12-29); Zhang & Stadie, *Temporal Leakage in LLM Backtesting*, arXiv 2608.02985 (2026-08-04); *FinCutBench*, arXiv 2611.11588 (2026-11-08).
+- *Fin-RATE*, arXiv 2602.07294 (2026-02); *FinFIRST*, arXiv 2609.25192; *FinHopper*, arXiv 2610.26036; *AgenticFinBench*, arXiv 2611.04813.

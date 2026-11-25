@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-25T16:29:29+00:00",
+  "generated_at": "2026-11-25T23:10:56+00:00",
   "n_clean": 10,
   "clean_false_positive_rate": 0.0,
   "clean_failures": [],
-  "n_injected": 50,
+  "n_injected": 60,
   "overall_detection_rate": 1.0,
   "by_type": {
     "fake_number": {
@@ -36,6 +36,13 @@
     },
     "fake_asset": {
       "expected_policy": "P-012",
+      "injected": 10,
+      "detected": 10,
+      "detection_rate": 1.0,
+      "misses": []
+    },
+    "wrong_unit": {
+      "expected_policy": "P-013",
       "injected": 10,
       "detected": 10,
       "detection_rate": 1.0,

@@ -21,7 +21,7 @@ from .datasources import DATA_SOURCES, MarketData
 from .datasources.base import DataSourceError
 from .evaluation.backtest import BacktestEngine
 from .evaluation.dataset import DatasetError, load_events
-from .evaluation.event_study import event_study_summary
+from .evaluation.event_study import cross_sectional_test, event_study_summary
 from .knowledge.loader import KnowledgeError
 from .reasoning.engine import AnalysisEngine
 from .symbolic import to_turtle
@@ -162,20 +162,29 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return backtest_cache[key]
 
     @app.get("/api/event-study")
-    def event_study(window_end: int = 1) -> dict:
-        events = load_events(settings=settings)
-        config = BacktestConfig(window_end=window_end)
-        prices = market.prices_wide("adj_close", engine.transmission.assets + ["SPY"]).dropna(how="all")
+    def event_study(
+        window_end: int = 1,
+        dataset: Literal["curated", "fomc", "fomc_surprise", "extended"] = "curated",
+    ) -> dict:
+        events = load_events(settings=settings, dataset=dataset)
+        config = BacktestConfig(window_end=window_end, dataset=dataset)
+        prices = market.prices_wide(
+            "adj_close", engine.transmission.assets + ["SPY"]
+        ).dropna(how="all")
         from .evaluation.event_study import compute_outcomes
 
         outcomes, skipped = compute_outcomes(events, prices, engine.transmission.assets, config)
         return {
             "window_end": window_end,
+            "dataset": dataset,
             "n_events": len(outcomes),
             "skipped": skipped,
             "summary": [
                 event_study_summary(outcomes, asset) for asset in engine.transmission.assets
             ],
+            "cross_sectional": cross_sectional_test(
+                outcomes, events, prices, engine.transmission.assets, config
+            ),
         }
 
     @app.get("/api/market/{ticker}")

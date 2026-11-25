@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from ..config import Settings, get_settings
+from ..nlp.numbers import parse_numbers
 from ..schemas import AnalysisResponse, PolicyResult, SymbolicReport
 
 ADVICE_RE = re.compile(
@@ -130,6 +131,53 @@ def _p004(response, _symbolic):
     return True, "Every number in the summary is traceable to the structured result."
 
 
+def _allowed_quantities(response: AnalysisResponse) -> set[tuple[float, str]]:
+    """Structured (value, unit) pairs a narrator may reuse.
+
+    P-004 checks the value; this table lets P-013 check the unit. A number that
+    is right but carries the wrong unit (50bp reported as 50%) is a distinct
+    provenance failure, following the taxonomy in NumTrace (arXiv 2610.34887).
+    """
+    allowed: set[tuple[float, str]] = set()
+    event = response.event
+    if event.magnitude:
+        allowed.add((float(event.magnitude.value), event.magnitude.unit))
+    if event.surprise:
+        allowed.add((float(event.surprise.value), event.surprise.unit))
+    for prediction in response.predictions:
+        allowed.add((float(prediction.expected_car_bps), "bps"))
+        allowed.add((float(prediction.horizon_days), "count"))
+    for text in (event.headline, event.summary):
+        for item in parse_numbers(text):
+            allowed.add((float(item.value), item.unit))
+    return allowed
+
+
+def _p013(response, _symbolic):
+    allowed = _allowed_quantities(response)
+    if not allowed:
+        return True, "No structured quantities to compare against."
+    wrong: list[str] = []
+    for item in parse_numbers(_visible_text(response)):
+        candidates = [
+            (value, unit)
+            for value, unit in allowed
+            if abs(float(item.value) - value) <= 0.51
+        ]
+        if not candidates:
+            # P-004 owns untraceable values; do not double-report them here.
+            continue
+        units = {unit for _, unit in candidates}
+        if item.unit not in units:
+            wrong.append(
+                f"{item.raw!r} parsed as {item.unit!r}, but the structured value "
+                f"carries {sorted(units)}"
+            )
+    if wrong:
+        return False, "Right number, wrong unit: " + "; ".join(sorted(set(wrong)))
+    return True, "Every unit-bearing number matches the structured unit."
+
+
 def _p005(response, _symbolic):
     leak = [
         prediction.asset
@@ -235,6 +283,7 @@ DEFAULT_POLICIES = [
     Policy("P-010", "Narrative mechanism IDs are grounded", "error", _p010),
     Policy("P-011", "Narrative citations are grounded", "error", _p011),
     Policy("P-012", "Narrative assets are grounded", "error", _p012),
+    Policy("P-013", "Narrative units are dimensionally grounded", "error", _p013),
 ]
 
 

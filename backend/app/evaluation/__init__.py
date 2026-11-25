@@ -3,7 +3,13 @@
 from .analog import AnalogModel, AnalogPrediction, direction_bucket
 from .backtest import BacktestEngine
 from .dataset import DatasetError, load_events, news_item, split_by_date
-from .event_study import Outcome, compute_outcomes, event_day_index, event_study_summary
+from .event_study import (
+    Outcome,
+    compute_outcomes,
+    cross_sectional_test,
+    event_day_index,
+    event_study_summary,
+)
 from .metrics import (
     accuracy,
     apply_platt,
@@ -30,6 +36,7 @@ __all__ = [
     "brier",
     "calibration_bins",
     "compute_outcomes",
+    "cross_sectional_test",
     "direction_bucket",
     "event_day_index",
     "event_study_summary",

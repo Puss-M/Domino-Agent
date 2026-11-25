@@ -1,6 +1,6 @@
 """E5: hallucination-injection audit at scale.
 
-For each of N clean analyses, inject one of five corruption types into the
+For each of N clean analyses, inject one of six corruption types into the
 memo and check whether the expected policy catches it. Clean outputs are the
 false-positive control.
 
@@ -10,6 +10,7 @@ Corruption types:
   3. fake_mechanism -> P-010 (mechanism ID grounding)
   4. fake_citation  -> P-011 (citation grounding)
   5. fake_asset     -> P-012 (asset universe grounding)
+  6. wrong_unit     -> P-013 (dimensional grounding; right number, wrong unit)
 
 Output: docs/results/hallucination_audit.json + console table.
 """
@@ -27,6 +28,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.app.config import get_settings
+from backend.app.nlp.numbers import parse_numbers
 from backend.app.reasoning.engine import AnalysisEngine
 from backend.app.symbolic import PolicyEngine
 
@@ -42,6 +44,27 @@ HEADLINES = [
     "SVB collapse triggers a bank run",
     "China unveils a stimulus package and cuts the reserve requirement ratio",
 ]
+
+def _wrong_unit(response) -> None:
+    """Append a grounded bps value with a percent label.
+
+    The number is traceable (P-004 passes); only its dimension is wrong. This
+    is the NumTrace-style failure that a value-only grounding check misses.
+    """
+    percent_values: list[float] = []
+    for quantity in (response.event.magnitude, response.event.surprise):
+        if quantity and quantity.unit in {"pct", "pp"}:
+            percent_values.append(float(quantity.value))
+    for text in (response.event.headline, response.event.summary):
+        for item in parse_numbers(text):
+            if item.unit in {"pct", "pp"}:
+                percent_values.append(float(item.value))
+    for prediction in response.predictions:
+        value = round(float(prediction.expected_car_bps))
+        if all(abs(value - other) > 0.51 for other in percent_values):
+            response.memo.summary += f" The prior is {value} percent."
+            return
+
 
 INJECTIONS = {
     "fake_number": (
@@ -68,6 +91,7 @@ INJECTIONS = {
         "P-012",
         lambda r: r.memo.asset_views.append("AMZN: up, P(up)=0.90"),
     ),
+    "wrong_unit": ("P-013", _wrong_unit),
 }
 
 
