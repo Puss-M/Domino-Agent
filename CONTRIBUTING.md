@@ -95,6 +95,16 @@ python -m backend.app.cli backtest --dataset fomc --window-end 1 --out backtest_
 - If you add a new statement, add a test in `tests/test_dataset.py` for the event count and tag.
 - The FOMC split is a **stress test**, not an extraction benchmark. Templated headlines are excluded from `extraction.n`.
 
+## Symbolic layer and policies
+
+- Sign algebra, SMT proofs and policies live in `backend/app/symbolic/`.
+- Run `pytest tests/test_symbolic.py -q` after changing a mechanism, a loading, or a policy.
+- If you add a mechanism, check its effect on the qualitative graph: a new edge can turn a previously definite asset into `?` (ambiguous). That is a feature; update the expected proof statuses rather than hiding it.
+- If you add a policy, add its ID to `DEFAULT_POLICIES`, give it a severity (`error`/`warning`), and add a test that a deliberately bad response fails it.
+- Do not weaken P-004 (numeric grounding). It is the anti-hallucination contract for any future LLM narrator.
+- Do not silence P-008/P-009. A numeric prediction that contradicts a formal proof is an error; symbolic ambiguity is a warning that must be visible.
+- The audit ledger is append-only. Do not edit historical records; use a new event/analysis.
+
 ## Docker
 
 ```bash
@@ -140,6 +150,8 @@ Conventional Commits:
 - [ ] New events have a source URL and a session.
 - [ ] If the benchmark changed, `docs/benchmark.md` and `docs/model_card.md` were updated.
 - [ ] The FOMC negative result is still reported, not hidden.
+- [ ] `pytest tests/test_symbolic.py` passes; policy IDs and proof statuses are documented.
+- [ ] If a policy changed, a clean response still passes and an injected bad response fails.
 - [ ] No claim of causal identification, trading alpha, or SOTA prediction was added.
 
 ## Research integrity

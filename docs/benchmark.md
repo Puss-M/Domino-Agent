@@ -78,6 +78,12 @@ Mechanism vs base rate: ΔBrier **+0.1338**, 95% CI **[0.076, 0.180]**, one-side
 | Analog only | 66.0% | 0.564 | 0.258 | 0.551 |
 | Stacked + Platt | 96.3% | 0.508 | 0.248 | 0.578 |
 
+## Symbolic verification on the benchmark
+
+For the hawkish-hike example, the matched mechanisms compile to a 19-node / 78-edge signed influence graph. 8 of 12 assets are formally proved, 4 are ambiguous (TLT, IEF, GLD, XLU) because the yield and safe-haven paths conflict. Proof coverage is 66.7% on the hike example and 81.8% on the CPI/China examples.
+
+The symbolic layer is not part of the accuracy metrics: it does not change `p_up`. It is a separate, auditable statement about **whether the direction is entailed by the cited mechanisms**. A proof is relative to the library; it is not a causal identification result.
+
 ## Intended use
 
 - Test whether a cited transmission mechanism has directional skill on a small event sample.
@@ -115,6 +121,7 @@ Compact summaries: `docs/results/backtest_*_summary.json`.
 
 - DMB v1: curated 50.
 - DMB v1.1: adds FOMC 58 and extended 92.
+- DMB v1.2: adds symbolic proof coverage and ambiguity reporting (v0.4).
 - Future: add CPI/payrolls surprise series, high-frequency Fed-funds/SOFR pricing, and a larger heterogeneous sample.
 
 ## License and provenance

@@ -24,10 +24,12 @@ from ..schemas import (
     BatchAnalyzeRequest,
     LabeledEvent,
     NewsItem,
+    PolicyResult,
     Provenance,
     SourceRef,
     SourceTier,
 )
+from ..symbolic import AuditLedger, PolicyEngine, SymbolicVerifier
 from .audit import audit
 from .memo import MemoBuilder
 from .transmission import TransmissionModel
@@ -46,6 +48,9 @@ class AnalysisEngine:
         self.retriever = MechanismRetriever(self.knowledge)
         self.transmission = TransmissionModel(self.knowledge, assets=assets)
         self.memo_builder = MemoBuilder(self.knowledge)
+        self.symbolic = SymbolicVerifier(self.knowledge, self.settings)
+        self.policy_engine = PolicyEngine()
+        self.ledger = AuditLedger(self.settings)
 
     def analyze_news(
         self,
@@ -74,7 +79,7 @@ class AnalysisEngine:
                 "No LLM is used in the offline path; numeric and graphical outputs are deterministic.",
             ],
         )
-        return AnalysisResponse(
+        response = AnalysisResponse(
             event=event,
             graph=transmission.graph,
             channel_activations=list(transmission.channels.values()),
@@ -90,6 +95,29 @@ class AnalysisEngine:
                 "audit_warnings": audit_report.warnings,
             },
         )
+
+        # Symbolic layer: sign algebra + SMT certification + policy-as-code.
+        symbolic_report = self.symbolic.verify(event, matches, transmission.predictions)
+        response.symbolic = symbolic_report
+        policy_results: list[PolicyResult] = self.policy_engine.evaluate(response, symbolic_report)
+        symbolic_report.policy_results = policy_results
+        policy_errors = [result for result in policy_results if not result.passed and result.severity == "error"]
+        if policy_errors:
+            audit_report.passed = False
+            audit_report.issues = list(audit_report.issues) + [
+                f"{result.id}: {result.detail}" for result in policy_errors
+            ]
+        payload = response.model_dump(mode="json")
+        if payload.get("symbolic"):
+            payload["symbolic"].pop("ledger_hash", None)
+        record = self.ledger.append(payload)
+        symbolic_report.ledger_hash = record["hash"]
+        response.diagnostics["symbolic"] = {
+            "proof_coverage": symbolic_report.proof_coverage,
+            "policy_failures": [r.id for r in policy_results if not r.passed],
+            "ledger_hash": record["hash"],
+        }
+        return response
 
     def analyze_headline(
         self,

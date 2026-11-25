@@ -12,7 +12,7 @@ from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__
@@ -24,6 +24,7 @@ from .evaluation.dataset import DatasetError, load_events
 from .evaluation.event_study import event_study_summary
 from .knowledge.loader import KnowledgeError
 from .reasoning.engine import AnalysisEngine
+from .symbolic import to_turtle
 from .schemas import (
     AnalysisResponse,
     AnalyzeRequest,
@@ -87,6 +88,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/data-sources", response_model=list[DataSourceInfo])
     def data_sources() -> list[DataSourceInfo]:
         return DATA_SOURCES
+
+    @app.get("/api/ontology.ttl", response_class=PlainTextResponse)
+    def ontology() -> str:
+        return to_turtle(engine.knowledge)
 
     @app.get("/api/mechanisms")
     def mechanisms() -> list[dict]:

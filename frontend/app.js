@@ -175,14 +175,17 @@ function renderAnalysis(analysis) {
     </div>
   `;
 
-  renderAssetTable(analysis.predictions);
+  renderAssetTable(analysis.predictions, analysis.symbolic);
   renderMemo(analysis.memo);
   renderAudit(analysis.audit);
+  renderSymbolic(analysis.symbolic);
   renderGraph(analysis.graph, analysis.predictions);
   renderSelectionDefault(analysis);
 }
 
-function renderAssetTable(predictions) {
+function renderAssetTable(predictions, symbolic) {
+  const proofMap = new Map((symbolic?.proofs || []).map((proof) => [proof.asset, proof]));
+  const proofLetter = { proved: "P", ambiguous: "A", not_entailed: "X", unverified: "U" };
   const rows = predictions
     .slice()
     .sort((left, right) => Math.abs(right.expected_car_bps) - Math.abs(left.expected_car_bps));
@@ -199,6 +202,7 @@ function renderAssetTable(predictions) {
           <span class="num">${fmt(prediction.p_up, 2)}</span>
           <span class="num">${prediction.abstain ? "—" : `${prediction.expected_car_bps > 0 ? "+" : ""}${fmt(prediction.expected_car_bps, 0)}bp`}</span>
           <span class="grade ${prediction.evidence_grade}">${prediction.evidence_grade}</span>
+          <span class="proof ${proofMap.get(prediction.asset)?.status || "unverified"}" title="${escapeHtml(proofMap.get(prediction.asset)?.note || "No symbolic proof")}">${proofLetter[proofMap.get(prediction.asset)?.status] || "U"}</span>
         </div>
       `;
     })
@@ -215,6 +219,51 @@ function renderMemo(memo) {
     ${memo.monitoring?.length ? `<h3>Monitoring</h3>${list(memo.monitoring)}` : ""}
     ${memo.citations?.length ? `<details><summary class="mono">${memo.citations.length} citations</summary>${list(memo.citations)}</details>` : ""}
     <p class="mono" style="margin-top:12px">${escapeHtml(memo.disclaimer || "")}</p>
+  `;
+}
+
+function renderSymbolic(symbolic) {
+  if (!symbolic) {
+    $("#symbolicBadge").textContent = "—";
+    $("#symbolic").innerHTML = `<div class="placeholder">No symbolic report.</div>`;
+    return;
+  }
+  const counts = symbolic.proofs.reduce((acc, proof) => {
+    acc[proof.status] = (acc[proof.status] || 0) + 1;
+    return acc;
+  }, {});
+  $("#symbolicBadge").textContent = symbolic.acyclic ? "DAG · certified" : "cycle!";
+  const ambiguity = (symbolic.qualitative || []).filter((view) => view.sign === "?");
+  const failures = (symbolic.policy_results || []).filter((result) => !result.passed);
+  const policyList = (symbolic.policy_results || [])
+    .map((result) => {
+      const cls = result.passed ? "policy-pass" : result.severity === "warning" ? "policy-warn" : "policy-fail";
+      return `<li class="${cls}">${result.passed ? "✓" : "✕"} ${escapeHtml(result.id)} ${escapeHtml(result.title)} <span class="mono">${escapeHtml(result.detail || "")}</span></li>`;
+    })
+    .join("");
+  $("#symbolic").innerHTML = `
+    <div class="stats">
+      <span class="stat">${symbolic.node_count} nodes</span>
+      <span class="stat">${symbolic.edge_count} edges</span>
+      <span class="stat">${symbolic.acyclic ? "acyclic ✓" : "cycle ✕"}</span>
+      <span class="stat">coverage ${pct(symbolic.proof_coverage, 1)}</span>
+      <span class="stat">proved ${counts.proved || 0}</span>
+      <span class="stat">ambiguous ${counts.ambiguous || 0}</span>
+    </div>
+    ${
+      ambiguity.length
+        ? `<h3>Ambiguity (not hidden)</h3><ul>${ambiguity
+            .map(
+              (view) =>
+                `<li><strong>${escapeHtml(view.asset)}</strong>: ${escapeHtml(view.explanation)}</li>`
+            )
+            .join("")}</ul>`
+        : `<h3>Ambiguity</h3><div class="placeholder">None: every active asset has a definite symbolic direction.</div>`
+    }
+    <h3>Policies</h3>
+    <ul>${policyList}</ul>
+    ${failures.length ? `<div class="mono" style="margin-top:6px">${failures.length} policy issue(s)</div>` : ""}
+    <div class="hash">ledger ${escapeHtml(symbolic.ledger_hash || "—")}</div>
   `;
 }
 

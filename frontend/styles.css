@@ -438,7 +438,7 @@ h2 {
 
 .asset-row {
   display: grid;
-  grid-template-columns: 40px 56px 1fr 44px 58px 24px;
+  grid-template-columns: 40px 56px 1fr 44px 58px 22px 22px;
   gap: 8px;
   align-items: center;
   padding: 7px 0;
@@ -526,6 +526,90 @@ h2 {
 .grade.C {
   color: var(--amber);
   border-color: var(--amber);
+}
+
+.proof {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line-strong);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.proof.proved {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+.proof.ambiguous {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+
+.proof.not_entailed,
+.proof.unverified {
+  border-color: var(--crimson);
+  color: var(--crimson);
+}
+
+.symbolic {
+  padding: 0 18px 18px;
+  font-size: 11.5px;
+}
+
+.symbolic .stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.symbolic .stat {
+  border: 1px solid var(--line);
+  padding: 3px 7px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--ink-2);
+}
+
+.symbolic h3 {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 12px 0 5px;
+}
+
+.symbolic ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+.symbolic li {
+  margin-bottom: 4px;
+}
+
+.policy-pass {
+  color: var(--teal);
+}
+
+.policy-fail {
+  color: var(--crimson);
+}
+
+.policy-warn {
+  color: var(--amber);
+}
+
+.hash {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted);
+  word-break: break-all;
+  margin-top: 8px;
 }
 
 .memo {
@@ -1072,7 +1156,7 @@ tr.highlight td {
   }
 
   .asset-row {
-    grid-template-columns: 36px 48px 1fr 38px 48px 22px;
+    grid-template-columns: 36px 48px 1fr 38px 48px 20px 20px;
   }
 }
 

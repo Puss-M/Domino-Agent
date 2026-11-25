@@ -33,11 +33,22 @@ def test_analyze_returns_graph_and_memo():
     assert payload["predictions"]
     assert payload["memo"]["summary"]
     assert payload["audit"]["passed"] is True
+    assert payload["symbolic"]["acyclic"] is True
+    assert payload["symbolic"]["proofs"]
+    assert payload["symbolic"]["policy_results"]
+    assert payload["symbolic"]["ledger_hash"]
 
 
 def test_analyze_rejects_empty_headline():
     response = _client().post("/api/analyze", json={"headline": ""})
     assert response.status_code == 422
+
+
+def test_ontology_endpoint():
+    response = _client().get("/api/ontology.ttl")
+    assert response.status_code == 200
+    assert "domino:Mechanism" in response.text
+    assert "MON_TIGHTEN" in response.text
 
 
 def test_mechanisms_and_events_catalogs():

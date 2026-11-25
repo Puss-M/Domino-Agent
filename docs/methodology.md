@@ -205,7 +205,57 @@ event → channel → asset
 
 ---
 
-## 3. Evidence audit
+## 3. Symbolic verification
+
+### 3.1 Sign algebra
+
+Each mechanism contributes signed weights to channels, and each channel contributes signed loadings to assets. The symbolic layer compiles the matched mechanisms into a signed influence graph:
+
+- edge sign = qualitative addition of parallel mechanism contributions (`+`/`-`/`0`/`?`);
+- path sign = qualitative product of edge signs (serial composition);
+- asset sign = qualitative addition of path signs.
+
+The result is a **qualitative prediction** per asset. If all paths agree, the direction is definite; if positive and negative paths coexist, the result is `?` (ambiguous). This is the classic qualitative-reasoning algebra, not a confidence heuristic.
+
+For a hawkish policy shock the graph has 19 nodes and 78 edges. QQQ/SPY/EEM/HYG/FXI are negative. TLT/IEF/GLD/XLU are ambiguous: higher real/nominal yields hurt duration, while the risk-premium/safe-haven channel supports it. The numeric model nets TLT to −119bp; the symbolic layer reports the conflict and names both sides.
+
+### 3.2 SMT proof cores
+
+`app/symbolic/smt.py` encodes the graph in Z3:
+
+1. one Boolean activation variable per matched mechanism;
+2. each edge sign is the sign of the active weighted sum (`>0`, `<0`, `=0`);
+3. each path sign is the qualitative product of its edge signs (enumerated over `3^L` assignments, L ≤ 4);
+4. an asset is definitely positive iff some path is positive and no path is negative (analogously for negative);
+5. `z3.Optimize` minimizes the number of active mechanisms subject to the claim.
+
+A satisfying model yields a **minimal proof core** — the exact mechanisms sufficient to entail the direction. If no core exists but both directions are consistent, the status is `ambiguous`; if neither, `not_entailed`. The proof is relative to the cited library: it is a machine-checkable internal consistency result, not a claim about the world.
+
+### 3.3 Policy-as-code and ledger
+
+Policies are executable predicates over the final response:
+
+| ID | Severity | Check |
+|---|---|---|
+| P-001 | error | Disclaimer present |
+| P-002 | error | No advice language (EN/ZH) |
+| P-003 | error | Every non-abstain prediction cites a mechanism |
+| **P-004** | error | **Every number in the summary is traceable to the structured result** |
+| P-005 | error | Low-confidence predictions abstain |
+| P-006 | error | Deterministic audit passes |
+| P-007 | warning | Action-only monetary events warn that the level may be priced |
+| P-008 | error | No numeric prediction contradicts a formal proof |
+| P-009 | warning | Symbolic ambiguity is surfaced |
+
+P-004 is the anti-hallucination contract for a narrator: injected fake numbers and advice language fail in `tests/test_symbolic.py`. Every analysis appends a SHA-256 hash-chained record (`seq`, timestamp, `prev_hash`, canonical payload) to an append-only ledger; the response carries the record hash and `verify_chain()` recomputes the chain.
+
+### 3.4 Typed ontology
+
+Units carry dimensions (`bps`/`pp` → rate, `pct` → inflation level, `usd_bn` → money, `mbpd`/`count` → quantity). `validate_event_units` flags a magnitude unit incompatible with the event type. `GET /api/ontology.ttl` exports channels, loadings, evidence grades and citations as RDF/Turtle.
+
+---
+
+## 4. Evidence audit
 
 The audit is deterministic and fails the run on any of the following:
 
@@ -229,7 +279,7 @@ The audit is not a proof of correctness. It is a set of checks that can fail a b
 
 ---
 
-## 4. Event study
+## 5. Event study
 
 ### 4.1 Alignment
 
@@ -263,7 +313,7 @@ A `flat` outcome is defined as `|CAR| < 10bp` (100bp for VIX). Flat outcomes are
 
 ---
 
-## 5. Walk-forward backtest
+## 6. Walk-forward backtest
 
 ### 5.1 No look-ahead in analogs
 
@@ -301,7 +351,7 @@ The mechanism weight is constrained to `[0.6, 1.2]` by the evidence prior; analo
 
 ---
 
-## 6. Threats to validity
+## 7. Threats to validity
 
 1. **Small samples.** 50 curated events and 58 FOMC events; 25–29 events in each held-out half. The confidence intervals are wide.
 2. **Curated labels.** Event type/direction labels are editorial. Extraction accuracy is in-sample vocabulary coverage, not an OOD benchmark.
@@ -309,13 +359,15 @@ The mechanism weight is constrained to `[0.6, 1.2]` by the evidence prior; analo
 4. **Revised prices.** Adjusted closes are not point-in-time. A production backtest should use CRSP/Compustat or a vendor with vintages.
 5. **Overlapping windows.** Events can cluster (e.g. CPI and FOMC in the same month). The cluster bootstrap helps but does not eliminate cross-event dependence.
 6. **Surprise measurement.** CPI surprises are curated; FOMC surprises are qualitative in most events. A real desk would use high-frequency futures. The FOMC stress test exists to make this limitation measurable: the mechanism prior is significantly worse than a base rate when the action is all you know.
-7. **No execution model.** The event study is an evaluation harness, not a P&L.
+7. **Symbolic proofs are relative to the library.** Z3 proves that the cited mechanisms entail a direction; it does not prove that the mechanisms are true. A proof core is a statement about internal consistency and evidence coverage, not about the world.
+8. **Ambiguity is real.** TLT is genuinely ambiguous under a hawkish shock until a regime condition or data decides. The symbolic layer reports `?`; it does not invent a resolution.
+9. **No execution model.** The event study is an evaluation harness, not a P&L.
 
 The correct claim is: **on the 50-event curated sample, the calibrated stack produced 60.4% directional views and a Brier of 0.238, but the improvement over the base rate is not statistically significant; on the 58-event action-only FOMC stress test, the mechanism prior is significantly worse than the base rate.** Not: “the model predicts markets.” The FOMC failure is the main research result and the reason the next step is surprise data, not more prompt engineering.
 
 ---
 
-## 7. How to extend
+## 8. How to extend
 
 - **Add a mechanism**: add a YAML entry with a citation, channels, conditions and a grade; add a retrieval test; run the backtest and inspect whether it changes the sign for the relevant assets.
 - **Add an event**: add a dated YAML entry with a source URL, session, magnitude, surprise and gold labels; run the extraction test and the backtest.

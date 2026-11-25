@@ -8,7 +8,7 @@
 
 **An event-driven macro transmission engine with cited mechanisms, deterministic graph construction, and an event-study backtest.**
 
-Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.3 is a rebuild around three questions a macro desk actually asks:
+Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.4 is a rebuild around three questions a macro desk actually asks:
 
 1. **What happened, and how much of it was a surprise?**
    `50bp` is not the same as `50bp more than priced`. `8.6%` CPI is a level; `+0.3pp vs consensus` is the shock.
@@ -25,9 +25,9 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 
 ---
 
-## What v0.3 changes
+## What v0.4 changes
 
-| v0.1 prototype | v0.3 |
+| v0.1 prototype | v0.4 |
 |---|---|
 | 2 LLM personas (Detective / Reviewer), ~300 LOC | 5 typed stages: extract → retrieve → transmit → audit → report |
 | No data layer | 7 data sources (6 live connectors + FOMC snapshot) + provenance, caching, retries, point-in-time notes |
@@ -35,6 +35,7 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 | No text normalization | bps/pp/%/$tn/mb/d/Chinese units, surprise vs level, entity linking, LM-style sentiment, near-duplicate clustering |
 | No evaluation | 50 curated + 58 FOMC + 92 extended events; 1-day market-model CAR; walk-forward analog/base rate; stacked ensemble; Platt; event-clustered bootstrap; paired Brier tests; documented FOMC negative skill |
 | "Reviewer agent" prompt | Deterministic audit: citations, evidence grades, sign conflicts, abstention, look-ahead check |
+| No formal verification | **Sign algebra + Z3 proof cores**; ambiguity is first-class; **policy-as-code P-001–P-009**; hash-chained audit ledger |
 | Empty frontend | Zero-build dashboard served by FastAPI; run it with one command |
 
 ### Why the agents are not LLM personas
@@ -110,8 +111,12 @@ flowchart LR
     C --> D[Cited mechanism retriever]
     D --> E[Transmission model]
     E --> E1[channels × asset loadings]
-    E1 --> F[Evidence audit]
-    F --> G[Graph + memo + abstention]
+    E1 --> S[Symbolic kernel]
+    S --> S1[sign algebra / paths]
+    S --> S2[Z3 proof cores / ambiguity]
+    S1 & S2 --> P[Policy-as-code P-001..P-009]
+    P --> L[Hash-chained audit ledger]
+    P --> G[Graph + memo + abstention]
     G --> H[Event study]
     H --> H1[market model / CAR]
     H1 --> I[Walk-forward stack + Platt]
@@ -119,14 +124,16 @@ flowchart LR
 ```
 
 Full methodology, formulas and threats to validity: [`docs/methodology.md`](docs/methodology.md).
+Neuro-symbolic design + compliance mapping: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md). Paper outline: [`docs/paper_outline.md`](docs/paper_outline.md).
 
-### The five stages
+### The six stages
 
 1. **Extract** (`app/nlp/`): rule-first event typing, direction, actor, magnitude, surprise, entities, sentiment, dedupe. A deterministic parser owns the numbers.
 2. **Retrieve** (`app/knowledge/`): match the event against a YAML library of cited transmission mechanisms. Conditions can include or exclude a mechanism (e.g. an emergency cut is not an insurance cut).
 3. **Transmit** (`app/reasoning/transmission.py`): mechanism → channel weights → asset loadings. Two layers, signed, with a saturating aggregation so a one-sided asset is not automatically pushed to ±1.
-4. **Audit** (`app/reasoning/audit.py`): every edge needs a citation; speculative mechanisms cannot drive a headline; conflicting channels are flagged; an event dated after the analysis as-of time fails the audit.
-5. **Evaluate** (`app/evaluation/`): market-model abnormal returns, event-day alignment, walk-forward analog priors, base rates, a stacked ensemble, Platt calibration, and an event-clustered bootstrap.
+4. **Verify** (`app/symbolic/`): compile the matched mechanisms into a signed influence graph; compose paths with qualitative sign algebra; use Z3 to return a **minimal proof core** for each asset direction, or mark it **ambiguous** when positive and negative paths coexist.
+5. **Audit & comply** (`app/reasoning/audit.py`, `app/symbolic/policy.py`): every edge needs a citation; speculative mechanisms cannot drive a headline; P-001–P-009 enforce disclaimer, no-advice, numeric grounding, abstention, proof consistency and ambiguity disclosure; every analysis is committed to a hash-chained ledger.
+6. **Evaluate** (`app/evaluation/`): market-model abnormal returns, event-day alignment, walk-forward analog priors, base rates, a stacked ensemble, Platt calibration, and an event-clustered bootstrap.
 
 ---
 
@@ -182,7 +189,34 @@ A mechanism in `backend/data/knowledge/mechanisms.yaml` looks like this:
 
 If no mechanism matches, **the engine abstains** instead of writing a plausible story. If a mechanism is only `D`-grade, it cannot drive a headline prediction. If two channels disagree, the asset is flagged as conflicting and its confidence is reduced.
 
-### 4. The evaluation is walk-forward and hard to fool
+### 4. Symbolic verification, not "another agent reviews it"
+
+The 2026 evidence is that homogeneous debate is **not** a reliable verifier: *More Debate, Same Evidence* (arXiv 2608.00243) finds groundedness changes of +8.5 to −4.4pp across six benchmarks, and *The Hallucination Snowball* (arXiv 2608.14588) shows errors becoming invisible across sequential handoffs. Domino puts the reliability budget into a symbolic kernel instead.
+
+For a hawkish policy shock, the matched mechanisms compile into a **19-node, 78-edge signed influence graph**:
+
+- **QQQ / SPY / EEM / HYG / FXI** are **proved** negative; the minimal proof core for QQQ is `{MON_TIGHTEN}`.
+- **TLT / IEF / GLD / XLU** are **ambiguous**: the real-yield/discount-rate path is negative, while the risk-premium/safe-haven path is positive. The numeric model nets TLT to −119bp; the symbolic layer refuses to hide the conflict.
+- Ambiguity is first-class. The UI shows a **P/A** proof badge per asset and a panel listing every ambiguous asset and the mechanisms on each side.
+
+`app/symbolic/smt.py` encodes the graph in Z3: one activation Boolean per mechanism, edge signs as signed sums, path signs as qualitative products, and an `Optimize` objective that minimizes the active mechanism set subject to the claim. The result is a machine-checkable **proof core**, not a confidence score. `GET /api/ontology.ttl` exports the same library as RDF/Turtle.
+
+The compliance layer is executable, not rhetorical:
+
+| ID | Check |
+|---|---|
+| P-001 / P-002 | Disclaimer present; no advice language (EN/ZH) |
+| P-003 | Every non-abstain prediction cites a mechanism |
+| **P-004** | **Every number in the summary is traceable to the structured result** |
+| P-005 / P-006 | Low-confidence abstains; deterministic audit passes |
+| P-007 / P-009 | Action-only monetary warning; ambiguity disclosed |
+| P-008 | No numeric direction contradicts a formal proof |
+
+An injected hallucinated memo ("SPY will fall 3.2%, gold +12.5%, we recommend you buy gold") fails **P-002** and **P-004** in the test suite. Every analysis also appends a SHA-256 hash-chained record to an append-only ledger, so the published output is tamper-evident.
+
+Full design and citations: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md).
+
+### 5. The evaluation is walk-forward and hard to fool
 
 - **Event window**: the first trading session that can price the news (`0..1`), with weekend/after-close alignment. A 5-day window is reported as robustness.
 - **Abnormal return**: market model estimated on `[-120, -21]`, CAR over `[0, +1]`. SPY is evaluated on its raw return because its market-model residual is zero by construction.
@@ -224,6 +258,7 @@ Protocol: **50 events, 12 assets, 1-day announcement window, first half for fitt
 - The mechanism-only model is more accurate but overconfident (Brier 0.259, ECE 0.117); calibration buys a better Brier/ECE at a small accuracy cost.
 - 5-day robustness: **54.5%**, Brier **0.252**, AUC **0.528**. The edge is concentrated in the announcement session.
 - Extraction: **50/50** joint event-type + direction on the curated sample. This is in-sample vocabulary coverage, not an OOD benchmark.
+- **Symbolic verification**: the hawkish-hike example compiles to 19 nodes / 78 edges / acyclic; **8/12 assets proved** and **4 ambiguous** (TLT, IEF, GLD, XLU) because the yield path and the safe-haven path conflict. Proof coverage is 66.7% on the hike example and 81.8% on the CPI/China examples. The numeric model still nets TLT to −119bp; the symbolic layer surfaces the conflict instead of hiding it.
 
 ## FOMC stress test: the mechanism prior needs surprise data
 
@@ -284,6 +319,7 @@ backend/
     nlp/            # numbers, entities, sentiment, dedupe, event extractor
     knowledge/      # mechanism loader, retrieval
     reasoning/      # transmission, audit, memo, orchestration
+    symbolic/       # sign algebra, SMT proof cores, policy-as-code, hash-chained ledger
     evaluation/     # event study, analog model, metrics, backtest
     datasources/    # SEC, GDELT, Treasury, FRED, World Bank, Yahoo, FOMC catalog
     api.py          # FastAPI surface
@@ -295,16 +331,28 @@ backend/
     market/         # 13 ETFs, 2000–present + provenance
     macro/ sec/ news/  # small public-data snapshots
 frontend/           # zero-build dashboard (HTML/CSS/JS + SVG)
-tests/              # 85 unit/contract tests
-docs/               # methodology, data sources, evaluation, benchmark/model cards, resume bullets
+tests/              # 101 unit/contract tests
+docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, paper outline, resume bullets
 ```
 
 ---
 
 ## Related work and what was borrowed
 
+- **FormaFin** (arXiv 2611.28881): trains small models to translate financial rules into SMT formulas and uses a solver for verification. Domino takes the same solver-guided stance but verifies **transmission signs** and returns minimal proof cores, rather than training a rule formalizer.
+- **Beyond LLM Wrappers / Three-Engine Architecture** (arXiv 2610.39230): financial knowledge graph + deterministic compute engine + LLM layer. Domino's symbolic kernel and policy layer follow this separation.
+- **More Debate, Same Evidence** (arXiv 2608.00243), **The Hallucination Snowball** (arXiv 2608.14588), **The Cost of Consensus** (arXiv 2605.00914): the 2026 evidence that homogeneous multi-agent debate is not a reliable verifier. Domino replaces the "reviewer agent" with a deterministic audit + SMT + policy gates.
+- **FinRobot V2** (AI4Finance): deterministic compute + LLM narration + output-contract gate. Domino's numeric/symbolic path is LLM-free, with a narrator-only role for any future LLM.
+- **RD-Agent(Q)** (Microsoft Research): LLM proposes, backtest disposes. Domino's event-study evaluation is the final arbiter.
+- **GuardAgent** (ICML 2025) and **NeMo Guardrails**: policy compiled to executable code / deterministic rails at tool boundaries. Domino's P-001–P-009 are predicates over the response, not prompts.
+- **ai-hedge-fund** (virattt): hash-chained paper-trading ledger and approval gates. Domino uses a SHA-256 hash-chained audit ledger for every analysis.
 - **TradingAgents** (TauricResearch): role-separated analysts/researchers/risk team. Domino keeps the separation but makes each role a typed contract instead of a free-form persona.
-- **FinRobot** (AI4Finance): the principle “models reason, software computes, agents orchestrate, systems verify.” Domino follows it: deterministic transmission, LLM-free offline path, provenance on every output.
+- **FinGPT** (AI4Finance): finance-specific sentiment and data pipelines. Domino's lexicon is a small seed plus an optional licensed LM dictionary, not a redistributed copy.
+- **Bauer & Swanson** (NBER Macroeconomics Annual 2023) and **Nakamura & Steinsson** (QJE 2013): high-frequency monetary surprises. Their absence in the free-data path is why Domino's FOMC stress test fails; the project reports it rather than hiding it.
+- **Kolari & Pynnönen** (RFS 2010): cross-sectional correlation in event studies. Domino uses event-clustered bootstrap; the KP-adjusted BMP statistic is a planned robustness check.
+- **Changing the Narrative** (SSRN 6677954): Fed communication as a narrative-baseline shift with belief objects. This is the right way to replace Domino's failed lexicon tone-delta.
+- **BettaFish / 微舆**: multi-agent public-opinion analysis. Domino is the macro-transmission and evidence-audit counterpart, not another social-listening dashboard.
+- **DoWhy / EconML**: a reminder to distinguish a causal *claim* from a causal *graph*. Domino explicitly declines to claim identification.
 - **FinGPT** (AI4Finance): finance-specific sentiment and data pipelines. Domino's lexicon is a small seed plus an optional licensed LM dictionary, not a redistributed copy.
 - **AI Hedge Fund** (virattt): the discipline of a backtest and a paper-trading ledger. Domino borrows the evaluation discipline, not the persona zoo.
 - **BettaFish / 微舆**: multi-agent public-opinion analysis. Domino is the macro-transmission and evidence-audit counterpart, not another social-listening dashboard.
@@ -318,7 +366,7 @@ See [`docs/resume_bullets.md`](docs/resume_bullets.md) for Chinese and English v
 
 **English (condensed):**
 
-> Built a five-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → evidence audit → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC events and 85 tests; runs fully offline with no API key.
+> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC events and 101 tests; runs fully offline with no API key.
 >
 > Implemented finance-aware text normalization (bps vs percentage points vs percent, `$tn`, `mb/d`, Chinese units, surprise vs level), entity linking, LM-style sentiment with negation, and near-duplicate news clustering; added provenance-aware connectors for SEC EDGAR/XBRL, GDELT, Treasury, FRED/ALFRED, World Bank and Yahoo.
 >

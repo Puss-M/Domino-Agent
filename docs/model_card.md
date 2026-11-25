@@ -1,4 +1,4 @@
-# Model card: Domino Agent v0.3
+# Model card: Domino Agent v0.4
 
 ## Model summary
 
@@ -8,7 +8,9 @@ Domino Agent is an **evidence-gated macro transmission pipeline**, not a single 
 2. a cited mechanism library;
 3. a deterministic channel/asset transmission model;
 4. an evidence audit with abstention;
-5. a walk-forward stack (mechanism, historical analog, base rate) with Platt calibration.
+5. a walk-forward stack (mechanism, historical analog, base rate) with Platt calibration;
+6. a symbolic kernel: sign algebra, Z3 proof cores, ambiguity as a first-class output;
+7. a policy-as-code compliance layer with a hash-chained audit ledger.
 
 The offline path is LLM-free. Every number, sign and graph edge is produced by typed code.
 
@@ -38,6 +40,7 @@ The offline path is LLM-free. Every number, sign and graph edge is produced by t
 - Asset predictions: `p_up`, expected 5-day CAR prior, confidence, evidence grade, abstention/conflict flags.
 - A research memo with transmission channels, falsifiers and monitoring indicators.
 - An audit report: citation completeness, speculative mechanisms, sign conflicts, look-ahead, coverage.
+- A symbolic report: signed influence graph, per-asset proof status (`proved`/`ambiguous`/`not_entailed`/`unverified`), minimal proof cores, policy results, ontology issues, ledger hash.
 - Backtest metrics: accuracy, Brier, AUC, ECE, coverage, event-clustered CIs and paired Brier comparisons.
 
 ## Training and estimation
@@ -67,6 +70,15 @@ The FOMC mechanism-only model is **significantly worse** than the always-up base
 4. **Geopolitics.** The 1-day equity sign is noisy even when the safe-haven direction is right.
 5. **Five-day horizon.** The announcement-session edge decays; 5-day accuracy is 54.5%, AUC 0.528.
 6. **Middle-bin calibration.** Noisy with 33 predictions per bin and correlated assets within events.
+7. **Symbolic ambiguity.** TLT/IEF/GLD/XLU are genuinely ambiguous under a hawkish shock (yield vs safe-haven paths). The system reports `?`; it does not resolve it without a regime condition or data.
+8. **Proofs are relative.** A Z3 proof core means the cited mechanisms entail the direction; it does not mean the mechanisms are true or that the effect is causal.
+
+## Symbolic verification and compliance
+
+- The matched mechanisms compile to a signed influence graph; Z3 returns a minimal proof core or an ambiguity status per asset.
+- Policies P-001–P-009 enforce disclaimer, no-advice, evidence citations, numeric grounding, abstention, audit pass, surprise warnings and proof consistency.
+- Every analysis is committed to a SHA-256 hash-chained ledger (`backend/.cache/audit/ledger.jsonl`); the response carries the record hash.
+- Compliance mapping is documented in [`neuro_symbolic.md`](neuro_symbolic.md): SEC Marketing Rule / AI-washing substantiation, Fed SR 11-7 independent validation, MiFID II accountability, EU AI Act logging/human oversight.
 
 ## Ethical and regulatory notes
 

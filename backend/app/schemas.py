@@ -246,6 +246,47 @@ class AuditReport(BaseModel):
     used_mechanisms: list[str] = Field(default_factory=list)
 
 
+class PolicyResult(BaseModel):
+    id: str
+    title: str
+    passed: bool
+    severity: Literal["error", "warning", "info"] = "error"
+    detail: str = ""
+
+
+class ProofReport(BaseModel):
+    asset: str
+    claim: str
+    status: Literal["proved", "ambiguous", "not_entailed", "unverified"]
+    core: list[str] = Field(default_factory=list)
+    paths: list[str] = Field(default_factory=list)
+    note: str = ""
+
+
+class QualitativeAssetView(BaseModel):
+    asset: str
+    sign: Literal["+", "-", "0", "?"]
+    direction: str
+    definite: bool
+    paths: list[dict[str, Any]] = Field(default_factory=list)
+    conflicts: list[dict[str, Any]] = Field(default_factory=list)
+    mechanisms: list[str] = Field(default_factory=list)
+    explanation: str = ""
+
+
+class SymbolicReport(BaseModel):
+    node_count: int
+    edge_count: int
+    acyclic: bool
+    cycles: list[list[str]] = Field(default_factory=list)
+    qualitative: list[QualitativeAssetView] = Field(default_factory=list)
+    proofs: list[ProofReport] = Field(default_factory=list)
+    policy_results: list[PolicyResult] = Field(default_factory=list)
+    ontology_issues: list[str] = Field(default_factory=list)
+    proof_coverage: float = 0.0
+    ledger_hash: str | None = None
+
+
 class AnalysisResponse(BaseModel):
     event: MacroEvent
     graph: GraphPayload
@@ -253,6 +294,7 @@ class AnalysisResponse(BaseModel):
     predictions: list[AssetPrediction]
     memo: Memo
     audit: AuditReport
+    symbolic: SymbolicReport | None = None
     provenance: Provenance
     diagnostics: dict[str, Any] = Field(default_factory=dict)
 
