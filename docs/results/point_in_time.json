@@ -1,0 +1,819 @@
+{
+  "generated_at": "2026-11-26T00:06:18+00:00",
+  "contract": "backend/data/point_in_time.yaml",
+  "price_snapshot_last_date": "2026-11-24",
+  "datasets": {
+    "curated": {
+      "dataset": "curated",
+      "generated_at": "2026-11-26T00:06:18+00:00",
+      "as_of": "2026-11-26",
+      "n_events": 50,
+      "event_window": {
+        "start": "2018-03-22",
+        "end": "2025-04-09"
+      },
+      "llm_in_metric_path": false,
+      "used_sources": [
+        "yahoo",
+        "curated_events"
+      ],
+      "revised_sources": [
+        "yahoo",
+        "curated_events"
+      ],
+      "sources": [
+        {
+          "id": "yahoo",
+          "name": "Yahoo Finance adjusted close",
+          "fields": [
+            "adj_close"
+          ],
+          "available_at": "After the US session close (16:00 ET) on the trading day",
+          "revision": "Adjusted retroactively for splits and dividends",
+          "point_in_time": "no",
+          "used_in_benchmark": true,
+          "datasets": [
+            "curated",
+            "fomc",
+            "fomc_surprise",
+            "extended"
+          ],
+          "caveat": "The snapshot is end-of-day and adjusted; it is not an as-traded vintage."
+        },
+        {
+          "id": "curated_events",
+          "name": "Curated macro event labels",
+          "fields": [
+            "headline",
+            "summary",
+            "published_at",
+            "direction",
+            "magnitude",
+            "surprise"
+          ],
+          "available_at": "The editorial published_at timestamp",
+          "revision": "Hand-edited; labels are not a frozen third-party dataset",
+          "point_in_time": "editorial",
+          "used_in_benchmark": true,
+          "datasets": [
+            "curated",
+            "extended"
+          ],
+          "caveat": "Labels are authored by the project; extraction accuracy is in-sample vocabulary coverage."
+        },
+        {
+          "id": "fomc",
+          "name": "FOMC statements and target-range changes",
+          "fields": [
+            "statement_text",
+            "target_range",
+            "decision_date"
+          ],
+          "available_at": "14:00 ET on the statement date",
+          "revision": "Statements are immutable; the upstream compilation can be updated",
+          "point_in_time": "partial",
+          "used_in_benchmark": true,
+          "datasets": [
+            "fomc",
+            "fomc_surprise",
+            "extended"
+          ],
+          "caveat": "The statement text is point-in-time; the parsed target range is reconstructed from the snapshot."
+        },
+        {
+          "id": "brw",
+          "name": "Bu-Rogers-Wu (2021) daily monetary policy surprises",
+          "fields": [
+            "brw_ext"
+          ],
+          "available_at": "Published ex post in the 2021 paper and replication package",
+          "revision": "Upstream series can be revised",
+          "point_in_time": "ex_post",
+          "used_in_benchmark": true,
+          "datasets": [
+            "fomc_surprise"
+          ],
+          "caveat": "The series is not a real-time surprise feed; it is joined after the fact for the fomc_surprise benchmark."
+        },
+        {
+          "id": "sec",
+          "name": "SEC EDGAR filings and XBRL facts",
+          "fields": [
+            "filed",
+            "form",
+            "fact_value"
+          ],
+          "available_at": "Filing acceptance time",
+          "revision": "Filings are immutable; XBRL values can be restated in later filings",
+          "point_in_time": "partial",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Used for XBRL examples, not for the macro event-study benchmark."
+        },
+        {
+          "id": "gdelt",
+          "name": "GDELT news discovery",
+          "fields": [
+            "seendate",
+            "url",
+            "title"
+          ],
+          "available_at": "Approximately 15 minutes after publication",
+          "revision": "Articles can be re-crawled; URLs are not permanent",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Discovery layer only; the curated benchmark uses authored event records."
+        },
+        {
+          "id": "fred",
+          "name": "FRED / ALFRED macro series",
+          "fields": [
+            "value",
+            "realtime_start",
+            "realtime_end"
+          ],
+          "available_at": "Release calendar; ALFRED exposes vintages",
+          "revision": "Yes; ALFRED exposes vintages",
+          "point_in_time": "yes",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Preferred vintage source when a FRED key is configured; not used in the offline benchmark."
+        },
+        {
+          "id": "treasury",
+          "name": "Daily Treasury yield curve",
+          "fields": [
+            "date",
+            "tenor",
+            "yield"
+          ],
+          "available_at": "End of day",
+          "revision": "Rare",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Cross-check only; not a benchmark input."
+        },
+        {
+          "id": "worldbank",
+          "name": "World Bank indicators",
+          "fields": [
+            "value",
+            "year"
+          ],
+          "available_at": "Annual/quarterly release",
+          "revision": "Yes; historical values are revised",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Regime context only; not an event-study input."
+        }
+      ],
+      "checks": [
+        {
+          "id": "no_llm_metric_path",
+          "passed": true,
+          "detail": "Rules, mechanism retrieval, sign algebra and the event study are deterministic; no LLM sits in the metric path."
+        },
+        {
+          "id": "event_timestamps_present",
+          "passed": true,
+          "detail": "50 events carry an editorial published_at timestamp."
+        },
+        {
+          "id": "labels_frozen",
+          "passed": false,
+          "detail": "Curated labels are hand-edited; they are not a frozen third-party dataset."
+        },
+        {
+          "id": "prices_point_in_time",
+          "passed": false,
+          "detail": "Yahoo adjusted closes are retroactively adjusted for splits and dividends."
+        },
+        {
+          "id": "surprises_point_in_time",
+          "passed": false,
+          "detail": "The Bu-Rogers-Wu series is an ex-post published series, not a real-time feed."
+        },
+        {
+          "id": "events_within_price_snapshot",
+          "passed": true,
+          "detail": "Latest event 2025-04-09; price snapshot ends 2026-11-24."
+        }
+      ],
+      "verdict": "not_point_in_time",
+      "summary": "The LLM-free metric path removes parametric lookahead, but the benchmark is not a point-in-time reconstruction: yahoo, curated_events are revised or ex-post."
+    },
+    "fomc": {
+      "dataset": "fomc",
+      "generated_at": "2026-11-26T00:06:18+00:00",
+      "as_of": "2026-11-26",
+      "n_events": 58,
+      "event_window": {
+        "start": "2004-06-30",
+        "end": "2025-12-10"
+      },
+      "llm_in_metric_path": false,
+      "used_sources": [
+        "yahoo",
+        "fomc"
+      ],
+      "revised_sources": [
+        "yahoo",
+        "fomc"
+      ],
+      "sources": [
+        {
+          "id": "yahoo",
+          "name": "Yahoo Finance adjusted close",
+          "fields": [
+            "adj_close"
+          ],
+          "available_at": "After the US session close (16:00 ET) on the trading day",
+          "revision": "Adjusted retroactively for splits and dividends",
+          "point_in_time": "no",
+          "used_in_benchmark": true,
+          "datasets": [
+            "curated",
+            "fomc",
+            "fomc_surprise",
+            "extended"
+          ],
+          "caveat": "The snapshot is end-of-day and adjusted; it is not an as-traded vintage."
+        },
+        {
+          "id": "curated_events",
+          "name": "Curated macro event labels",
+          "fields": [
+            "headline",
+            "summary",
+            "published_at",
+            "direction",
+            "magnitude",
+            "surprise"
+          ],
+          "available_at": "The editorial published_at timestamp",
+          "revision": "Hand-edited; labels are not a frozen third-party dataset",
+          "point_in_time": "editorial",
+          "used_in_benchmark": true,
+          "datasets": [
+            "curated",
+            "extended"
+          ],
+          "caveat": "Labels are authored by the project; extraction accuracy is in-sample vocabulary coverage."
+        },
+        {
+          "id": "fomc",
+          "name": "FOMC statements and target-range changes",
+          "fields": [
+            "statement_text",
+            "target_range",
+            "decision_date"
+          ],
+          "available_at": "14:00 ET on the statement date",
+          "revision": "Statements are immutable; the upstream compilation can be updated",
+          "point_in_time": "partial",
+          "used_in_benchmark": true,
+          "datasets": [
+            "fomc",
+            "fomc_surprise",
+            "extended"
+          ],
+          "caveat": "The statement text is point-in-time; the parsed target range is reconstructed from the snapshot."
+        },
+        {
+          "id": "brw",
+          "name": "Bu-Rogers-Wu (2021) daily monetary policy surprises",
+          "fields": [
+            "brw_ext"
+          ],
+          "available_at": "Published ex post in the 2021 paper and replication package",
+          "revision": "Upstream series can be revised",
+          "point_in_time": "ex_post",
+          "used_in_benchmark": true,
+          "datasets": [
+            "fomc_surprise"
+          ],
+          "caveat": "The series is not a real-time surprise feed; it is joined after the fact for the fomc_surprise benchmark."
+        },
+        {
+          "id": "sec",
+          "name": "SEC EDGAR filings and XBRL facts",
+          "fields": [
+            "filed",
+            "form",
+            "fact_value"
+          ],
+          "available_at": "Filing acceptance time",
+          "revision": "Filings are immutable; XBRL values can be restated in later filings",
+          "point_in_time": "partial",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Used for XBRL examples, not for the macro event-study benchmark."
+        },
+        {
+          "id": "gdelt",
+          "name": "GDELT news discovery",
+          "fields": [
+            "seendate",
+            "url",
+            "title"
+          ],
+          "available_at": "Approximately 15 minutes after publication",
+          "revision": "Articles can be re-crawled; URLs are not permanent",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Discovery layer only; the curated benchmark uses authored event records."
+        },
+        {
+          "id": "fred",
+          "name": "FRED / ALFRED macro series",
+          "fields": [
+            "value",
+            "realtime_start",
+            "realtime_end"
+          ],
+          "available_at": "Release calendar; ALFRED exposes vintages",
+          "revision": "Yes; ALFRED exposes vintages",
+          "point_in_time": "yes",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Preferred vintage source when a FRED key is configured; not used in the offline benchmark."
+        },
+        {
+          "id": "treasury",
+          "name": "Daily Treasury yield curve",
+          "fields": [
+            "date",
+            "tenor",
+            "yield"
+          ],
+          "available_at": "End of day",
+          "revision": "Rare",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Cross-check only; not a benchmark input."
+        },
+        {
+          "id": "worldbank",
+          "name": "World Bank indicators",
+          "fields": [
+            "value",
+            "year"
+          ],
+          "available_at": "Annual/quarterly release",
+          "revision": "Yes; historical values are revised",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Regime context only; not an event-study input."
+        }
+      ],
+      "checks": [
+        {
+          "id": "no_llm_metric_path",
+          "passed": true,
+          "detail": "Rules, mechanism retrieval, sign algebra and the event study are deterministic; no LLM sits in the metric path."
+        },
+        {
+          "id": "event_timestamps_present",
+          "passed": true,
+          "detail": "58 events carry an editorial published_at timestamp."
+        },
+        {
+          "id": "labels_frozen",
+          "passed": false,
+          "detail": "Curated labels are hand-edited; they are not a frozen third-party dataset."
+        },
+        {
+          "id": "prices_point_in_time",
+          "passed": false,
+          "detail": "Yahoo adjusted closes are retroactively adjusted for splits and dividends."
+        },
+        {
+          "id": "surprises_point_in_time",
+          "passed": false,
+          "detail": "The Bu-Rogers-Wu series is an ex-post published series, not a real-time feed."
+        },
+        {
+          "id": "events_within_price_snapshot",
+          "passed": true,
+          "detail": "Latest event 2025-12-10; price snapshot ends 2026-11-24."
+        }
+      ],
+      "verdict": "not_point_in_time",
+      "summary": "The LLM-free metric path removes parametric lookahead, but the benchmark is not a point-in-time reconstruction: yahoo, fomc are revised or ex-post."
+    },
+    "fomc_surprise": {
+      "dataset": "fomc_surprise",
+      "generated_at": "2026-11-26T00:06:18+00:00",
+      "as_of": "2026-11-26",
+      "n_events": 45,
+      "event_window": {
+        "start": "2004-06-30",
+        "end": "2025-12-10"
+      },
+      "llm_in_metric_path": false,
+      "used_sources": [
+        "yahoo",
+        "fomc",
+        "brw"
+      ],
+      "revised_sources": [
+        "yahoo",
+        "fomc",
+        "brw"
+      ],
+      "sources": [
+        {
+          "id": "yahoo",
+          "name": "Yahoo Finance adjusted close",
+          "fields": [
+            "adj_close"
+          ],
+          "available_at": "After the US session close (16:00 ET) on the trading day",
+          "revision": "Adjusted retroactively for splits and dividends",
+          "point_in_time": "no",
+          "used_in_benchmark": true,
+          "datasets": [
+            "curated",
+            "fomc",
+            "fomc_surprise",
+            "extended"
+          ],
+          "caveat": "The snapshot is end-of-day and adjusted; it is not an as-traded vintage."
+        },
+        {
+          "id": "curated_events",
+          "name": "Curated macro event labels",
+          "fields": [
+            "headline",
+            "summary",
+            "published_at",
+            "direction",
+            "magnitude",
+            "surprise"
+          ],
+          "available_at": "The editorial published_at timestamp",
+          "revision": "Hand-edited; labels are not a frozen third-party dataset",
+          "point_in_time": "editorial",
+          "used_in_benchmark": true,
+          "datasets": [
+            "curated",
+            "extended"
+          ],
+          "caveat": "Labels are authored by the project; extraction accuracy is in-sample vocabulary coverage."
+        },
+        {
+          "id": "fomc",
+          "name": "FOMC statements and target-range changes",
+          "fields": [
+            "statement_text",
+            "target_range",
+            "decision_date"
+          ],
+          "available_at": "14:00 ET on the statement date",
+          "revision": "Statements are immutable; the upstream compilation can be updated",
+          "point_in_time": "partial",
+          "used_in_benchmark": true,
+          "datasets": [
+            "fomc",
+            "fomc_surprise",
+            "extended"
+          ],
+          "caveat": "The statement text is point-in-time; the parsed target range is reconstructed from the snapshot."
+        },
+        {
+          "id": "brw",
+          "name": "Bu-Rogers-Wu (2021) daily monetary policy surprises",
+          "fields": [
+            "brw_ext"
+          ],
+          "available_at": "Published ex post in the 2021 paper and replication package",
+          "revision": "Upstream series can be revised",
+          "point_in_time": "ex_post",
+          "used_in_benchmark": true,
+          "datasets": [
+            "fomc_surprise"
+          ],
+          "caveat": "The series is not a real-time surprise feed; it is joined after the fact for the fomc_surprise benchmark."
+        },
+        {
+          "id": "sec",
+          "name": "SEC EDGAR filings and XBRL facts",
+          "fields": [
+            "filed",
+            "form",
+            "fact_value"
+          ],
+          "available_at": "Filing acceptance time",
+          "revision": "Filings are immutable; XBRL values can be restated in later filings",
+          "point_in_time": "partial",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Used for XBRL examples, not for the macro event-study benchmark."
+        },
+        {
+          "id": "gdelt",
+          "name": "GDELT news discovery",
+          "fields": [
+            "seendate",
+            "url",
+            "title"
+          ],
+          "available_at": "Approximately 15 minutes after publication",
+          "revision": "Articles can be re-crawled; URLs are not permanent",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Discovery layer only; the curated benchmark uses authored event records."
+        },
+        {
+          "id": "fred",
+          "name": "FRED / ALFRED macro series",
+          "fields": [
+            "value",
+            "realtime_start",
+            "realtime_end"
+          ],
+          "available_at": "Release calendar; ALFRED exposes vintages",
+          "revision": "Yes; ALFRED exposes vintages",
+          "point_in_time": "yes",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Preferred vintage source when a FRED key is configured; not used in the offline benchmark."
+        },
+        {
+          "id": "treasury",
+          "name": "Daily Treasury yield curve",
+          "fields": [
+            "date",
+            "tenor",
+            "yield"
+          ],
+          "available_at": "End of day",
+          "revision": "Rare",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Cross-check only; not a benchmark input."
+        },
+        {
+          "id": "worldbank",
+          "name": "World Bank indicators",
+          "fields": [
+            "value",
+            "year"
+          ],
+          "available_at": "Annual/quarterly release",
+          "revision": "Yes; historical values are revised",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Regime context only; not an event-study input."
+        }
+      ],
+      "checks": [
+        {
+          "id": "no_llm_metric_path",
+          "passed": true,
+          "detail": "Rules, mechanism retrieval, sign algebra and the event study are deterministic; no LLM sits in the metric path."
+        },
+        {
+          "id": "event_timestamps_present",
+          "passed": true,
+          "detail": "45 events carry an editorial published_at timestamp."
+        },
+        {
+          "id": "labels_frozen",
+          "passed": false,
+          "detail": "Curated labels are hand-edited; they are not a frozen third-party dataset."
+        },
+        {
+          "id": "prices_point_in_time",
+          "passed": false,
+          "detail": "Yahoo adjusted closes are retroactively adjusted for splits and dividends."
+        },
+        {
+          "id": "surprises_point_in_time",
+          "passed": false,
+          "detail": "The Bu-Rogers-Wu series is an ex-post published series, not a real-time feed."
+        },
+        {
+          "id": "events_within_price_snapshot",
+          "passed": true,
+          "detail": "Latest event 2025-12-10; price snapshot ends 2026-11-24."
+        }
+      ],
+      "verdict": "not_point_in_time",
+      "summary": "The LLM-free metric path removes parametric lookahead, but the benchmark is not a point-in-time reconstruction: yahoo, fomc, brw are revised or ex-post."
+    },
+    "extended": {
+      "dataset": "extended",
+      "generated_at": "2026-11-26T00:06:19+00:00",
+      "as_of": "2026-11-26",
+      "n_events": 92,
+      "event_window": {
+        "start": "2004-06-30",
+        "end": "2025-12-10"
+      },
+      "llm_in_metric_path": false,
+      "used_sources": [
+        "yahoo",
+        "curated_events",
+        "fomc"
+      ],
+      "revised_sources": [
+        "yahoo",
+        "curated_events",
+        "fomc"
+      ],
+      "sources": [
+        {
+          "id": "yahoo",
+          "name": "Yahoo Finance adjusted close",
+          "fields": [
+            "adj_close"
+          ],
+          "available_at": "After the US session close (16:00 ET) on the trading day",
+          "revision": "Adjusted retroactively for splits and dividends",
+          "point_in_time": "no",
+          "used_in_benchmark": true,
+          "datasets": [
+            "curated",
+            "fomc",
+            "fomc_surprise",
+            "extended"
+          ],
+          "caveat": "The snapshot is end-of-day and adjusted; it is not an as-traded vintage."
+        },
+        {
+          "id": "curated_events",
+          "name": "Curated macro event labels",
+          "fields": [
+            "headline",
+            "summary",
+            "published_at",
+            "direction",
+            "magnitude",
+            "surprise"
+          ],
+          "available_at": "The editorial published_at timestamp",
+          "revision": "Hand-edited; labels are not a frozen third-party dataset",
+          "point_in_time": "editorial",
+          "used_in_benchmark": true,
+          "datasets": [
+            "curated",
+            "extended"
+          ],
+          "caveat": "Labels are authored by the project; extraction accuracy is in-sample vocabulary coverage."
+        },
+        {
+          "id": "fomc",
+          "name": "FOMC statements and target-range changes",
+          "fields": [
+            "statement_text",
+            "target_range",
+            "decision_date"
+          ],
+          "available_at": "14:00 ET on the statement date",
+          "revision": "Statements are immutable; the upstream compilation can be updated",
+          "point_in_time": "partial",
+          "used_in_benchmark": true,
+          "datasets": [
+            "fomc",
+            "fomc_surprise",
+            "extended"
+          ],
+          "caveat": "The statement text is point-in-time; the parsed target range is reconstructed from the snapshot."
+        },
+        {
+          "id": "brw",
+          "name": "Bu-Rogers-Wu (2021) daily monetary policy surprises",
+          "fields": [
+            "brw_ext"
+          ],
+          "available_at": "Published ex post in the 2021 paper and replication package",
+          "revision": "Upstream series can be revised",
+          "point_in_time": "ex_post",
+          "used_in_benchmark": true,
+          "datasets": [
+            "fomc_surprise"
+          ],
+          "caveat": "The series is not a real-time surprise feed; it is joined after the fact for the fomc_surprise benchmark."
+        },
+        {
+          "id": "sec",
+          "name": "SEC EDGAR filings and XBRL facts",
+          "fields": [
+            "filed",
+            "form",
+            "fact_value"
+          ],
+          "available_at": "Filing acceptance time",
+          "revision": "Filings are immutable; XBRL values can be restated in later filings",
+          "point_in_time": "partial",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Used for XBRL examples, not for the macro event-study benchmark."
+        },
+        {
+          "id": "gdelt",
+          "name": "GDELT news discovery",
+          "fields": [
+            "seendate",
+            "url",
+            "title"
+          ],
+          "available_at": "Approximately 15 minutes after publication",
+          "revision": "Articles can be re-crawled; URLs are not permanent",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Discovery layer only; the curated benchmark uses authored event records."
+        },
+        {
+          "id": "fred",
+          "name": "FRED / ALFRED macro series",
+          "fields": [
+            "value",
+            "realtime_start",
+            "realtime_end"
+          ],
+          "available_at": "Release calendar; ALFRED exposes vintages",
+          "revision": "Yes; ALFRED exposes vintages",
+          "point_in_time": "yes",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Preferred vintage source when a FRED key is configured; not used in the offline benchmark."
+        },
+        {
+          "id": "treasury",
+          "name": "Daily Treasury yield curve",
+          "fields": [
+            "date",
+            "tenor",
+            "yield"
+          ],
+          "available_at": "End of day",
+          "revision": "Rare",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Cross-check only; not a benchmark input."
+        },
+        {
+          "id": "worldbank",
+          "name": "World Bank indicators",
+          "fields": [
+            "value",
+            "year"
+          ],
+          "available_at": "Annual/quarterly release",
+          "revision": "Yes; historical values are revised",
+          "point_in_time": "no",
+          "used_in_benchmark": false,
+          "datasets": [],
+          "caveat": "Regime context only; not an event-study input."
+        }
+      ],
+      "checks": [
+        {
+          "id": "no_llm_metric_path",
+          "passed": true,
+          "detail": "Rules, mechanism retrieval, sign algebra and the event study are deterministic; no LLM sits in the metric path."
+        },
+        {
+          "id": "event_timestamps_present",
+          "passed": true,
+          "detail": "92 events carry an editorial published_at timestamp."
+        },
+        {
+          "id": "labels_frozen",
+          "passed": false,
+          "detail": "Curated labels are hand-edited; they are not a frozen third-party dataset."
+        },
+        {
+          "id": "prices_point_in_time",
+          "passed": false,
+          "detail": "Yahoo adjusted closes are retroactively adjusted for splits and dividends."
+        },
+        {
+          "id": "surprises_point_in_time",
+          "passed": false,
+          "detail": "The Bu-Rogers-Wu series is an ex-post published series, not a real-time feed."
+        },
+        {
+          "id": "events_within_price_snapshot",
+          "passed": true,
+          "detail": "Latest event 2025-12-10; price snapshot ends 2026-11-24."
+        }
+      ],
+      "verdict": "not_point_in_time",
+      "summary": "The LLM-free metric path removes parametric lookahead, but the benchmark is not a point-in-time reconstruction: yahoo, curated_events, fomc are revised or ex-post."
+    }
+  }
+}

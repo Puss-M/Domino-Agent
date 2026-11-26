@@ -22,6 +22,7 @@ from .metrics import (
     log_loss,
     summarize,
 )
+from .temporal import audit_point_in_time, load_point_in_time
 
 __all__ = [
     "AnalogModel",
@@ -32,6 +33,7 @@ __all__ = [
     "accuracy",
     "apply_platt",
     "auc",
+    "audit_point_in_time",
     "bootstrap_ci",
     "brier",
     "calibration_bins",
@@ -43,6 +45,7 @@ __all__ = [
     "expected_calibration_error",
     "fit_platt",
     "load_events",
+    "load_point_in_time",
     "log_loss",
     "news_item",
     "split_by_date",

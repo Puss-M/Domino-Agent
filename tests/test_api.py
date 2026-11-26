@@ -97,6 +97,17 @@ def test_event_study_endpoint():
     assert cross_sectional["mean_abs_kp_t"] <= cross_sectional["mean_abs_bmp_t"]
 
 
+def test_point_in_time_endpoint():
+    response = _client().get("/api/point-in-time?dataset=curated")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["dataset"] == "curated"
+    assert payload["n_events"] == 50
+    assert payload["llm_in_metric_path"] is False
+    assert payload["verdict"] == "not_point_in_time"
+    assert "yahoo" in payload["revised_sources"]
+
+
 def test_backtest_endpoint_small_subset():
     client = _client()
     payload = {

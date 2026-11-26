@@ -22,6 +22,7 @@ from .datasources.base import DataSourceError
 from .evaluation.backtest import BacktestEngine
 from .evaluation.dataset import DatasetError, load_events
 from .evaluation.event_study import cross_sectional_test, event_study_summary
+from .evaluation.temporal import audit_point_in_time
 from .knowledge.loader import KnowledgeError
 from .reasoning.engine import AnalysisEngine
 from .symbolic import to_turtle
@@ -186,6 +187,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 outcomes, events, prices, engine.transmission.assets, config
             ),
         }
+
+    @app.get("/api/point-in-time")
+    def point_in_time(
+        dataset: Literal["curated", "fomc", "fomc_surprise", "extended"] = "curated",
+    ) -> dict:
+        events = load_events(settings=settings, dataset=dataset)
+        prices = market.prices_wide("adj_close", ["SPY"]).dropna(how="all")
+        price_last = prices.index[-1].date() if len(prices.index) else None
+        return audit_point_in_time(
+            events, dataset=dataset, price_last_date=price_last, settings=settings
+        )
 
     @app.get("/api/market/{ticker}")
     def market_snapshot(ticker: str) -> dict:

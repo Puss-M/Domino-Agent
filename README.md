@@ -8,7 +8,7 @@
 
 **An event-driven macro transmission engine with cited mechanisms, deterministic graph construction, and an event-study backtest.**
 
-Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.5 is a rebuild around three questions a macro desk actually asks:
+Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.6 is a rebuild around three questions a macro desk actually asks:
 
 1. **What happened, and how much of it was a surprise?**
    `50bp` is not the same as `50bp more than priced`. `8.6%` CPI is a level; `+0.3pp vs consensus` is the shock.
@@ -25,15 +25,15 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 
 ---
 
-## What v0.5 changes
+## What v0.6 changes
 
-| v0.1 prototype | v0.5 |
+| v0.1 prototype | v0.6 |
 |---|---|
 | 2 LLM personas (Detective / Reviewer), ~300 LOC | 5 typed stages: extract → retrieve → transmit → audit → report |
 | No data layer | 8 data sources (6 live connectors + FOMC + BRW snapshots) + provenance, caching, retries, point-in-time notes |
 | Free-form causal edges | 20 cited mechanisms → 14 channels → 12 assets; every edge has a mechanism ID and references |
 | No text normalization | bps/pp/%/$tn/mb/d/Chinese units, surprise vs level, entity linking, LM-style sentiment, near-duplicate clustering |
-| No evaluation | 50 curated + 58 FOMC + 45 surprise-aware + 92 extended events; 1-day market-model CAR; Kolari–Pynnönen cross-correlation adjustment; walk-forward analog/base rate; stacked ensemble; Platt; event-clustered bootstrap; paired Brier tests; documented FOMC negative skill |
+| No evaluation | 50 curated + 58 FOMC + 45 surprise-aware + 92 extended events; 1-day market-model CAR; Kolari–Pynnönen cross-correlation adjustment; numeric/symbolic/gated/blend ablation; point-in-time contract; walk-forward analog/base rate; stacked ensemble; Platt; event-clustered bootstrap; paired Brier tests; documented FOMC negative skill |
 | "Reviewer agent" prompt | Deterministic audit: citations, evidence grades, sign conflicts, abstention, look-ahead check |
 | No formal verification | **Sign algebra + Z3 proof cores**; ambiguity is first-class; **policy-as-code P-001–P-013**; hash-chained audit ledger |
 | Empty frontend | Zero-build dashboard served by FastAPI; run it with one command |
@@ -124,7 +124,7 @@ flowchart LR
 ```
 
 Full methodology, formulas and threats to validity: [`docs/methodology.md`](docs/methodology.md).
-Neuro-symbolic design + compliance mapping: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md). Paper outline: [`docs/paper_outline.md`](docs/paper_outline.md). 2026-11 literature sweep: [`docs/literature_2026_11.md`](docs/literature_2026_11.md).
+Neuro-symbolic design + compliance mapping: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md). Paper outline: [`docs/paper_outline.md`](docs/paper_outline.md). 2026-11 literature sweep: [`docs/literature_2026_11.md`](docs/literature_2026_11.md). Point-in-time contract: [`docs/point_in_time.md`](docs/point_in_time.md).
 
 ### The six stages
 
@@ -260,6 +260,8 @@ Protocol: **50 events, 12 assets, 1-day announcement window, first half for fitt
 - 5-day robustness: **54.5%**, Brier **0.252**, AUC **0.528**. The edge is concentrated in the announcement session.
 - Extraction: **50/50** joint event-type + direction on the curated sample. This is in-sample vocabulary coverage, not an OOD benchmark.
 - **Symbolic verification**: the hawkish-hike example compiles to 19 nodes / 78 edges / acyclic; **8/12 assets proved** and **4 ambiguous** (TLT, IEF, GLD, XLU) because the yield path and the safe-haven path conflict. Proof coverage is 66.7% on the hike example and 81.8% on the CPI/China examples. The numeric model still nets TLT to −119bp; the symbolic layer surfaces the conflict instead of hiding it.
+- **E6 ablation — a negative result**: the symbolic layer does **not** improve directional accuracy. Symbolic-only covers 62.5% (curated) / 56.7% (FOMC) of predictions; gated and blended arms do not beat the numeric model (blend ΔBrier −0.0002, p=0.52 on curated; +0.0025, p=0.89 on FOMC). Its value is ambiguity disclosure, proof cores and auditability.
+- **E11 point-in-time audit**: all four benchmarks return `verdict: not_point_in_time`. The LLM-free metric path removes parametric lookahead, but Yahoo adjusted closes, editorial labels, the FOMC compilation and the ex-post BRW series are not frozen vintages. See [`docs/point_in_time.md`](docs/point_in_time.md).
 
 ## FOMC stress test: the mechanism prior needs surprise data
 
@@ -348,8 +350,8 @@ backend/
     market/         # 13 ETFs, 2000–present + provenance
     macro/ sec/ news/  # small public-data snapshots
 frontend/           # zero-build dashboard (HTML/CSS/JS + SVG)
-tests/              # 108 unit/contract tests
-docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, paper outline, literature sweep, resume bullets
+tests/              # 113 unit/contract tests
+docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, point-in-time contract, paper outline, literature sweep, resume bullets
 ```
 
 ---
@@ -389,7 +391,7 @@ See [`docs/resume_bullets.md`](docs/resume_bullets.md) for Chinese and English v
 
 **English (condensed):**
 
-> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC + 45 surprise-aware events and 108 tests; runs fully offline with no API key.
+> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC + 45 surprise-aware events and 113 tests; runs fully offline with no API key.
 >
 > Implemented finance-aware text normalization (bps vs percentage points vs percent, `$tn`, `mb/d`, Chinese units, surprise vs level), entity linking, LM-style sentiment with negation, and near-duplicate news clustering; added provenance-aware connectors for SEC EDGAR/XBRL, GDELT, Treasury, FRED/ALFRED, World Bank and Yahoo.
 >

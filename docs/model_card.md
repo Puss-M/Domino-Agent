@@ -63,6 +63,8 @@ Primary results (1-day window):
 
 The FOMC mechanism-only model is **significantly worse** than the always-up base rate (ΔBrier +0.1338, 95% CI 0.076–0.180). This is the model's most important limitation.
 
+The E6 ablation shows the symbolic layer does **not** improve directional accuracy: the symbolic-blend vs numeric-only Brier delta is −0.0002 on curated (p=0.52) and +0.0025 on FOMC (p=0.89). Its value is ambiguity disclosure, proof cores and auditability, not accuracy. The E11 point-in-time audit labels every benchmark `not_point_in_time`; the LLM-free metric path removes parametric lookahead, not revised-data leakage.
+
 ## Failure modes
 
 1. **Action-only policy events.** Without a surprise/positioning measure, the mechanism sign is wrong across regimes (normalization vs recession vs inflation shock).
@@ -74,6 +76,8 @@ The FOMC mechanism-only model is **significantly worse** than the always-up base
 7. **Middle-bin calibration.** Noisy with 33 predictions per bin and correlated assets within events.
 8. **Symbolic ambiguity.** TLT/IEF/GLD/XLU are genuinely ambiguous under a hawkish shock (yield vs safe-haven paths). The system reports `?`; it does not resolve it without a regime condition or data.
 9. **Proofs are relative.** A Z3 proof core means the cited mechanisms entail the direction; it does not mean the mechanisms are true or that the effect is causal.
+10. **Symbolic layer does not add accuracy.** In E6, symbolic-only covers 62.5% (curated) / 56.7% (FOMC) of predictions at roughly the same accuracy as the numeric model; gating and blending do not improve Brier. Do not use the symbolic layer as a performance claim.
+11. **Not point-in-time.** Yahoo adjusted closes, editorial labels, the FOMC compilation and the ex-post BRW series are revised or ex-post; E11 reports the dataset-specific verdict.
 
 ## Symbolic verification and compliance
 

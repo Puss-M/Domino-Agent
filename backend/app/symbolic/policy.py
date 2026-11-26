@@ -206,14 +206,21 @@ def _p007(response, _symbolic):
 def _p008(response, symbolic):
     if symbolic is None:
         return True, "No symbolic report attached."
-    bad = [
-        proof.asset
-        for proof in symbolic.proofs
-        if proof.status == "not_entailed"
-        and any(p.asset == proof.asset and not p.abstain for p in response.predictions)
-    ]
+    predictions = {p.asset: p for p in response.predictions if not p.abstain}
+    bad: list[str] = []
+    for proof in symbolic.proofs:
+        prediction = predictions.get(proof.asset)
+        if prediction is None:
+            continue
+        if proof.status == "not_entailed":
+            bad.append(proof.asset)
+            continue
+        if proof.status == "proved" and proof.claim in {"+", "-"}:
+            expected = "up" if proof.claim == "+" else "down"
+            if prediction.direction in {"up", "down"} and prediction.direction != expected:
+                bad.append(proof.asset)
     if bad:
-        return False, f"Numeric prediction has a formally unentailed direction: {bad}"
+        return False, f"Numeric prediction has a formally unentailed or contradicted direction: {bad}"
     return True, "No numeric prediction contradicts a formal proof."
 
 

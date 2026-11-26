@@ -340,6 +340,11 @@ It abstains when `n < 2`.
 - **Hybrid**: `sigmoid(logit(p_mech) + 0.5 logit(p_analog))`.
 - **Stacked**: `sigmoid(w_m logit(p_mech) + w_a logit(p_analog) + w_b logit(p_base))`, with non-negative weights selected on the training half by Brier score.
 - **Calibrated**: Platt scaling `sigmoid(a logit(p) + b)` fitted on the training half.
+- **Symbolic only** (E6): `p=0.8` for a proved positive direction, `p=0.2` for a proved negative direction, abstain otherwise.
+- **Symbolic gated** (E6): keep the mechanism probability only when the proof is proved and does not contradict the numeric direction; abstain on `ambiguous` / `not_entailed`.
+- **Symbolic blend** (E6): equal-weight logit blend of mechanism and symbolic signals; fall back to whichever is available.
+
+E6 is a negative ablation for predictive skill: the blend's paired Brier delta vs the numeric model is −0.0002 on curated (p=0.52) and +0.0025 on FOMC (p=0.89). The gated arm's difference is coverage, not calibration; its paired delta is zero by construction.
 
 The mechanism weight is constrained to `[0.6, 1.2]` by the evidence prior; analog/base weights are fitted on the training half. On the curated 1-day run the stack selected `w_m=0.60`, `w_a=0.40`, `w_b=0.40`, with Platt `a=0.34`, `b=0.05`. On the FOMC stress test it selected `w_m=0.60`, `w_a=0.60`, `w_b=0.00`, and the result is still negative skill. These values are printed in the backtest response; they are not hard-coded into the engine.
 
@@ -360,7 +365,7 @@ The mechanism weight is constrained to `[0.6, 1.2]` by the evidence prior; analo
 1. **Small samples.** 50 curated events and 58 FOMC events; 25–29 events in each held-out half. The confidence intervals are wide.
 2. **Curated labels.** Event type/direction labels are editorial. Extraction accuracy is in-sample vocabulary coverage, not an OOD benchmark.
 3. **Authored priors.** The mechanism library was written by the project with knowledge of the literature and history, though not fitted to the test outcomes. It is not preregistered.
-4. **Revised prices.** Adjusted closes are not point-in-time. A production backtest should use CRSP/Compustat or a vendor with vintages.
+4. **Revised prices.** Adjusted closes are not point-in-time. A production backtest should use CRSP/Compustat or a vendor with vintages. E11 makes this explicit: the machine-readable contract (`backend/data/point_in_time.yaml`) and `/api/point-in-time` report a dataset-specific `not_point_in_time` verdict. The LLM-free path removes parametric lookahead, not data-revision leakage.
 5. **Overlapping windows.** Events can cluster (e.g. CPI and FOMC in the same month). The cluster bootstrap helps but does not eliminate cross-event dependence.
 6. **Surprise measurement.** CPI surprises are curated; FOMC surprises are qualitative in most events. A real desk would use high-frequency futures. The FOMC stress test exists to make this limitation measurable: the mechanism prior is significantly worse than a base rate when the action is all you know.
 7. **Symbolic proofs are relative to the library.** Z3 proves that the cited mechanisms entail a direction; it does not prove that the mechanisms are true. A proof core is a statement about internal consistency and evidence coverage, not about the world.

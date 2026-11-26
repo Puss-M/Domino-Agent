@@ -127,41 +127,50 @@ the full texts for the starred items.
   `234bp`, which made P-013 unable to see negative memo values.
 - **E5 audit** (`scripts/hallucination_audit.py`): six corruption types,
   60 injected cases, 60/60 detected, 0/10 clean false positives.
+- **E11 point-in-time contract** (`backend/data/point_in_time.yaml`,
+  `backend/app/evaluation/temporal.py`, `/api/point-in-time`): every benchmark
+  now returns a dataset-specific `not_point_in_time` verdict with the culprit
+  list. The LLM-free metric path removes parametric lookahead, not data
+  revision leakage.
+- **E6 symbolic ablation** (`backend/app/evaluation/backtest.py`): numeric-only,
+  symbolic-only, symbolic-gated and symbolic-blend arms. The result is a
+  **negative ablation for predictive skill** — blend vs numeric ΔBrier −0.0002
+  (curated) / +0.0025 (FOMC), neither significant. The symbolic layer's value is
+  auditability and structured ambiguity, not accuracy.
+- **P-008 fix**: the policy now catches a numeric direction that contradicts a
+  *proved* symbolic claim, not only a `not_entailed` status.
 - **Docs**: P-001–P-013 across README, methodology, model card, neuro-symbolic
   design and resume bullets; paper-related-work section extended with the new
-  clusters.
+  clusters; `docs/point_in_time.md` added.
 
 ## What to do next
 
 **P0 — paper credibility**
 
-1. Add a **point-in-time contract** table: for each data source, the timestamp
-   at which the value became public, and whether the benchmark uses a revised
-   value. Cite Gao et al. (2512.23847), Zhang & Stadie (2608.02985),
-   FinCutBench (2611.11588) and the availability-contract paper (2610.21659).
+1. Add a **production point-in-time feed**: E11 is a contract, not a vintage
+   archive. The benchmark's claim is mechanism-level directional skill, not a
+   deployable signal.
 2. Add **FCM and RICE-Alpha** to the paper's closest-work paragraph and explain
-   the difference in one sentence each.
+   the difference in one sentence each. (Done in the outline; verify full text
+   when PaperDaily is reachable.)
 3. Add **FinVerify / NumTrace** to the verification paragraph; state that Domino
-   verifies transmission signs, not answers or filings.
+   verifies transmission signs, not answers or filings. (Done.)
 
 **P1 — stronger system**
 
-4. Extend P-013 to **period/entity/scope**: each memo number should carry a
-   reference to the structured field (value, unit, period, entity), not just a
+4. Extend P-013 to **period/entity/scope** (E12): each memo number should carry
+   a reference to the structured field (value, unit, period, entity), not just a
    dimensional check. This is the NumTrace agenda applied to our memo.
-5. Add a **temporal integrity audit** to the benchmark: fail if any input used
-   for an event was published after the event's decision time; report the
-   share of revised vs point-in-time series.
-6. Consider an **FCM baseline** on the curated benchmark. It would test whether
+5. Consider an **FCM baseline** on the curated benchmark. It would test whether
    a learned weighted graph beats our qualitative mechanism graph — a useful
    adversarial baseline, not a required one.
 
 **P2 — paper experiments**
 
-7. E6 ablation (numeric-only vs symbolic-only vs symbolic-gated) remains the
-   highest-value missing experiment.
-8. E10 monetary/information decomposition remains the scientifically strongest
-   extension, but needs intraday rate-equity data.
+6. **E10 monetary/information decomposition** remains the scientifically
+   strongest extension, but needs intraday rate-equity data.
+7. Optional **E8 LLM perception** to make the neuro-symbolic claim concrete
+   rather than architectural.
 
 ## Uncertainties
 

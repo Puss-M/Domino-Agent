@@ -1,0 +1,93 @@
+# Point-in-time contract for benchmark inputs.
+#
+# This is a declaration, not a live vintage feed. It exists so the benchmark
+# can say exactly which inputs were available at the event date and which were
+# revised later. Update it whenever a data source or snapshot changes.
+
+version: 1
+as_of: "2026-11-26"
+sources:
+  - id: yahoo
+    name: Yahoo Finance adjusted close
+    fields: [adj_close]
+    available_at: "After the US session close (16:00 ET) on the trading day"
+    revision: "Adjusted retroactively for splits and dividends"
+    point_in_time: "no"
+    used_in_benchmark: true
+    datasets: [curated, fomc, fomc_surprise, extended]
+    caveat: "The snapshot is end-of-day and adjusted; it is not an as-traded vintage."
+
+  - id: curated_events
+    name: Curated macro event labels
+    fields: [headline, summary, published_at, direction, magnitude, surprise]
+    available_at: "The editorial published_at timestamp"
+    revision: "Hand-edited; labels are not a frozen third-party dataset"
+    point_in_time: "editorial"
+    used_in_benchmark: true
+    datasets: [curated, extended]
+    caveat: "Labels are authored by the project; extraction accuracy is in-sample vocabulary coverage."
+
+  - id: fomc
+    name: FOMC statements and target-range changes
+    fields: [statement_text, target_range, decision_date]
+    available_at: "14:00 ET on the statement date"
+    revision: "Statements are immutable; the upstream compilation can be updated"
+    point_in_time: "partial"
+    used_in_benchmark: true
+    datasets: [fomc, fomc_surprise, extended]
+    caveat: "The statement text is point-in-time; the parsed target range is reconstructed from the snapshot."
+
+  - id: brw
+    name: Bu-Rogers-Wu (2021) daily monetary policy surprises
+    fields: [brw_ext]
+    available_at: "Published ex post in the 2021 paper and replication package"
+    revision: "Upstream series can be revised"
+    point_in_time: "ex_post"
+    used_in_benchmark: true
+    datasets: [fomc_surprise]
+    caveat: "The series is not a real-time surprise feed; it is joined after the fact for the fomc_surprise benchmark."
+
+  - id: sec
+    name: SEC EDGAR filings and XBRL facts
+    fields: [filed, form, fact_value]
+    available_at: "Filing acceptance time"
+    revision: "Filings are immutable; XBRL values can be restated in later filings"
+    point_in_time: "partial"
+    used_in_benchmark: false
+    caveat: "Used for XBRL examples, not for the macro event-study benchmark."
+
+  - id: gdelt
+    name: GDELT news discovery
+    fields: [seendate, url, title]
+    available_at: "Approximately 15 minutes after publication"
+    revision: "Articles can be re-crawled; URLs are not permanent"
+    point_in_time: "no"
+    used_in_benchmark: false
+    caveat: "Discovery layer only; the curated benchmark uses authored event records."
+
+  - id: fred
+    name: FRED / ALFRED macro series
+    fields: [value, realtime_start, realtime_end]
+    available_at: "Release calendar; ALFRED exposes vintages"
+    revision: "Yes; ALFRED exposes vintages"
+    point_in_time: "yes"
+    used_in_benchmark: false
+    caveat: "Preferred vintage source when a FRED key is configured; not used in the offline benchmark."
+
+  - id: treasury
+    name: Daily Treasury yield curve
+    fields: [date, tenor, yield]
+    available_at: "End of day"
+    revision: "Rare"
+    point_in_time: "no"
+    used_in_benchmark: false
+    caveat: "Cross-check only; not a benchmark input."
+
+  - id: worldbank
+    name: World Bank indicators
+    fields: [value, year]
+    available_at: "Annual/quarterly release"
+    revision: "Yes; historical values are revised"
+    point_in_time: "no"
+    used_in_benchmark: false
+    caveat: "Regime context only; not an event-study input."

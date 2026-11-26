@@ -105,7 +105,7 @@ The symbolic layer is not part of the accuracy metrics: it does not change `p_up
 3. **Curated labels.** The 50-event labels are editorial; extraction accuracy is in-sample vocabulary coverage.
 4. **Templated FOMC headlines.** They test transmission, not extraction.
 5. **Overlapping windows.** Events cluster; the event-clustered bootstrap helps but does not eliminate dependence.
-6. **Revised prices.** Yahoo adjusted closes are not point-in-time; a production version needs CRSP/Compustat or a vendor with vintages.
+6. **Revised prices.** Yahoo adjusted closes are not point-in-time; a production version needs CRSP/Compustat or a vendor with vintages. The machine-readable E11 contract and the per-dataset verdict are in [`point_in_time.md`](point_in_time.md).
 7. **Authored mechanisms.** The mechanism library is theory- and literature-informed but not preregistered.
 
 ## Reproduction

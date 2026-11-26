@@ -26,6 +26,20 @@ The benchmark card is [`docs/benchmark.md`](benchmark.md); the model card is [`d
 - **Mechanism anchor**: the stack search allows mechanism weights `0.6–1.2`, analog/base weights `0–0.6`. The anchor is a deliberate prior; the FOMC stress test shows its cost.
 - **Temporal integrity**: no LLM sits in the metric path, so the benchmark is not exposed to parametric lookahead (Gao et al., arXiv 2512.23847; Zhang & Stadie, arXiv 2608.02985). It is still exposed to revised Yahoo adjusted closes; the point-in-time contract (E11) is the missing audit.
 
+## Temporal integrity (E11)
+
+The benchmark is **not** a point-in-time reconstruction. The machine-readable
+contract is [`backend/data/point_in_time.yaml`](../backend/data/point_in_time.yaml);
+the audit is [`docs/point_in_time.md`](point_in_time.md) and
+`docs/results/point_in_time.json`.
+
+The LLM-free metric path removes parametric lookahead, but Yahoo adjusted
+closes, editorial labels, the FOMC compilation and the ex-post BRW series are
+not frozen vintages. Every benchmark therefore returns
+`verdict: not_point_in_time` with a dataset-specific culprit list. That is the
+honest boundary: the claim is mechanism-level directional skill, not a
+deployable point-in-time signal.
+
 ## Curated benchmark (primary)
 
 | Model (held-out) | n | Coverage | Accuracy | 95% CI | Brier | AUC | ECE |
@@ -104,6 +118,56 @@ No model dominates. The mechanism has an accuracy advantage but is overconfident
 | Stacked + Platt | 277 | 96.5% | 0.545 | 0.252 | 0.528 |
 
 The five-day horizon is materially weaker than the one-day announcement window. Macro information is largely priced in the first session; subsequent drift is dominated by other news. The project does not claim a five-day trading signal.
+
+## Symbolic ablation (E6)
+
+E6 asks whether the symbolic layer adds **predictive** value on top of the
+numeric mechanism model, or whether its value is auditability. The arms are:
+
+- **Numeric only**: the mechanism prior (`p_mech`).
+- **Symbolic only**: a fixed 0.8 probability for a proved positive direction,
+  0.2 for a proved negative direction, abstain otherwise.
+- **Symbolic gated**: keep `p_mech` only when the proof is proved and does not
+  contradict the numeric direction; abstain on `ambiguous` / `not_entailed`.
+- **Symbolic blend**: equal-weight logit blend of `p_mech` and the symbolic
+  signal when both exist; fall back to whichever exists.
+
+| Dataset | Model | n | Coverage | Accuracy | Brier | AUC |
+|---|---|---:|---:|---:|---:|---:|
+| Curated | Numeric only | 254 | 92.4% | 61.4% | 0.259 | 0.613 |
+| Curated | Symbolic only | 172 | 62.5% | 60.5% | 0.277 | 0.608 |
+| Curated | Symbolic gated | 172 | 62.5% | 60.5% | 0.273 | 0.589 |
+| Curated | Symbolic blend | 254 | 92.4% | 61.4% | 0.258 | 0.610 |
+| Curated | Stacked + Platt | 265 | 96.4% | 60.4% | 0.238 | 0.634 |
+| FOMC | Numeric only | 297 | 93.1% | 41.1% | 0.384 | 0.416 |
+| FOMC | Symbolic only | 181 | 56.7% | 41.4% | 0.391 | 0.408 |
+| FOMC | Symbolic gated | 181 | 56.7% | 41.4% | 0.383 | 0.403 |
+| FOMC | Symbolic blend | 297 | 93.1% | 41.1% | 0.386 | 0.410 |
+
+Paired Brier, symbolic blend vs numeric only: curated **−0.0002** (95% CI
+−0.0073–0.0072, p=0.52, n=254); FOMC **+0.0025** (95% CI −0.0013–0.0067,
+p=0.89, n=297). Neither is significant. Symbolic-only vs numeric only on
+covered pairs: curated **+0.0043** (95% CI −0.0153–0.0241, p=0.68), FOMC
+**+0.0087** (95% CI −0.0032–0.0222, p=0.92); the symbolic arm is not better.
+
+Other benchmarks show the same pattern:
+
+| Benchmark | Numeric accuracy | Symbolic accuracy (coverage) | Blend ΔBrier vs numeric |
+|---|---:|---:|---:|
+| Curated 5-day | 56.8% | 57.1% (63.4%) | +0.0002 (p=0.54) |
+| FOMC surprise-aware | 45.3% | 44.0% (58.6%) | +0.0033 (p=0.87) |
+| Extended | 57.5% | 57.1% (60.5%) | +0.0018 (p=0.75) |
+
+The gated arm's paired delta is **0.0 by construction**: it keeps the numeric
+probability on covered pairs. Its difference is coverage — it abstains on
+30–43% of assets — not calibration.
+
+This is a **negative ablation for predictive skill**. The symbolic layer does
+not improve direction or Brier on these benchmarks. Its value is:
+structured ambiguity (37.5% of curated active predictions are not certified),
+a minimal proof core per proved asset, and a formal gate that can contradict a
+narrative. That is the honest claim; the paper should not sell E6 as an accuracy
+win.
 
 ## Cross-sectional correlation and clustering (E7)
 

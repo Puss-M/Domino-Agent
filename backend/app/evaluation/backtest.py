@@ -170,6 +170,16 @@ class BacktestEngine:
                 for prediction in response.predictions
                 if not prediction.abstain
             }
+            mechanism_directions = {
+                prediction.asset: prediction.direction
+                for prediction in response.predictions
+                if not prediction.abstain
+            }
+            proofs = (
+                {proof.asset: proof for proof in response.symbolic.proofs}
+                if response.symbolic
+                else {}
+            )
             if "generated" not in event.tags:
                 # Templated FOMC headlines are not an extraction test; keep the
                 # extraction metric on the curated text sample only.
@@ -206,6 +216,36 @@ class BacktestEngine:
                 else:
                     p_hybrid = None
 
+                proof = proofs.get(asset)
+                proof_status = proof.status if proof else None
+                proof_claim = proof.claim if proof else None
+                # Symbolic-only: a proved direction becomes a fixed, deliberately
+                # uncalibrated probability; everything else abstains.
+                p_symbolic = None
+                if proof_status == "proved" and proof_claim in {"+", "-"}:
+                    p_symbolic = 0.8 if proof_claim == "+" else 0.2
+                # Symbolic-gated: keep the numeric mechanism prior only when the
+                # symbolic layer does not flag ambiguity or contradiction.
+                p_gated = p_mech
+                if proof_status in {"ambiguous", "not_entailed"}:
+                    p_gated = None
+                elif proof_status == "proved" and proof_claim in {"+", "-"}:
+                    expected = "up" if proof_claim == "+" else "down"
+                    numeric_direction = mechanism_directions.get(asset)
+                    if numeric_direction in {"up", "down"} and numeric_direction != expected:
+                        p_gated = None
+                # Both: equal-weight logit blend when both signals exist; fall
+                # back to whichever signal is available. This is the "both"
+                # arm of the E6 ablation, not an abstention rule.
+                if p_mech is not None and p_symbolic is not None:
+                    p_blend = _sigmoid(0.5 * _logit(p_mech) + 0.5 * _logit(p_symbolic))
+                elif p_mech is not None:
+                    p_blend = p_mech
+                elif p_symbolic is not None:
+                    p_blend = p_symbolic
+                else:
+                    p_blend = None
+
                 base = {
                     "event_id": event.id,
                     "asset": asset,
@@ -223,11 +263,25 @@ class BacktestEngine:
                 rows_by_model["hybrid"].append({**base, "p_up": p_hybrid})
                 rows_by_model["always_up"].append({**base, "p_up": p_base})
                 rows_by_model["coin_flip"].append({**base, "p_up": 0.5})
+                rows_by_model["symbolic"].append(
+                    {**base, "p_up": p_symbolic, "proof_status": proof_status, "proof_claim": proof_claim}
+                )
+                rows_by_model["symbolic_gated"].append(
+                    {**base, "p_up": p_gated, "proof_status": proof_status, "proof_claim": proof_claim}
+                )
+                rows_by_model["symbolic_blend"].append(
+                    {**base, "p_up": p_blend, "proof_status": proof_status, "proof_claim": proof_claim}
+                )
 
                 event_predictions[asset] = {
                     "mechanism": p_mech,
                     "analog": p_analog,
                     "hybrid": round(p_hybrid, 4) if p_hybrid is not None else None,
+                    "symbolic": round(p_symbolic, 4) if p_symbolic is not None else None,
+                    "symbolic_gated": round(p_gated, 4) if p_gated is not None else None,
+                    "symbolic_blend": round(p_blend, 4) if p_blend is not None else None,
+                    "proof_status": proof_status,
+                    "proof_claim": proof_claim,
                     "base_rate": round(p_base, 4),
                     "analog_n": analog_predictions[asset].n if asset in analog_predictions else 0,
                     "analog_mean_car_bps": (
@@ -296,6 +350,15 @@ class BacktestEngine:
             ],
             "hybrid_test": test_rows,
             "stacked_test": stacked_test,
+            "symbolic_test": [
+                row for row in rows_by_model["symbolic"] if row["event_id"] in test_ids
+            ],
+            "symbolic_gated_test": [
+                row for row in rows_by_model["symbolic_gated"] if row["event_id"] in test_ids
+            ],
+            "symbolic_blend_test": [
+                row for row in rows_by_model["symbolic_blend"] if row["event_id"] in test_ids
+            ],
             "mechanism_calibrated_test": [
                 {**row, "p_up": apply_platt(row["p_up"], mechanism_platt)}
                 for row in rows_by_model["mechanism"]
@@ -321,6 +384,9 @@ class BacktestEngine:
             ("stacked_calibrated_test", "always_up_test"),
             ("stacked_calibrated_test", "mechanism_test"),
             ("mechanism_test", "always_up_test"),
+            ("symbolic_test", "mechanism_test"),
+            ("symbolic_gated_test", "mechanism_test"),
+            ("symbolic_blend_test", "mechanism_test"),
         ):
             comparison = paired_bootstrap_difference(
                 test_models[model_name],
@@ -402,6 +468,8 @@ class BacktestEngine:
             f"Dataset: {config.dataset}.",
             "The sample is small and event windows overlap; the bootstrap resamples events, not asset rows.",
             "Mechanism priors were authored by the project, not preregistered, and were not fitted to these outcomes.",
+            "E6 ablation: symbolic-only uses a fixed 0.8/0.2 probability for a proved direction and abstains otherwise; symbolic-gated keeps the mechanism prior only when the proof is proved and not contradicted, and abstains on ambiguous/not_entailed assets; symbolic-blend is an equal-weight logit blend of mechanism and symbolic signals, falling back to whichever is available.",
+            "The gated model's probabilities are identical to the mechanism model on its covered pairs by construction; its paired Brier delta is zero and its difference is coverage, not calibration.",
             "Stack weights fitted on train: mechanism={:.2f}, analog={:.2f}, base_rate={:.2f}.".format(*stack_weights),
             f"Platt parameters (stacked): a={stacked_platt[0]:.2f}, b={stacked_platt[1]:.2f}.",
             (

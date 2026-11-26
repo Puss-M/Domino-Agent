@@ -12,7 +12,7 @@ Target venues, in order:
 
 ## Abstract (draft)
 
-> Macro event analysis with LLMs usually stops at prompt orchestration: an LLM proposes a causal chain and another LLM reviews it. We argue that this architecture has a structural verification problem, and build a neuro-symbolic alternative. A cited mechanism library is compiled into a signed influence graph; qualitative sign algebra and an SMT solver certify (or refute) each asset direction, returning a minimal proof core and treating ambiguity as a first-class output. A policy-as-code layer enforces numeric grounding, no-advice language, abstention, and a hash-chained audit trail. We release a 92-event benchmark (50 curated macro events + 58 systematic FOMC decisions, deduplicated to 92) with paired event-clustered Brier tests. On the curated benchmark the calibrated stack reaches 60.4% directional accuracy (Brier 0.238, AUC 0.634, 95% CI 0.537–0.668), but the improvement over a base rate is not statistically significant. On the systematic FOMC benchmark the mechanism prior is **significantly worse** than a base rate (41.1% vs 56.6%, ΔBrier +0.134, 95% CI 0.076–0.180). A lexicon tone-delta proxy does not rescue it. Even joining the events with the Bu-Rogers-Wu (2021) daily surprise series leaves the mechanism below the base rate (45.3% vs 52.7%; tightening surprises 52.2%, easing surprises 43.3%), consistent with the information effect: a dovish surprise can be bad news. The missing input is not a surprise number but a monetary/information decomposition. We conclude that action-only policy events require high-frequency surprise/positioning data, not better prompt engineering, and that symbolic verification is the right place to put the reliability budget.
+> Macro event analysis with LLMs usually stops at prompt orchestration: an LLM proposes a causal chain and another LLM reviews it. We argue that this architecture has a structural verification problem, and build a neuro-symbolic alternative. A cited mechanism library is compiled into a signed influence graph; qualitative sign algebra and an SMT solver certify (or refute) each asset direction, returning a minimal proof core and treating ambiguity as a first-class output. A policy-as-code layer enforces numeric grounding, no-advice language, abstention, and a hash-chained audit trail. An ablation shows the symbolic layer does **not** improve directional accuracy (blend ΔBrier −0.0002, p=0.52); its value is ambiguity disclosure and auditability. A machine-readable point-in-time contract labels every benchmark as **not** a vintage reconstruction, separating parametric lookahead from data-revision leakage. We release a 92-event benchmark (50 curated macro events + 58 systematic FOMC decisions, deduplicated to 92) with paired event-clustered Brier tests. On the curated benchmark the calibrated stack reaches 60.4% directional accuracy (Brier 0.238, AUC 0.634, 95% CI 0.537–0.668), but the improvement over a base rate is not statistically significant. On the systematic FOMC benchmark the mechanism prior is **significantly worse** than a base rate (41.1% vs 56.6%, ΔBrier +0.134, 95% CI 0.076–0.180). A lexicon tone-delta proxy does not rescue it. Even joining the events with the Bu-Rogers-Wu (2021) daily surprise series leaves the mechanism below the base rate (45.3% vs 52.7%; tightening surprises 52.2%, easing surprises 43.3%), consistent with the information effect: a dovish surprise can be bad news. The missing input is not a surprise number but a monetary/information decomposition. We conclude that action-only policy events require high-frequency surprise/positioning data, not better prompt engineering, and that symbolic verification is the right place to put the reliability budget.
 
 ## Contributions
 
@@ -108,12 +108,12 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 | E3 | Tone-delta surprise proxy | done (negative) | Table 3 (44–50%, base 52.6%) |
 | E4 | Symbolic proof coverage / ambiguity | done | Table 4 (66.7% coverage on hawkish hike; TLT/GLD ambiguous) |
 | E5 | Hallucination injection: 10 clean memos × 6 corruption types | done | Table 5 (60/60 detected; 0/10 clean false positives) |
-| E6 | Ablation: numeric-only vs symbolic-only vs both | todo | Ambiguity catch rate; proof coverage |
+| E6 | Ablation: numeric-only vs symbolic-only vs gated vs blend | done (negative) | Table 7 (no predictive lift; coverage falls to 62.5%/56.7%) |
 | E7 | Kolari–Pynnönen cross-correlation-adjusted CAR test | done | Table 6 (rho 0.04–0.06; FOMC sig. events 6.9% → 3.5%) |
 | E8 | LLM perception vs rule extraction (optional) | todo, needs API key | Extraction accuracy / cost |
 | E9 | Surprise-aware FOMC with BRW (2021) daily shocks | done (negative) | Table 3b (45.3% vs 52.7%; easing 43.3%) |
 | E10 | Monetary vs information shock decomposition (Jarociński–Karadi 2020) | todo | FOMC accuracy/Brier after decomposition; needs intraday rate-equity co-movement |
-| E11 | Point-in-time contract and lookahead audit | todo | Per-source availability table; share of revised series |
+| E11 | Point-in-time contract and lookahead audit | done | Table 8 (all benchmarks `not_point_in_time`; dataset-specific culprits) |
 | E12 | Period/entity/scope provenance (NumTrace agenda) | partial (P-013 units done) | Provenance failure taxonomy; 60/60 unit injections |
 
 ## Results to report now
@@ -124,6 +124,8 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 - Surprise-aware FOMC (BRW 2021, 45 events): 45.3% vs base 52.7%; tightening 52.2%, easing 43.3%.
 - Symbolic: 19 nodes/78 edges/acyclic for a hawkish shock; 8 proved, 4 ambiguous; proof core for QQQ = {MON_TIGHTEN}.
 - Policy injection (E5): 60/60 injected corruptions detected across fake numbers, advice, fake mechanism IDs, fake citations, out-of-universe assets and right-number/wrong-unit claims; 0/10 clean memos raised an error policy.
+- Symbolic ablation (E6): numeric-only 61.4% / Brier 0.259 on curated; symbolic-only 60.5% on 62.5% coverage; gated 60.5% on 62.5%; blend 61.4% / 0.258. Blend vs numeric ΔBrier −0.0002 (95% CI −0.0073–0.0072, p=0.52). FOMC: 41.1% numeric, 41.4% symbolic on 56.7% coverage; blend ΔBrier +0.0025 (95% CI −0.0013–0.0067, p=0.89). Curated 5-day, surprise-aware and extended show the same non-significant pattern. **No predictive lift** — the symbolic layer's value is auditability and structured ambiguity.
+- Point-in-time audit (E11): every benchmark is `not_point_in_time`; culprits are Yahoo adjusted prices, editorial labels, the FOMC compilation and the ex-post BRW series. The LLM-free metric path removes parametric lookahead but not data-revision leakage.
 - Cross-sectional correlation (E7): mean residual rho 0.043–0.059; KP inflation 1.19–1.23. Mean |BMP| falls from 1.18–1.29 to 1.01–1.06. FOMC significant-event share falls 6.9% → 3.5% (surprise-aware 8.9% → 4.4%). Pooled equal-weighted CAR: curated t 1.92 → 1.65, FOMC 0.25 → 0.21, surprise-aware −0.38 → −0.33, extended 1.35 → 1.14. No pooled CAR is significant.
 
 ## Threats to validity
@@ -140,16 +142,15 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 
 ## What is missing for a strong submission
 
-1. **Ablation** (E6) — show that symbolic verification catches ambiguity that the numeric model hides; quantify how often.
-2. **Point-in-time contract** (E11) — per source, record when the value became public and whether the benchmark uses a revised value. Cite Gao et al. (2512.23847), Zhang & Stadie (2608.02985), FinCutBench (2611.11588) and the availability-contract paper (2610.21659). This is now a reviewer-level expectation, not a nicety.
-3. **Period/entity/scope provenance** (E12) — extend P-013 beyond units, following NumTrace (2610.34887): each memo number should reference the structured field's entity, concept, period and scope.
-4. **Optional LLM perception** (E8) — one open model or API, schema-constrained, with the rule extractor as fallback. Report extraction accuracy and cost. This makes the "neuro-symbolic" claim concrete rather than architectural.
-5. **Monetary/information decomposition** (E10) — the BRW surprise test shows a surprise number is not enough; use Jarociński–Karadi (2020) or a high-frequency rate-equity co-movement proxy. If unavailable, the negative result stands as a benchmark contribution.
-6. **A cleaner related-work positioning** — FinVerify verifies answers, NumTrace verifies number provenance, GURU verifies actions; we verify transmission signs and expose ambiguity. FCM/RICE-Alpha build event graphs; we add solver proof cores and a public negative result. No single neighbor does both.
+1. **Period/entity/scope provenance** (E12) — extend P-013 beyond units, following NumTrace (2610.34887): each memo number should reference the structured field's entity, concept, period and scope.
+2. **Optional LLM perception** (E8) — one open model or API, schema-constrained, with the rule extractor as fallback. Report extraction accuracy and cost. This makes the "neuro-symbolic" claim concrete rather than architectural.
+3. **Monetary/information decomposition** (E10) — the BRW surprise test shows a surprise number is not enough; use Jarociński–Karadi (2020) or a high-frequency rate-equity co-movement proxy. If unavailable, the negative result stands as a benchmark contribution.
+4. **A production point-in-time feed** — E11 is a contract, not a vintage archive. A deployable system needs as-traded prices and a real-time surprise feed; the current benchmark's claim is mechanism-level directional skill, not a trading signal.
+5. **A cleaner related-work positioning** — FinVerify verifies answers, NumTrace verifies number provenance, GURU verifies actions; we verify transmission signs and expose ambiguity. FCM/RICE-Alpha build event graphs; we add solver proof cores and a public negative result. No single neighbor does both.
 
 ## Suggested timeline
 
-- Week 1: E6 (ablation), E10 (shock decomposition), optional E8.
+- Week 1: E10 (shock decomposition), optional E8, E12 (period/entity provenance).
 - Week 2: paper draft (8 pages), figures from `docs/results/`, artifact appendix.
 - Week 3: internal review, reproduction from a clean clone, submission.
 - Optional parallel: high-frequency surprise adapter; if it works, promote E9 to a main result.

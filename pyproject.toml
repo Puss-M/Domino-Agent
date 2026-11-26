@@ -1,6 +1,6 @@
 [project]
 name = "domino-agent"
-version = "0.5.2"
+version = "0.6.0"
 description = "Event-driven macro transmission with cited mechanisms and an event-study backtest"
 readme = "README.md"
 requires-python = ">=3.10"

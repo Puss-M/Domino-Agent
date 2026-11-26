@@ -44,6 +44,9 @@ def test_walk_forward_backtest_contract():
         if metric.brier is not None:
             assert 0.0 <= metric.brier <= 1.0
     assert any("Stack weights" in note for note in result.notes)
+    names = {metric.model for metric in result.metrics}
+    assert {"symbolic_test", "symbolic_gated_test", "symbolic_blend_test"} <= names
+    assert any(comparison.model == "symbolic_blend_test" for comparison in result.comparisons)
 
 
 def test_fomc_stress_test_contract():
@@ -70,6 +73,10 @@ def test_event_detail_contains_realized_outcomes():
         assert "mechanism" in prediction
         assert "analog" in prediction
         assert "stacked" in prediction
+        assert "symbolic" in prediction
+        assert "symbolic_gated" in prediction
+        assert "symbolic_blend" in prediction
+        assert "proof_status" in prediction
 
 
 def test_kolar_pynnonen_counts_cross_correlation():

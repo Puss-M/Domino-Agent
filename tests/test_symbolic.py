@@ -198,6 +198,28 @@ def test_policy_catches_right_number_wrong_unit(engine):
     assert all(r.passed for r in results if r.id == "P-004")
 
 
+def test_policy_catches_numeric_direction_contradicting_a_proof(engine):
+    response = engine.analyze_headline("Fed raises rates by 50 basis points")
+    proof = next(
+        (
+            item
+            for item in response.symbolic.proofs
+            if item.status == "proved" and item.claim in {"+", "-"}
+        ),
+        None,
+    )
+    assert proof is not None
+    expected_opposite = "down" if proof.claim == "+" else "up"
+    bad = response.model_copy(deep=True)
+    for prediction in bad.predictions:
+        if prediction.asset == proof.asset:
+            prediction.direction = expected_opposite
+            prediction.abstain = False
+            break
+    results = PolicyEngine().evaluate(bad, bad.symbolic)
+    assert any(r.id == "P-008" and not r.passed for r in results)
+
+
 def test_audit_ledger_hash_chain():
     with tempfile.TemporaryDirectory() as tmp:
         ledger = AuditLedger(path=Path(tmp) / "ledger.jsonl")

@@ -1,5 +1,4 @@
 {
-  "generated_at": "2026-11-25T16:37:44+00:00",
   "config": {
     "assets": null,
     "dataset": "fomc_surprise",
@@ -121,6 +120,60 @@
       ]
     },
     {
+      "model": "symbolic_test",
+      "n": 150,
+      "coverage": 0.5859,
+      "accuracy": 0.44,
+      "brier": 0.376,
+      "log_loss": 0.9995,
+      "auc": 0.4363,
+      "ece": 0.36,
+      "accuracy_ci": [
+        0.3292,
+        0.5448
+      ],
+      "brier_ci": [
+        0.3067,
+        0.4413
+      ]
+    },
+    {
+      "model": "symbolic_gated_test",
+      "n": 150,
+      "coverage": 0.5859,
+      "accuracy": 0.44,
+      "brier": 0.3641,
+      "log_loss": 0.9773,
+      "auc": 0.4345,
+      "ece": 0.334,
+      "accuracy_ci": [
+        0.3292,
+        0.5448
+      ],
+      "brier_ci": [
+        0.3051,
+        0.4211
+      ]
+    },
+    {
+      "model": "symbolic_blend_test",
+      "n": 254,
+      "coverage": 0.9922,
+      "accuracy": 0.4528,
+      "brier": 0.3585,
+      "log_loss": 0.9573,
+      "auc": 0.4467,
+      "ece": 0.3304,
+      "accuracy_ci": [
+        0.3689,
+        0.5353
+      ],
+      "brier_ci": [
+        0.3118,
+        0.4021
+      ]
+    },
+    {
       "model": "mechanism_calibrated_test",
       "n": 254,
       "coverage": 0.9922,
@@ -191,41 +244,6 @@
         0.2494,
         0.2558
       ]
-    }
-  ],
-  "comparisons": [
-    {
-      "model": "stacked_calibrated_test",
-      "baseline": "always_up_test",
-      "delta_brier": -0.0034,
-      "ci": [
-        -0.0164,
-        0.0094
-      ],
-      "p_value": 0.318,
-      "n_pairs": 254
-    },
-    {
-      "model": "stacked_calibrated_test",
-      "baseline": "mechanism_test",
-      "delta_brier": -0.1028,
-      "ci": [
-        -0.1447,
-        -0.0628
-      ],
-      "p_value": 0.0,
-      "n_pairs": 254
-    },
-    {
-      "model": "mechanism_test",
-      "baseline": "always_up_test",
-      "delta_brier": 0.0994,
-      "ci": [
-        0.0486,
-        0.1492
-      ],
-      "p_value": 1.0,
-      "n_pairs": 254
     }
   ],
   "by_asset": [
@@ -381,6 +399,74 @@
       "observed_frequency": 0.4054
     }
   ],
+  "comparisons": [
+    {
+      "model": "stacked_calibrated_test",
+      "baseline": "always_up_test",
+      "delta_brier": -0.0034,
+      "ci": [
+        -0.0164,
+        0.0094
+      ],
+      "p_value": 0.318,
+      "n_pairs": 254
+    },
+    {
+      "model": "stacked_calibrated_test",
+      "baseline": "mechanism_test",
+      "delta_brier": -0.1028,
+      "ci": [
+        -0.1447,
+        -0.0628
+      ],
+      "p_value": 0.0,
+      "n_pairs": 254
+    },
+    {
+      "model": "mechanism_test",
+      "baseline": "always_up_test",
+      "delta_brier": 0.0994,
+      "ci": [
+        0.0486,
+        0.1492
+      ],
+      "p_value": 1.0,
+      "n_pairs": 254
+    },
+    {
+      "model": "symbolic_test",
+      "baseline": "mechanism_test",
+      "delta_brier": 0.0119,
+      "ci": [
+        -0.0059,
+        0.0297
+      ],
+      "p_value": 0.902,
+      "n_pairs": 150
+    },
+    {
+      "model": "symbolic_gated_test",
+      "baseline": "mechanism_test",
+      "delta_brier": 0.0,
+      "ci": [
+        0.0,
+        0.0
+      ],
+      "p_value": 1.0,
+      "n_pairs": 150
+    },
+    {
+      "model": "symbolic_blend_test",
+      "baseline": "mechanism_test",
+      "delta_brier": 0.0033,
+      "ci": [
+        -0.0024,
+        0.0089
+      ],
+      "p_value": 0.866,
+      "n_pairs": 254
+    }
+  ],
   "extraction": {
     "n": 0,
     "event_type_accuracy": 0.0,
@@ -388,16 +474,6 @@
     "joint_accuracy": 0.0,
     "confusion": {}
   },
-  "notes": [
-    "Only the stack weights and Platt calibration are fitted, on the first half of the events; all other components are fixed or walk-forward.",
-    "Analog priors use only prior events whose outcome window has matured before the current event.",
-    "Dataset: fomc_surprise.",
-    "The sample is small and event windows overlap; the bootstrap resamples events, not asset rows.",
-    "Mechanism priors were authored by the project, not preregistered, and were not fitted to these outcomes.",
-    "Stack weights fitted on train: mechanism=0.60, analog=0.00, base_rate=0.00.",
-    "Platt parameters (stacked): a=0.10, b=-0.00.",
-    "No events were skipped for price history."
-  ],
   "provenance": {
     "sources": [
       "events: backend/data/events/events.yaml",
@@ -405,12 +481,25 @@
       "knowledge: mechanisms.yaml v1",
       "extraction: rules-v1"
     ],
-    "retrieved_at": "2026-11-25T16:37:44.860372Z",
+    "retrieved_at": "2026-11-26T00:11:48.948484Z",
     "as_of": "2025-12-10T14:00:00-05:00",
     "snapshot_version": "local",
     "notes": [
       "Adjusted closes are revised after corporate actions; this is not a point-in-time price database.",
       "Event labels are editorial; market outcomes are computed independently."
     ]
-  }
+  },
+  "notes": [
+    "Only the stack weights and Platt calibration are fitted, on the first half of the events; all other components are fixed or walk-forward.",
+    "Analog priors use only prior events whose outcome window has matured before the current event.",
+    "Dataset: fomc_surprise.",
+    "The sample is small and event windows overlap; the bootstrap resamples events, not asset rows.",
+    "Mechanism priors were authored by the project, not preregistered, and were not fitted to these outcomes.",
+    "E6 ablation: symbolic-only uses a fixed 0.8/0.2 probability for a proved direction and abstains otherwise; symbolic-gated keeps the mechanism prior only when the proof is proved and not contradicted, and abstains on ambiguous/not_entailed assets; symbolic-blend is an equal-weight logit blend of mechanism and symbolic signals, falling back to whichever is available.",
+    "The gated model's probabilities are identical to the mechanism model on its covered pairs by construction; its paired Brier delta is zero and its difference is coverage, not calibration.",
+    "Stack weights fitted on train: mechanism=0.60, analog=0.00, base_rate=0.00.",
+    "Platt parameters (stacked): a=0.10, b=-0.00.",
+    "No events were skipped for price history."
+  ],
+  "generated_at": "2026-11-26T00:11:48+00:00"
 }
