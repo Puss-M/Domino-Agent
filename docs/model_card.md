@@ -68,7 +68,7 @@ The E6 ablation shows the symbolic layer does **not** improve directional accura
 ## Failure modes
 
 1. **Action-only policy events.** Without a surprise/positioning measure, the mechanism sign is wrong across regimes (normalization vs recession vs inflation shock).
-2. **Surprise-aware policy events.** Even the BRW (2021) daily surprise does not fix the sign (45.3% vs base 52.7%); easing surprises are 43.3%. The information effect requires a monetary/information decomposition, not just a surprise number.
+2. **Surprise-aware policy events.** Even the BRW (2021) daily surprise does not fix the sign (45.3% vs base 52.7%); easing surprises are 43.3%. The information effect requires a monetary/information/supply decomposition, not just a surprise number.
 3. **Duration-sensitive equities.** QQQ and XLU are over-predicted down around hikes.
 4. **China policy.** Two events; stimulus transmission is regime-dependent.
 5. **Geopolitics.** The 1-day equity sign is noisy even when the safe-haven direction is right.

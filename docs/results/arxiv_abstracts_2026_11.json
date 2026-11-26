@@ -1,0 +1,197 @@
+[
+  {
+    "id": "2611.13388",
+    "title": "Online-Adaptive Fuzzy Cognitive Maps for Neuro-symbolic Financial Forecasting",
+    "authors": [
+      "Rodriguez, Brandon",
+      "Deulofeu, Abel",
+      "Adigun, Olaoluwa"
+    ],
+    "date": "2026/11/10",
+    "abstract": "We present a neuro-symbolic framework that pairs online-adaptive Fuzzy Cognitive Maps (FCMs) with long short-term memory (LSTM) networks for financial forecasting. Financial markets exhibit regime shifts and nonlinear dynamics. Existing models often trade off one of these key properties: these models capture temporal patterns but hide causal drivers, or they recover causal graphs that cannot adapt post-training. We close this gap with two frameworks. Framework I constructs an FCM from live dual-source price series and macroeconomic indicators, and adapts its edges online through an error-driven Hebbian rule. We introduce the Asymmetric Additive Residual Fusion method to seamlessly combine the FCM and LSTM predictions under Framework I. Framework II constructs a literature-grounded, LLM-augmented FCM where every edge carries a verifiable citation that gives an auditable map of factor interactions. On NASDAQ Composite data, Framework I matched the performance of the LSTM baseline on state-directional accuracy and outperformed LSTM by 7.6 percentage points on the return-sign accuracy. Framework I outperformed standalone FCM models across both evaluation metrics. The adaptive maps converged to new regimes within 10-15 trading days, and Framework II center-node FCMs scored 68.9% to 85.7% on the state-directional accuracy."
+  },
+  {
+    "id": "2609.34004",
+    "title": "RICE-Alpha: Reliability-Informed Correction with Event Graphs for LLM-Agent Stock Forecasting",
+    "authors": [
+      "Liu, Tong",
+      "Liu, Lanmiao",
+      "Hu, Xiang"
+    ],
+    "date": "2026/09/27",
+    "abstract": "Equity-relevant news evolves through temporally dependent corporate events, making historical information useful only when event continuity, information availability, and transition reliability are modeled. Existing LLM-based financial agents incorporate historical evidence, yet they provide limited support for preserving issuer-specific chronology under point-in-time constraints and for identifying when historical transitions contribute information beyond the current forecast. We present RICE-Alpha (Reliability-Informed Correction with Event Graphs), a point-in-time stock-scoring framework that separates a history-aware multi-view Base Alpha from a reliability-calibrated residual correction derived from historical event continuation. A Multi-Tier Memory Layer grounds news interpretation in temporally eligible issuer-specific history, while a Typed Event Agent constructs event states whose successor relations are formed within issuers and pooled across firms only after valid local pairing. Matured transitions are calibrated by their empirical reliability, and the resulting graph signal is residualized against the Base Alpha and technical view to obtain the RICE Delta. On daily Nasdaq-100 and Hang Seng Index panels from 2024 to 2026, RICE-Alpha achieves the strongest results among the evaluated LLM-based agents and momentum across four predictive and four portfolio-level metrics. Its ICIR more than doubles that of the strongest baseline, while net Sharpe ratios reach 1.656 and 1.725 in the U.S. and Hong Kong, respectively. U.S. ablations further show significant reductions in IC and RankIC after Holm adjustment when major components are removed. These results indicate that historical event continuation adds incremental information when it is temporally grounded, reliability-calibrated, and introduced as a residual correction to a multi-view forecast."
+  },
+  {
+    "id": "2512.19484",
+    "title": "Structured Event Representation and Stock Return Predictability",
+    "authors": [
+      "Li, Gang",
+      "Qiao, Dandan",
+      "Zheng, Mingxuan"
+    ],
+    "date": "2025/12/22",
+    "abstract": "We find that event features extracted by large language models (LLMs) are effective for text-based stock return prediction. Using a pre-trained LLM to extract event features from news articles, we propose a novel deep learning model based on structured event representation (SER) and attention mechanisms to predict stock returns in the cross-section. Our SER-based model provides superior performance compared with other existing text-driven models to forecast stock returns out of sample and offers highly interpretable feature structures to examine the mechanisms underlying the stock return predictability. We further provide various implications based on SER and highlight the crucial benefit of structured model inputs in stock return predictability."
+  },
+  {
+    "id": "2611.20423",
+    "title": "FinVerify: A Verification Framework for Financial Agents",
+    "authors": [
+      "Guan, Mao",
+      "Chen, Qian",
+      "Meng, Ge",
+      "Liu, Xiao-Yang"
+    ],
+    "date": "2026/11/16",
+    "abstract": "Financial agents produce numerical claims that can be wrong even when their calculations execute correctly, due to mismatched reporting periods, unsupported sources, incompatible units, or incorrect financial definitions. We introduce FinVerify, an evidence-grounded framework for verifying financial agents' numerical claims. Based on an analysis of 190 incorrect trajectories from the Agent Finance Reasoning dataset, we define five error categories--temporal integrity, source fidelity, comparability, accounting integrity, and financial-model fidelity--and operationalize them as verification protocols. An LLM structures claims and supporting evidence, while deterministic validators check financial requirements; when authoritative formulas are available, Z3 checks consistency with grounded inputs. FinVerify accepts only if all applicable checks pass, rejects proven violations, and abstains when evidence is insufficient. We evaluate the framework against a Direct baseline and an LLM judge across five fixed-candidate benchmarks. On Agent Finance Reasoning, accepted-claim precision increases from 56.4% for the LLM judge to 76.7% at 81.2% coverage. On XBRLFiling, FinVerify achieves 99.8% accepted-claim precision and 97.0% decision accuracy; on FinanceBench-67, it reaches 87.9% accepted-claim precision versus 69.7% for the judge. Improvements are smaller on FinQA and TAT-QA, where authoritative evidence is limited. These results suggest that explicit, evidence-backed verification can improve financial-agent reliability while exposing trade-offs between correctness, false rejection, and abstention."
+  },
+  {
+    "id": "2610.34887",
+    "title": "NumTrace: Auditing the Number Provenance of Financial Analyst Agents",
+    "authors": [
+      "Zhu, Tianlei",
+      "White, Matt",
+      "Liu, Xue",
+      "Liu, Xiao-Yang"
+    ],
+    "date": "2026/10/26",
+    "abstract": "A numerical claim generated by a financial analyst agent can match a number in a company filing but refer to the wrong entity, concept, period, unit or scope. A check based on reference answers can mark such an answer as wrong but does not explain why it fails. In this paper, we present NumTrace, a new benchmark that audits the provenance of each numerical claim made by financial analyst agents: its source and financial semantics. NumTrace currently has 540 questions over 2,163 SEC EDGAR documents. To the best of our knowledge, it is the first numerical benchmark about who holds a company's shares (Form 13F) and what its executives are owed (Item 402(i)). On a frozen snapshot of these documents, we build the reference answers according to accounting rules. NumTrace then gives each claim three separate verdicts: value, binding and support. By retaining separate value and binding verdicts, NumTrace detects right number, wrong account (RNWA) errors: a claim has an RNWA error when it passes the value check but fails the binding check. The RNWA rate quantifies the gap between value-only and joint value-and-binding pass rates. Finally, we audit three agents, Claude Opus 5.5, GPT-6 Astra and DeepSeek-V4.1-Flash. RNWA errors make up 67.5-81.8% of each agent's failing claims. In particular, on 13F co-filing group questions, about 91% of claims pass the value check, but fewer than half pass the binding check."
+  },
+  {
+    "id": "2611.01001",
+    "title": "GURU: A Hierarchical Neuro-Symbolic Multi-Agent System for Verification-Aware Automation of Mission-Critical Digital Engineering and Operations",
+    "authors": [
+      "Grosvenor, Allan",
+      "Zemlyansky, Anton",
+      "Wahab, Abdul",
+      "Bohachov, Kyrylo",
+      "Dogan, Aras",
+      "Adams, Ryland",
+      "Deighan, Dwyer"
+    ],
+    "date": "2026/10/31",
+    "abstract": "An AI can find a safe action faster than any human, but it must never decide what counts as safe. We present GURU, a hierarchical neuro-symbolic multi-agent system for mission-critical digital engineering and operations, built on one partition of authority: learned models propose, rank, and accelerate; a symbolic rules engine checks every consequential action against hard limits before it executes; and validated physics confirms and decides. GURU runs a workflow as a closed control loop, with Navigation, Action, and Planning agents sharing one Common Internal Language and one training factory. Nuclear, aviation, and national-security guidance now requires this pattern; a harnessed language model keeps the model at the center, GURU puts a validated reference there. In computational fluid dynamics, the workflow raised the converged-simulation rate on unseen aircraft geometries from under 1 percent to 74 percent over 100 single-attempt cases, ran 54 live cases to Mach 6 on three facilities, and an ablation put the symbolic layer at 13 points of boundary-layer capture. Knowledge-graph retrieval and role adapters raised ParaView control success from 55 to 75 percent. In space domain awareness, where a language model cannot be trusted to decide, a frozen self-supervised world model under validated propagation scored highest of five methods at conjunction risk, including fully fine-tuned language models, with several-times-lower seed variance: the trustworthy design gives up nothing in accuracy, and the recipe transferred to reactor anomaly detection. A radar-to-avoidance debris pipeline was demonstrated in stages on a 2026 reentry; the hierarchy coordinates simulated teams of 200 aircraft. Training scaled near-linearly past 1,000 Aurora nodes and ran at 8,000. The approach extends to a control-grade microreactor digital twin with validated physics, not a learned model, as the safety basis."
+  },
+  {
+    "id": "2605.01562",
+    "title": "Neuro-Symbolic Agents for Hallucination-Free Requirements Reuse",
+    "authors": [
+      "Ibrahim, Ahmed F."
+    ],
+    "date": "2026/05/02",
+    "abstract": "The Object-Oriented Method for Requirements Authoring and Management (OOMRAM) is a requirements reuse framework that relies on exact identifier matching and rigid templates, limiting its ability to adapt specifications across diverse contexts. While Large Language Models (LLMs) offer the flexibility to overcome this bottleneck, they introduce the risk of generating structurally invalid or inconsistent requirement combinations. To address this tension, we present a neuro-symbolic multi-agent system that re-conceptualizes requirements reuse as a Model-Driven Elicitation process. In this paradigm, an LLM serves as a non-deterministic heuristic for traversing a deterministic domain model represented by a formal OOMRAM requirement lattice. A deterministic, symbolic validator enforces all structural constraints within the agent loop, effectively eliminating hallucinated requirement combinations by construction. Evaluated on an autonomous benchmark across two application families, our system achieves 100% requirement coverage and a constraint-violation rate of only 0.2%. Although the F1-score against a single gold standard is moderate (0.47-0.51), every generated specification is structurally valid and satisfies all mandatory domain requirements. The model-agnostic implementation scales to larger lattices via subgraph navigation and provides transparent audit trails for regulatory compliance."
+  },
+  {
+    "id": "2601.17789",
+    "title": "Neuro-Symbolic Verification on Instruction Following of LLMs",
+    "authors": [
+      "Su, Yiming",
+      "Xu, Kunzhao",
+      "Gao, Yanjie",
+      "Yang, Fan",
+      "Li, Cheng",
+      "Yang, Mao",
+      "Xu, Tianyin"
+    ],
+    "date": "2026/01/25",
+    "abstract": "A fundamental problem of applying Large Language Models (LLMs) to important applications is that LLMs do not always follow instructions, and violations are often hard to observe or check. In LLM-based agentic workflows, such violations can propagate and amplify along reasoning chains, causing task failures and system incidents. This paper presents NSVIF, a neuro-symbolic framework for verifying whether an LLM's output follows the instructions used to prompt the LLM. NSVIF is a universal, general-purpose verifier; it makes no assumption about the instruction or the LLM. NSVIF formulates instruction-following verification as a constraint-satisfaction problem by modeling user instructions as constraints. NSVIF models both logical and semantic constraints; constraint solving is done by a unified solver that orchestrates logical reasoning and semantic analysis. To evaluate NSVIF, we develop VIFBENCH, a new benchmark for instruction-following verifiers with fine-grained data labels. Experiments show that NSVIF significantly outperforms LLM-based approaches and provides interpretable feedback. We also show that feedback from NSVIF helps improve LLMs' instruction-following capability without post-training."
+  },
+  {
+    "id": "2512.23847",
+    "title": "Detecting Lookahead Bias in LLM Forecasts",
+    "authors": [
+      "Gao, Zhenyu",
+      "Jiang, Wenxi",
+      "Yan, Yutong"
+    ],
+    "date": "2025/12/29",
+    "abstract": "We develop a statistical procedure to detect lookahead bias in economic forecasts generated by large language models (LLMs). Using a date-only recall query for a firm-date pair, we estimate the probability that the LLM has internalized information about the realized outcome, a statistic we term Lookahead Propensity (LAP). LAP is materially positive throughout the in-sample period and collapses essentially to zero right after the training-data cutoff. We show that a positive interaction between LAP and the LLM forecast in an accuracy regression indicates lookahead-bias contamination, and apply the test to two forecasting tasks: news headlines predicting stock returns and earnings call transcripts predicting capital expenditures. In both applications, the LLM forecast's predictive power is amplified on high-LAP firm-date pairs, and the interaction loses significance on post-training-cutoff samples. Our test provides a cost-efficient, diagnostic tool for assessing the validity and reliability of LLM-generated forecasts."
+  },
+  {
+    "id": "2608.02985",
+    "title": "Temporal Leakage in LLM Backtesting: Measurement, Validation, and Adjusted Scores",
+    "authors": [
+      "Zhang, Zeyu",
+      "Stadie, Bradly C."
+    ],
+    "date": "2026/08/04",
+    "abstract": "The standard check for contamination in LLM backtests is simple: compare scores before and after the training cutoff. We show this check is uninformative. Four flagship models fail it on questions they cannot have memorized: every scored question resolved after their cutoffs. The reason is structural. Models legitimately know more about times near their cutoff, so recency mimics leakage, and we prove no passive backtest can separate the two from genuine skill. Measurement, not just detection, requires information from outside the backtest. We supply it in two forms. A known cutoff identifies leakage at the boundary; a matched clean control identifies it globally and yields a leakage-adjusted score. Under a convex-pull model, leakage concentrates on outcomes that surprised the crowd and that training covered well. Partial memorization gives a large part of the full inflation. In twin models with planted leakage, the estimators detect and localize it, track its dose, and return null on clean questions. On frontier models, the estimators detect one cutoff-localized signature. They find no significant leakage at the tested boundaries in five models with positive naive gaps. Backtests need not be discarded; they need one defensible reference."
+  },
+  {
+    "id": "2611.11588",
+    "title": "FinCutBench: A Continually Updated Benchmark for Measuring the Temporal Boundaries of LLM Financial Knowledge",
+    "authors": [
+      "Li, Siyuan",
+      "Wan, Ke",
+      "Hou, Boyong",
+      "Deng, Yujie",
+      "Yuan, Zixuan"
+    ],
+    "date": "2026/11/08",
+    "abstract": "In financial backtesting and other point-in-time tasks, external inputs can be restricted by date, but model parameters may retain financial facts disclosed later, introducing parametric look-ahead bias. We introduce FinCutBench, a continually updated monthly financial knowledge benchmark for measuring how far a fixed model's financial knowledge extends over calendar time. The current dataset contains 9,000 Chinese and English four-option multiple-choice questions from January 2023 to September 2026, covering Chinese and U.S. markets and four categories of financial information. We construct monthly knowledge profiles using the approximate months in which the tested facts became public. After a profile passes the decline test and knot checks, we define the FinCut Boundary as the first month when the fitted profile reaches its lower level, and report the stability of the estimated date under resampling. Boundary dates and localization precision vary across models. Using the independently measured Transition Start and Boundary as fixed references for downstream sample grouping, we find significant relative declines in U.S. asset-ranking performance and in earnings recall for Sol and Luna. Downstream effects vary across markets and tasks. The FinCut Boundary thus provides an empirical reference for the temporal scope of parametric knowledge in point-in-time financial evaluation, supporting evaluation-window selection and result interpretation."
+  },
+  {
+    "id": "2610.21659",
+    "title": "When Does \"Post-Call\" Begin? An Availability Contract for Earnings-Call NLP Benchmarks",
+    "authors": [
+      "Ma, Xiaoyu",
+      "Koa, Kelvin J. L.",
+      "Liu, Yuncong",
+      "Huang, Ke-Wei"
+    ],
+    "date": "2026/10/15",
+    "abstract": "Corporate financial disclosures often unfold over time, with announcements, prepared remarks, and discussion spanning multiple high-frequency return intervals. Financial NLP benchmarks can therefore suffer from a within-event timing mismatch when the prediction target begins before the textual or audio input used by a model could be complete. Chronological train--test splits do not prevent this mismatch, because it occurs inside individual events rather than across samples. We introduce an Availability Contract, which requires a benchmark to state the input boundary, evidence for input availability, the outcome start, and the claims supported by that evidence. We apply this framework to 552 earnings calls from 24 firms. For each call, we hold the return endpoint fixed and compare the previous close, a documentary call-start proxy, and a completion proxy based on reconstructed audio end plus a stipulated processing allowance. At this baseline, moving from the call-start proxy to the completion proxy flips return signs for 9.4% of calls. Holding completion-clock cutpoints fixed, 28.3% change quintile. In an independent release-session analysis of a public earnings-call volatility benchmark, shifting before-market target windows forward by one trading session raises three-day mean squared error by 18.1-21.4% across four frozen prediction streams, while their point rankings remain unchanged. Together, the results show that labels and losses can depend materially on the declared outcome clock even when model rankings appear stable. The Availability Contract makes this assumption explicit and ties post-input claims to the available timing evidence."
+  },
+  {
+    "id": "2602.07294",
+    "title": "Fin-RATE: A Real-world Financial Analytics and Tracking Evaluation Benchmark for LLMs on SEC Filings",
+    "authors": [
+      "Jiang, Yidong",
+      "Chen, Junrong",
+      "Makri, Eftychia",
+      "Chen, Jialin",
+      "Li, Peiwen",
+      "Maatouk, Ali",
+      "Tassiulas, Leandros",
+      "Brenner, Eliot",
+      "Xiang, Bing",
+      "Ying, Rex"
+    ],
+    "date": "2026/02/07",
+    "abstract": "With the increasing deployment of Large Language Models (LLMs) in the finance domain, LLMs are increasingly expected to parse complex regulatory disclosures. However, existing benchmarks often focus on isolated details, failing to reflect the complexity of professional analysis that requires synthesizing information across multiple documents, reporting periods, and corporate entities. Furthermore, these benchmarks do not disentangle whether errors arise from retrieval failures, generation inaccuracies, domain-specific reasoning mistakes, or misinterpretation of the query or context, making it difficult to precisely diagnose performance bottlenecks. To bridge these gaps, we introduce Fin-RATE, a benchmark built on U.S. Securities and Exchange Commission (SEC) filings and mirroring financial analyst workflows through three pathways: detail-oriented reasoning within individual disclosures, cross-entity comparison under shared topics, and longitudinal tracking of the same firm across reporting periods. We benchmark 17 leading LLMs, spanning open-source, closed-source, and finance-specialized models, under both ground-truth context and retrieval-augmented settings. Results show substantial performance degradation, with accuracy dropping by 18.60% and 14.35% as tasks shift from single-document reasoning to longitudinal and cross-entity analysis. This degradation is associated with increased comparison hallucinations, temporal and entity mismatches, and is further reflected in declines in reasoning quality and factual consistency--limitations that existing benchmarks have yet to formally categorize or quantify."
+  },
+  {
+    "id": "2611.25071",
+    "title": "FinVeriQA: Financial Research Agents for Question Answering: Routing, Retrieval, MCP Tool Use, and Provenance-Aware Evidence Verification",
+    "authors": [
+      "Rajpurohit, Meenakshi",
+      "Phan, Anna",
+      "Narayanan, Ravikumar Komandur",
+      "Ramakrishnan, Gunanidhi",
+      "Howland, Nathan"
+    ],
+    "date": "2026/11/18",
+    "abstract": "Large language models (LLMs) write fluent financial analyses but miscompute ratios, recall stale prices, and route questions to the wrong tool with high confidence. We ask which component should do each job in a financial question-answering assistant, and study it with FinVeriQA, an open-source multi-agent research prototype over SEC filings and live market data: a compact typed-decision model (Laya) routes each question and screens out advice requests, Python computes every number, retrieval and tools fetch evidence, Mistral-7B writes a cited answer, a code validator checks that cited IDs exist and that numbers match computed notes, and a Model Context Protocol (MCP) server exposes the pipeline. In live experiments, Laya routed better than Mistral-7B (0.85 vs. 0.52; overall 0.86 vs. 0.68, McNemar p = 0.0003); a 12B Mistral decided no better, and DeepSeek-R1-8B decided better (0.79 vs. 0.68, p = 0.0192) but about 9.9 times more slowly. Mistral-7B computed 29% of 100 financial calculations correctly against 100% for Python, a live quote cut price error from 210% to 0.00%, and hybrid retrieval reached 76% Hit@5 on 50 filing questions. Yet in a live case study, both agent answers passed validation while describing AMD sample data under NVIDIA's and Alphabet's names. A controlled upper-bound study on the FinRank benchmark explains why: when one figure in the shared evidence is corrupted, self-consistency stays confident (agreement 0.55 to 0.59 while accuracy falls from 0.50 to 0.00), and a shared-evidence check (the kind our validator performs) catches 35% of the errors, whereas a check against the original passage catches 77% ($p = 5.96 \\times 10^{-8}$); for DeepSeek-R1-8B, 68% vs. 90%. Verification must be independent of the evidence the writer saw."
+  },
+  {
+    "id": "2601.00097",
+    "title": "The Agentic Leash: Extracting Causal Feedback Fuzzy Cognitive Maps with LLMs",
+    "authors": [
+      "Panda, Akash Kumar",
+      "Adigun, Olaoluwa",
+      "Kosko, Bart"
+    ],
+    "date": "2025/12/31",
+    "abstract": "We design a large-language-model (LLM) agent system that extracts causal feedback fuzzy cognitive maps (FCMs) from raw text. The causal learning or extraction process is agentic both because of the LLM's semi-autonomy and because ultimately the FCM dynamical system's equilibria drive the LLM agents to fetch and process causal text. The fetched text can in principle modify the adaptive FCM causal structure and so modify the source of its quasi-autonomy$-$its equilibrium limit cycles and fixed-point attractors. This bidirectional process endows the evolving FCM dynamical system with a degree of autonomy while the system still stays on its agentic leash. We show in particular that a sequence of three system-instruction sets guide an LLM agent as it systematically extracts key nouns and noun phrases from text, as it extracts FCM concept nodes from among those nouns and noun phrases, and then as it extracts or infers partial or fuzzy causal edges between those FCM nodes. We test this FCM generation on a recent essay about the promise of AI from the late diplomat and political theorist Henry Kissinger and his colleagues. This three-step process produced FCM dynamical systems that converged to the same equilibrium limit cycles as did the human-generated FCMs even though the human-generated FCM differed in the number of nodes and edges. A final FCM mixed generated FCMs from separate Gemini and ChatGPT LLM agents. The mixed FCM absorbed the equilibria of its dominant mixture component but also created new equilibria of its own to better approximate the underlying causal dynamical system."
+  },
+  {
+    "id": "2509.25593",
+    "title": "Causal Autoencoder-like Generation of Feedback Fuzzy Cognitive Maps with an LLM Agent",
+    "authors": [
+      "Panda, Akash Kumar",
+      "Adigun, Olaoluwa",
+      "Kosko, Bart"
+    ],
+    "date": "2025/09/29",
+    "abstract": "A large language model (LLM) can map a feedback causal fuzzy cognitive map (FCM) into text and then reconstruct the FCM from the text. This explainable AI system approximates an identity map from the FCM to itself and resembles the operation of an autoencoder (AE). Both the encoder and the decoder explain their decisions in contrast to black-box AEs. Humans can read and interpret the encoded text in contrast to the hidden variables and synaptic webs in AEs. The LLM agent approximates the identity map through a sequence of system instructions that does not compare the output to the input. The reconstruction is lossy because it removes weak causal edges or rules while it preserves strong causal edges. The encoder preserves the strong causal edges even when it trades off some details about the FCM to make the text sound more natural."
+  }
+]

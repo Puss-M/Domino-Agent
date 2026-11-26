@@ -93,7 +93,7 @@ A natural objection to the action-only failure is that we ignored the surprise. 
 | Mechanism (surprise direction) | 254 | 99.2% | **0.453** | 0.355 | 0.450 |
 | Stacked + Platt | 254 | 99.2% | 0.453 | 0.253 | 0.450 |
 
-By surprise sign: **tightening surprises 52.2%**, **easing surprises 43.3%**. A dovish surprise is not automatically risk-on; it can be an **information shock** (the Fed sees a weaker economy), which is the Nakamura–Steinsson (2018) information effect. Separating monetary from information shocks requires intraday rate-equity co-movement (Jarociński & Karadi 2020); a daily surprise sign cannot do it.
+By surprise sign: **tightening surprises 52.2%**, **easing surprises 43.3%**. A dovish surprise is not automatically risk-on; it can be an **information shock** (the Fed sees a weaker economy), which is the Nakamura–Steinsson (2018) information effect. Separating monetary from information shocks requires intraday rate-equity co-movement (Jarociński & Karadi 2020); a daily surprise sign cannot do it. A 2026 supply-side result (SSRN 7633199) adds a third component: supply conditions enter surprises through rate–exchange-rate comovement, so the right decomposition is monetary / information / supply, not just the first two.
 
 This is a stronger negative result than the action-only one: even a published surprise series does not rescue 1-day asset direction. It also defines the next experiment precisely — not "add a surprise number", but "decompose the surprise".
 
@@ -267,7 +267,7 @@ The top of the distribution is monotonic and close to the diagonal; the middle i
 ## Failure cases
 
 1. **FOMC action-only events.** Mechanism accuracy 41.1% vs base 56.6%; significant negative skill.
-2. **FOMC surprise-aware events.** Even with the BRW (2021) daily surprise, mechanism accuracy is 45.3% vs base 52.7%; tightening surprises 52.2%, easing surprises 43.3%. The missing input is the monetary/information decomposition, not just a surprise number.
+2. **FOMC surprise-aware events.** Even with the BRW (2021) daily surprise, mechanism accuracy is 45.3% vs base 52.7%; tightening surprises 52.2%, easing surprises 43.3%. The missing input is the monetary/information/supply decomposition, not just a surprise number (SSRN 7633199).
 3. **QQQ (42.9%) and XLU (42.9%) on curated.** The engine over-predicts duration-sensitive downside around hikes; QQQ's mean 1-day CAR is **+48bp** in this sample.
 4. **FXI (50.0%).** Two China policy events; stimulus transmission is regime-dependent.
 5. **Geopolitics (40.9%).** Two events; the 1-day equity sign is noisy even when the safe-haven direction is right.
