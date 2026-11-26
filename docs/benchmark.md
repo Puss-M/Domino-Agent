@@ -124,6 +124,7 @@ Compact summaries: `docs/results/backtest_*_summary.json`.
 - DMB v1.1: adds FOMC 58 and extended 92.
 - DMB v1.2: adds symbolic proof coverage and ambiguity reporting (v0.4).
 - DMB v1.3: adds the surprise-aware FOMC subset (BRW 2021) and the information-effect negative result.
+- DMB v1.4: adds the Kolari–Pynnönen cross-correlation adjustment (E7), the numeric/symbolic ablation (E6), and the point-in-time contract (E11).
 - Future: add CPI/payrolls surprise series, high-frequency Fed-funds/SOFR pricing, and a larger heterogeneous sample.
 
 ## License and provenance

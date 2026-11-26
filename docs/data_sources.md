@@ -15,7 +15,7 @@ The repository is designed to run offline from small, redistributable snapshots.
 | `fomc` | FOMC Dataset (HusseinKh90) + Federal Reserve statements | Systematic FOMC rate-change benchmark | No key; static snapshot | Event-driven | Statements are immutable | Archive the snapshot; no live vintage feed |
 | `brw` | Bu, Rogers & Wu (2021) monetary policy shocks | Daily policy surprise for the surprise-aware FOMC benchmark | No key; static snapshot | Event-driven | Series can be revised/updated | Snapshot; archive the CSV |
 
-The machine-readable version is served at `GET /api/data-sources`.
+The machine-readable version is served at `GET /api/data-sources`. The benchmark-specific point-in-time contract is separate: [`backend/data/point_in_time.yaml`](../backend/data/point_in_time.yaml), audited at `GET /api/point-in-time` and explained in [`point_in_time.md`](point_in_time.md).
 
 ## What is bundled
 

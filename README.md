@@ -302,14 +302,15 @@ Mixing the two families (92 events) produces no dominant model: base rate 54.1% 
 
 ## SOTA framing
 
-This is **not** a SOTA return predictor, and the README does not claim one. It is a SOTA-grade **evaluation and evidence pipeline**: two open benchmarks, paired event-clustered bootstrap, calibration, a documented negative result, and a clear statement of the missing input. A 60% number without the FOMC failure would be marketing; the failure is the research contribution.
+This is **not** a SOTA return predictor, and the README does not claim one. It is a SOTA-grade **evaluation and evidence pipeline**: four benchmarks, paired event-clustered bootstrap, calibration, a symbolic ablation, a point-in-time contract, a documented negative result, and a clear statement of the missing input. A 60% number without the FOMC failure would be marketing; the failure is the research contribution.
 
 Reproduce:
 
 ```bash
-python -m backend.app.cli backtest --dataset curated  --window-end 1 --out backtest_curated.json
-python -m backend.app.cli backtest --dataset fomc     --window-end 1 --out backtest_fomc.json
-python -m backend.app.cli backtest --dataset extended --window-end 1 --out backtest_extended.json
+python scripts/run_benchmarks.py          # all five result summaries + E6 arms
+python scripts/point_in_time_audit.py     # E11 contract audit
+python scripts/hallucination_audit.py     # E5 60/60 injection audit
+python scripts/kp_test.py                 # E7 Kolari–Pynnönen adjustment
 ```
 
 Compact summaries are in `docs/results/`.
