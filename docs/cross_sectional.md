@@ -28,19 +28,19 @@ falsifiable.
 
 | Dataset | Model | Mean rank IC | Gross L/S | 95% CI | Net @10bp |
 |---|---|---:|---:|---|---:|
-| Curated | LightGBM | −0.014 | −74.9bp | [−259.1, 91.2] | −94.9bp |
+| Curated | LightGBM | −0.001 | +19.1bp | [−152.1, 186.1] | −0.9bp |
 | Curated | Ridge | **+0.089** | **+207.6bp** | **[41.5, 418.2]** | **+187.6bp** |
 | Curated | Momentum | +0.081 | +172.4bp | [17.0, 358.1] | +152.4bp |
 | Curated | Random | −0.030 | −78.7bp | [−141.7, −28.3] | −98.7bp |
-| FOMC | LightGBM | −0.012 | −3.4bp | [−122.9, 105.9] | −23.4bp |
+| FOMC | LightGBM | −0.063 | −20.1bp | [−111.6, 62.1] | −40.1bp |
 | FOMC | Ridge | +0.016 | +2.2bp | [−110.8, 118.9] | −17.8bp |
 | FOMC | Momentum | +0.001 | −3.6bp | [−122.8, 114.8] | −23.6bp |
 | FOMC | Random | +0.003 | +18.8bp | [−64.6, 111.0] | −1.2bp |
-| Surprise FOMC | LightGBM | +0.072 | +63.1bp | [−43.7, 174.6] | +43.1bp |
+| Surprise FOMC | LightGBM | +0.105 | +102.5bp | [−13.8, 233.6] | +82.5bp |
 | Surprise FOMC | Ridge | +0.030 | −5.1bp | [−153.8, 145.4] | −25.1bp |
 | Surprise FOMC | Momentum | −0.015 | −18.3bp | [−141.9, 108.3] | −38.3bp |
 | Surprise FOMC | Random | +0.035 | −28.0bp | [−93.0, 31.1] | −48.0bp |
-| Extended | LightGBM | −0.038 | −6.8bp | [−101.6, 85.5] | −26.8bp |
+| Extended | LightGBM | +0.013 | −17.1bp | [−109.7, 70.2] | −37.1bp |
 | Extended | Ridge | +0.060 | +13.5bp | [−81.3, 96.5] | −6.5bp |
 | Extended | Momentum | +0.024 | +66.2bp | [−30.2, 181.0] | +46.2bp |
 | Extended | Random | +0.001 | +4.4bp | [−61.9, 72.7] | −15.6bp |
@@ -53,8 +53,9 @@ Raw JSON: [`results/cross_sectional_rank.json`](results/cross_sectional_rank.jso
    gross long-short on curated (CI excludes zero), but the same models are flat
    or negative on FOMC and extended. A result that appears on one benchmark and
    disappears on the others is not an alpha claim.
-2. **LightGBM overfits the small panel.** On 600 rows × 67 features, LightGBM
-   does not beat ridge/momentum; on FOMC it is flat. This is exactly the
+2. **LightGBM does not beat the simple baselines.** On 600 rows × 67 features,
+   LightGBM is flat on curated and negative on FOMC; its surprise-aware result
+   has a CI that crosses zero and does not replicate. This is exactly the
    "strong tabular baseline first" lesson from Qlib/PaCMoE.
 3. **FOMC has no cross-sectional direction signal.** All models are within
    noise and negative after 10bp costs. This is consistent with the event-study

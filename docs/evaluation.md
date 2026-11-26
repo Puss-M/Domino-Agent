@@ -181,11 +181,12 @@ and caveats: [`cross_sectional.md`](cross_sectional.md).
 |---|---|---:|---:|---|---:|
 | Curated | Ridge | +0.089 | +207.6bp | [41.5, 418.2] | +187.6bp |
 | FOMC | Ridge | +0.016 | +2.2bp | [−110.8, 118.9] | −17.8bp |
-| FOMC surprise-aware | LightGBM | +0.072 | +63.1bp | [−43.7, 174.6] | +43.1bp |
+| FOMC surprise-aware | LightGBM | +0.105 | +102.5bp | [−13.8, 233.6] | +82.5bp |
 | Extended | Momentum | +0.024 | +66.2bp | [−30.2, 181.0] | +46.2bp |
 
-The curated edge **does not replicate** on FOMC or extended; LightGBM overfits
-the 600-row panel; FOMC is flat/negative after costs. The honest read is **no
+The curated edge **does not replicate** on FOMC or extended; LightGBM does not
+beat ridge/momentum on curated and is unstable across datasets; FOMC is
+flat/negative after costs. The honest read is **no
 consistent cross-sectional direction edge**. This is the same boundary the
 2026 Audit-Ready ML paper finds with 41 causal folds: direction is hard,
 volatility/risk is more predictable.

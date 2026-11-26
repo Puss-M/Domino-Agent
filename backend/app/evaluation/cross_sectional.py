@@ -304,20 +304,25 @@ def walk_forward(panel: pd.DataFrame, min_train_events: int = 20, n_folds: int =
 
         scores: dict[str, np.ndarray] = {}
         if lgb is not None:
-            model = lgb.LGBMRegressor(
-                n_estimators=120,
-                learning_rate=0.05,
-                num_leaves=7,
-                min_child_samples=8,
-                subsample=0.85,
-                colsample_bytree=0.85,
-                reg_lambda=1.0,
-                random_state=42 + fold_index,
-                verbose=-1,
-            )
-            model.fit(train_x, train_y)
-            scores["lightgbm"] = model.predict(test_x)
-            for name, value in zip(feature_columns, model.feature_importances_):
+            train_data = lgb.Dataset(train_x, label=train_y)
+            params = {
+                "objective": "regression",
+                "metric": "l2",
+                "boosting_type": "gbdt",
+                "num_leaves": 7,
+                "learning_rate": 0.05,
+                "min_data_in_leaf": 8,
+                "feature_fraction": 0.85,
+                "bagging_fraction": 0.85,
+                "bagging_freq": 1,
+                "lambda_l2": 1.0,
+                "verbose": -1,
+                "seed": 42 + fold_index,
+                "num_threads": 1,
+            }
+            booster = lgb.train(params, train_data, num_boost_round=120)
+            scores["lightgbm"] = booster.predict(test_x)
+            for name, value in zip(feature_columns, booster.feature_importance(importance_type="split")):
                 importance[name] += float(value)
         scores["ridge"] = _fit_ridge(train_x, train_y, test_x)
         scores["momentum"] = test["trailing_20"].to_numpy(dtype=float)

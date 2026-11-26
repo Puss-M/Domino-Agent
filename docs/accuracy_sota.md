@@ -119,9 +119,10 @@ The protocol is now in [`cross_sectional.md`](cross_sectional.md) and
 - gross and net long-short at 5/10/20bp.
 
 Result: curated ridge +207.6bp gross (95% CI 41.5–418.2), but FOMC +2.2bp
-(CI crosses zero), surprise-aware LightGBM +63.1bp (CI crosses zero), extended
+(CI crosses zero), surprise-aware LightGBM +102.5bp (CI crosses zero), extended
 momentum +66.2bp (CI crosses zero). **No model replicates across datasets**;
-LightGBM overfits the 600-row panel. This is exactly the Audit-Ready ML lesson:
+LightGBM does not beat ridge/momentum on curated and is unstable across datasets.
+This is exactly the Audit-Ready ML lesson:
 the direction edge is not robust, and the honest output is "no consistent edge".
 
 ## What not to chase
