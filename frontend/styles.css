@@ -972,6 +972,48 @@ select {
   padding: 20px;
 }
 
+.pit {
+  margin-bottom: 14px;
+}
+
+.pit-card {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  background: var(--amber-soft);
+  font-size: 12px;
+}
+
+.pit-card.pass {
+  background: var(--teal-soft);
+}
+
+.pit-card.warn {
+  background: var(--amber-soft);
+}
+
+.pit-card strong {
+  display: inline-block;
+  margin-right: 8px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pit-card span {
+  color: var(--muted);
+}
+
+.pit-detail {
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-align: right;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1153,6 +1195,15 @@ tr.highlight td {
 
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pit-card {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pit-detail {
+    text-align: left;
   }
 
   .asset-row {

@@ -22,5 +22,7 @@ jobs:
         run: pip install -r requirements.txt
       - name: Lint fatal issues (syntax and undefined names)
         run: ruff check . --select E9,F --extend-exclude frontend
+      - name: Check frontend syntax
+        run: node --check frontend/app.js
       - name: Test
         run: pytest -q

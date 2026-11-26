@@ -10,6 +10,22 @@ const state = {
   edges: [],
 };
 
+const MODEL_LABELS = {
+  always_up_test: "Always-up base rate",
+  coin_flip_test: "Coin flip",
+  mechanism_test: "Mechanism only",
+  analog_test: "Historical analog only",
+  hybrid_test: "Hybrid (mechanism + analog)",
+  stacked_test: "Stacked",
+  mechanism_calibrated_test: "Mechanism + Platt",
+  analog_calibrated_test: "Analog + Platt",
+  hybrid_calibrated_test: "Hybrid + Platt",
+  stacked_calibrated_test: "Stacked + Platt",
+  symbolic_test: "Symbolic only (E6)",
+  symbolic_gated_test: "Symbolic gated (E6)",
+  symbolic_blend_test: "Symbolic blend (E6)",
+};
+
 const EXAMPLES = [
   "Fed raises rates by 50 basis points",
   "US CPI rises 3.5% in March, above expectations",
@@ -583,7 +599,7 @@ function renderBacktest(data) {
       const ci = metric.accuracy_ci ? `[${fmt(metric.accuracy_ci[0], 2)}, ${fmt(metric.accuracy_ci[1], 2)}]` : "—";
       return `
         <tr class="${highlight}">
-          <td>${escapeHtml(metric.model)}</td>
+          <td>${escapeHtml(MODEL_LABELS[metric.model] || metric.model)}</td>
           <td class="num">${metric.n}</td>
           <td class="num">${fmt(metric.coverage, 3)}</td>
           <td class="num">${fmt(metric.accuracy, 3)}</td>
@@ -610,6 +626,7 @@ function renderBacktest(data) {
     .join("");
   $("#backtestBody").innerHTML = `
     <p class="hint" style="margin:0 0 12px">Benchmark: <strong>${escapeHtml(data.config.dataset)}</strong>. All model metrics below are on the held-out second half of the event sample. Stack weights and Platt calibration are fitted on the first half only. Dataset <em>fomc</em> is a stress test of action-only policy events; it is expected to expose the cost of the mechanism prior.</p>
+    <div id="pitBody" class="pit"></div>
     <div class="metric-grid">
       ${metricCard("Events", data.n_events, `${data.n_outcome_observations} outcome obs`)}
       ${metricCard("Window", `0..${data.config.window_end}`, "trading days")}
@@ -640,6 +657,29 @@ function renderBacktest(data) {
       <ul>${(data.notes || []).map((note) => `<li>${escapeHtml(note)}</li>`).join("")}</ul>
     </div>
   `;
+  loadPointInTime(data.config.dataset);
+}
+
+async function loadPointInTime(dataset) {
+  const el = $("#pitBody");
+  if (!el) return;
+  el.innerHTML = `<div class="placeholder">Checking point-in-time contract…</div>`;
+  try {
+    const audit = await fetchJSON(`/api/point-in-time?dataset=${encodeURIComponent(dataset)}`);
+    const revised = (audit.revised_sources || []).join(", ") || "none";
+    const cls = audit.verdict === "point_in_time" ? "pass" : "warn";
+    el.innerHTML = `
+      <div class="pit-card ${cls}">
+        <div>
+          <strong>Point-in-time: ${escapeHtml(audit.verdict.replaceAll("_", " "))}</strong>
+          <span>LLM-free metric path · ${escapeHtml(String(audit.n_events))} events</span>
+        </div>
+        <div class="pit-detail">Revised / ex-post inputs: ${escapeHtml(revised)}</div>
+      </div>
+    `;
+  } catch (error) {
+    el.innerHTML = `<div class="empty-state">Point-in-time audit unavailable: ${escapeHtml(error.message)}</div>`;
+  }
 }
 
 function renderCalibration(bins) {

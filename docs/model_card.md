@@ -1,4 +1,4 @@
-# Model card: Domino Agent v0.5
+# Model card: Domino Agent v0.6
 
 ## Model summary
 
