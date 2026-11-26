@@ -972,8 +972,13 @@ select {
   padding: 20px;
 }
 
-.pit {
+.pit,
+.xs {
   margin-bottom: 14px;
+}
+
+.xs .section-title {
+  margin-top: 4px;
 }
 
 .pit-card {

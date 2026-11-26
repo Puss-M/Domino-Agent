@@ -24,6 +24,10 @@ const MODEL_LABELS = {
   symbolic_test: "Symbolic only (E6)",
   symbolic_gated_test: "Symbolic gated (E6)",
   symbolic_blend_test: "Symbolic blend (E6)",
+  lightgbm: "LightGBM (E13)",
+  ridge: "Ridge (E13)",
+  momentum: "Momentum (E13)",
+  random: "Random (E13)",
 };
 
 const EXAMPLES = [
@@ -627,6 +631,7 @@ function renderBacktest(data) {
   $("#backtestBody").innerHTML = `
     <p class="hint" style="margin:0 0 12px">Benchmark: <strong>${escapeHtml(data.config.dataset)}</strong>. All model metrics below are on the held-out second half of the event sample. Stack weights and Platt calibration are fitted on the first half only. Dataset <em>fomc</em> is a stress test of action-only policy events; it is expected to expose the cost of the mechanism prior.</p>
     <div id="pitBody" class="pit"></div>
+    <div id="xsBody" class="xs"></div>
     <div class="metric-grid">
       ${metricCard("Events", data.n_events, `${data.n_outcome_observations} outcome obs`)}
       ${metricCard("Window", `0..${data.config.window_end}`, "trading days")}
@@ -658,6 +663,44 @@ function renderBacktest(data) {
     </div>
   `;
   loadPointInTime(data.config.dataset);
+  loadCrossSectional(data.config.dataset);
+}
+
+async function loadCrossSectional(dataset) {
+  const el = $("#xsBody");
+  if (!el) return;
+  el.innerHTML = `<div class="placeholder">Running cross-sectional rank + cost audit…</div>`;
+  try {
+    const data = await fetchJSON(`/api/cross-sectional?dataset=${encodeURIComponent(dataset)}`);
+    const rows = ["lightgbm", "ridge", "momentum", "random"]
+      .map((name) => {
+        const metrics = data.models[name] || {};
+        const ci = metrics.gross_ls_ci
+          ? `[${fmt(metrics.gross_ls_ci[0], 1)}, ${fmt(metrics.gross_ls_ci[1], 1)}]`
+          : "—";
+        const net10 = metrics.net_ls_bps ? metrics.net_ls_bps["10"] : null;
+        return `
+          <tr>
+            <td>${escapeHtml(MODEL_LABELS[name] || name)}</td>
+            <td class="num">${fmt(metrics.mean_rank_ic, 3)}</td>
+            <td class="num">${metrics.gross_ls_bps === undefined ? "—" : `${fmt(metrics.gross_ls_bps, 1)}bp`}</td>
+            <td class="num">${ci}</td>
+            <td class="num">${net10 === null ? "—" : `${fmt(net10, 1)}bp`}</td>
+          </tr>
+        `;
+      })
+      .join("");
+    el.innerHTML = `
+      <h3 class="section-title">Cross-sectional rank (E13)</h3>
+      <p class="hint" style="margin:0 0 8px">Target = within-event CAR rank. Features are strictly pre-event; net = gross − 2 × 10bp. No model replicates across datasets, so this is a protocol check, not an alpha claim.</p>
+      <table>
+        <thead><tr><th>Model</th><th class="num">Rank IC</th><th class="num">Gross L/S</th><th class="num">95% CI</th><th class="num">Net @10bp</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  } catch (error) {
+    el.innerHTML = `<div class="empty-state">Cross-sectional audit unavailable: ${escapeHtml(error.message)}</div>`;
+  }
 }
 
 async function loadPointInTime(dataset) {
