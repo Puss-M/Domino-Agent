@@ -169,6 +169,27 @@ a minimal proof core per proved asset, and a formal gate that can contradict a
 narrative. That is the honest claim; the paper should not sell E6 as an accuracy
 win.
 
+## Cross-sectional rank and costs (E13)
+
+E13 changes the target from 12 independent up/down labels to the **within-event
+percentile rank of CAR[0,+1]**, following the Qlib/PaCMoE protocol. It uses
+strictly pre-event features, expanding-window event folds, LightGBM/ridge/
+momentum/random baselines, and net long-short returns at 5/10/20bp. Full protocol
+and caveats: [`cross_sectional.md`](cross_sectional.md).
+
+| Dataset | Best model | Mean rank IC | Gross L/S | 95% CI | Net @10bp |
+|---|---|---:|---:|---|---:|
+| Curated | Ridge | +0.089 | +207.6bp | [41.5, 418.2] | +187.6bp |
+| FOMC | Ridge | +0.016 | +2.2bp | [−110.8, 118.9] | −17.8bp |
+| FOMC surprise-aware | LightGBM | +0.072 | +63.1bp | [−43.7, 174.6] | +43.1bp |
+| Extended | Momentum | +0.024 | +66.2bp | [−30.2, 181.0] | +46.2bp |
+
+The curated edge **does not replicate** on FOMC or extended; LightGBM overfits
+the 600-row panel; FOMC is flat/negative after costs. The honest read is **no
+consistent cross-sectional direction edge**. This is the same boundary the
+2026 Audit-Ready ML paper finds with 41 causal folds: direction is hard,
+volatility/risk is more predictable.
+
 ## Cross-sectional correlation and clustering (E7)
 
 Macro events hit all assets at once. A naive event-study t-statistic that treats

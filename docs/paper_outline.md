@@ -116,7 +116,7 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 | E10 | Monetary / information / supply shock decomposition (Jarociński–Karadi 2020; SSRN 7633199) | todo | FOMC accuracy/Brier after decomposition; needs intraday rate, equity and FX co-movement |
 | E11 | Point-in-time contract and lookahead audit | done | Table 8 (all benchmarks `not_point_in_time`; dataset-specific culprits) |
 | E12 | Period/entity/scope provenance (NumTrace agenda) | partial (P-013 units done) | Provenance failure taxonomy; 60/60 unit injections |
-| E13 | Cross-sectional rank + LightGBM baseline + cost-aware evaluation | todo | IC/RankIC, net Sharpe, break-even cost; see `accuracy_sota.md` |
+| E13 | Cross-sectional rank + LightGBM baseline + cost-aware evaluation | done (no consistent edge) | Table 9 (curated ridge +207.6bp; FOMC flat; no replication) |
 
 ## Results to report now
 
@@ -128,6 +128,7 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 - Policy injection (E5): 60/60 injected corruptions detected across fake numbers, advice, fake mechanism IDs, fake citations, out-of-universe assets and right-number/wrong-unit claims; 0/10 clean memos raised an error policy.
 - Symbolic ablation (E6): numeric-only 61.4% / Brier 0.259 on curated; symbolic-only 60.5% on 62.5% coverage; gated 60.5% on 62.5%; blend 61.4% / 0.258. Blend vs numeric ΔBrier −0.0002 (95% CI −0.0073–0.0072, p=0.52). FOMC: 41.1% numeric, 41.4% symbolic on 56.7% coverage; blend ΔBrier +0.0025 (95% CI −0.0013–0.0067, p=0.89). Curated 5-day, surprise-aware and extended show the same non-significant pattern. **No predictive lift** — the symbolic layer's value is auditability and structured ambiguity.
 - Point-in-time audit (E11): every benchmark is `not_point_in_time`; culprits are Yahoo adjusted prices, editorial labels, the FOMC compilation and the ex-post BRW series. The LLM-free metric path removes parametric lookahead but not data-revision leakage.
+- Cross-sectional/cost-aware protocol (E13): curated ridge rank IC +0.089, gross L/S +207.6bp (95% CI 41.5–418.2), net @10bp +187.6bp; FOMC flat (+2.2bp, CI crosses zero), surprise-aware LightGBM +63.1bp (CI crosses zero), extended momentum +66.2bp (CI crosses zero). **No model replicates across datasets**; LightGBM overfits the 600-row panel. The honest read is no consistent cross-sectional direction edge.
 - Cross-sectional correlation (E7): mean residual rho 0.043–0.059; KP inflation 1.19–1.23. Mean |BMP| falls from 1.18–1.29 to 1.01–1.06. FOMC significant-event share falls 6.9% → 3.5% (surprise-aware 8.9% → 4.4%). Pooled equal-weighted CAR: curated t 1.92 → 1.65, FOMC 0.25 → 0.21, surprise-aware −0.38 → −0.33, extended 1.35 → 1.14. No pooled CAR is significant.
 
 ## Threats to validity
@@ -147,13 +148,13 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 1. **Period/entity/scope provenance** (E12) — extend P-013 beyond units, following NumTrace (2610.34887): each memo number should reference the structured field's entity, concept, period and scope.
 2. **Optional LLM perception** (E8) — one open model or API, schema-constrained, with the rule extractor as fallback. Report extraction accuracy and cost. This makes the "neuro-symbolic" claim concrete rather than architectural.
 3. **Monetary/information/supply decomposition** (E10) — the BRW surprise test shows a surprise number is not enough; use Jarociński–Karadi (2020) plus the 2026 supply-side rate–FX comovement result (SSRN 7633199). If intraday data are unavailable, the negative result stands as a benchmark contribution.
-4. **Cross-sectional, cost-aware accuracy protocol** (E13) — rank the 12 assets by expected CAR, add a LightGBM/XGBoost baseline, evaluate IC/RankIC and net Sharpe at 0/5/10/20bp. See [`accuracy_sota.md`](accuracy_sota.md): credible ACL18 SOTA is 61.3% / MCC 0.231, and cost-aware evaluation is what separates it from inflated claims.
+4. **A larger cross-sectional panel** — E13's cost-aware rank protocol is implemented, but the curated ridge edge does not replicate on FOMC/extended. The next step is 500+ events plus intraday features, not more model capacity.
 5. **A production point-in-time feed** — E11 is a contract, not a vintage archive. A deployable system needs as-traded prices and a real-time surprise feed; the current benchmark's claim is mechanism-level directional skill, not a trading signal.
 6. **A cleaner related-work positioning** — FinVerify verifies answers, NumTrace verifies number provenance, GURU verifies actions; we verify transmission signs and expose ambiguity. FCM/RICE-Alpha build event graphs; we add solver proof cores and a public negative result. No single neighbor does both.
 
 ## Suggested timeline
 
-- Week 1: E10 (shock decomposition), E13 (cross-sectional/cost-aware baseline), optional E8, E12 (period/entity provenance).
+- Week 1: E10 (shock decomposition), optional E8, E12 (period/entity provenance); extend the E13 panel to 500+ events.
 - Week 2: paper draft (8 pages), figures from `docs/results/`, artifact appendix.
 - Week 3: internal review, reproduction from a clean clone, submission.
 - Optional parallel: high-frequency surprise adapter; if it works, promote E9 to a main result.

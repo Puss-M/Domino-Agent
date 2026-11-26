@@ -108,6 +108,22 @@ baselines are strong. The gap is not "we need a bigger LLM"; it is:
 | Calibration | Platt/isotonic; abstention threshold | ECE, coverage-accuracy curve |
 | Reproducibility | seeds, config, data snapshot, one command | Clean-clone reproduction |
 
+### E13 implemented (2026-11-26)
+
+The protocol is now in [`cross_sectional.md`](cross_sectional.md) and
+`backend/app/evaluation/cross_sectional.py`:
+
+- 50 curated events, 600 rows, 5 expanding folds;
+- LightGBM / ridge / momentum / random;
+- target = within-event CAR rank; features strictly pre-event;
+- gross and net long-short at 5/10/20bp.
+
+Result: curated ridge +207.6bp gross (95% CI 41.5–418.2), but FOMC +2.2bp
+(CI crosses zero), surprise-aware LightGBM +63.1bp (CI crosses zero), extended
+momentum +66.2bp (CI crosses zero). **No model replicates across datasets**;
+LightGBM overfits the 600-row panel. This is exactly the Audit-Ready ML lesson:
+the direction edge is not robust, and the honest output is "no consistent edge".
+
 ## What not to chase
 
 - **90% daily direction accuracy**: not credible without leakage, a different

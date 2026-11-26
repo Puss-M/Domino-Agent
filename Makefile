@@ -27,3 +27,4 @@ audit:
 	python scripts/point_in_time_audit.py
 	python scripts/hallucination_audit.py
 	python scripts/kp_test.py
+	python scripts/cross_sectional_eval.py

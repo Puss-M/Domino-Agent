@@ -21,6 +21,7 @@ from .datasources import DATA_SOURCES, MarketData
 from .datasources.base import DataSourceError
 from .evaluation.backtest import BacktestEngine
 from .evaluation.dataset import DatasetError, load_events
+from .evaluation.cross_sectional import evaluate_cross_sectional
 from .evaluation.event_study import cross_sectional_test, event_study_summary
 from .evaluation.temporal import audit_point_in_time
 from .knowledge.loader import KnowledgeError
@@ -187,6 +188,21 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 outcomes, events, prices, engine.transmission.assets, config
             ),
         }
+
+    @app.get("/api/cross-sectional")
+    def cross_sectional(
+        dataset: Literal["curated", "fomc", "fomc_surprise", "extended"] = "curated",
+    ) -> dict:
+        events = load_events(settings=settings, dataset=dataset)
+        prices = market.prices_wide(
+            "adj_close", engine.transmission.assets + ["SPY"]
+        ).dropna(how="all")
+        return evaluate_cross_sectional(
+            events,
+            prices,
+            engine.transmission.assets,
+            BacktestConfig(dataset=dataset),
+        )
 
     @app.get("/api/point-in-time")
     def point_in_time(

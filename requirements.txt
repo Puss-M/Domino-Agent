@@ -7,6 +7,7 @@ requests>=2.31,<3
 PyYAML>=6.0,<7
 ftfy>=6.2,<7
 z3-solver>=4.12,<5
+lightgbm>=4.3,<5
 httpx>=0.27,<1
 pytest>=8.0,<9
 ruff>=0.6,<1

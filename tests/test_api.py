@@ -108,6 +108,17 @@ def test_point_in_time_endpoint():
     assert "yahoo" in payload["revised_sources"]
 
 
+def test_cross_sectional_endpoint():
+    response = _client().get("/api/cross-sectional?dataset=curated")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["dataset"] == "curated"
+    assert payload["n_events"] == 50
+    assert payload["n_folds"] == 5
+    assert "lightgbm" in payload["models"]
+    assert payload["leakage_checks"]["feature_end_before_event"] is True
+
+
 def test_backtest_endpoint_small_subset():
     client = _client()
     payload = {

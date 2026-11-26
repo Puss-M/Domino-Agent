@@ -8,7 +8,7 @@
 
 **An event-driven macro transmission engine with cited mechanisms, deterministic graph construction, and an event-study backtest.**
 
-Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.6 is a rebuild around three questions a macro desk actually asks:
+Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.7 is a rebuild around three questions a macro desk actually asks:
 
 1. **What happened, and how much of it was a surprise?**
    `50bp` is not the same as `50bp more than priced`. `8.6%` CPI is a level; `+0.3pp vs consensus` is the shock.
@@ -25,15 +25,15 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 
 ---
 
-## What v0.6 changes
+## What v0.7 changes
 
-| v0.1 prototype | v0.6 |
+| v0.1 prototype | v0.7 |
 |---|---|
 | 2 LLM personas (Detective / Reviewer), ~300 LOC | 5 typed stages: extract → retrieve → transmit → audit → report |
 | No data layer | 8 data sources (6 live connectors + FOMC + BRW snapshots) + provenance, caching, retries, point-in-time notes |
 | Free-form causal edges | 20 cited mechanisms → 14 channels → 12 assets; every edge has a mechanism ID and references |
 | No text normalization | bps/pp/%/$tn/mb/d/Chinese units, surprise vs level, entity linking, LM-style sentiment, near-duplicate clustering |
-| No evaluation | 50 curated + 58 FOMC + 45 surprise-aware + 92 extended events; 1-day market-model CAR; Kolari–Pynnönen cross-correlation adjustment; numeric/symbolic/gated/blend ablation; point-in-time contract; walk-forward analog/base rate; stacked ensemble; Platt; event-clustered bootstrap; paired Brier tests; documented FOMC negative skill |
+| No evaluation | 50 curated + 58 FOMC + 45 surprise-aware + 92 extended events; 1-day market-model CAR; Kolari–Pynnönen cross-correlation adjustment; numeric/symbolic/gated/blend ablation; cross-sectional rank + LightGBM/ridge/momentum baselines with costs; point-in-time contract; walk-forward analog/base rate; stacked ensemble; Platt; event-clustered bootstrap; paired Brier tests; documented FOMC negative skill |
 | "Reviewer agent" prompt | Deterministic audit: citations, evidence grades, sign conflicts, abstention, look-ahead check |
 | No formal verification | **Sign algebra + Z3 proof cores**; ambiguity is first-class; **policy-as-code P-001–P-013**; hash-chained audit ledger |
 | Empty frontend | Zero-build dashboard served by FastAPI; run it with one command |
@@ -124,7 +124,7 @@ flowchart LR
 ```
 
 Full methodology, formulas and threats to validity: [`docs/methodology.md`](docs/methodology.md).
-Neuro-symbolic design + compliance mapping: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md). Paper outline: [`docs/paper_outline.md`](docs/paper_outline.md). 2026-11 literature sweep: [`docs/literature_2026_11.md`](docs/literature_2026_11.md). Point-in-time contract: [`docs/point_in_time.md`](docs/point_in_time.md). What credible accuracy looks like: [`docs/accuracy_sota.md`](docs/accuracy_sota.md).
+Neuro-symbolic design + compliance mapping: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md). Paper outline: [`docs/paper_outline.md`](docs/paper_outline.md). 2026-11 literature sweep: [`docs/literature_2026_11.md`](docs/literature_2026_11.md). Point-in-time contract: [`docs/point_in_time.md`](docs/point_in_time.md). What credible accuracy looks like: [`docs/accuracy_sota.md`](docs/accuracy_sota.md). Cross-sectional rank protocol: [`docs/cross_sectional.md`](docs/cross_sectional.md).
 
 ### The six stages
 
@@ -311,6 +311,7 @@ python scripts/run_benchmarks.py          # all five result summaries + E6 arms
 python scripts/point_in_time_audit.py     # E11 contract audit
 python scripts/hallucination_audit.py     # E5 60/60 injection audit
 python scripts/kp_test.py                 # E7 Kolari–Pynnönen adjustment
+python scripts/cross_sectional_eval.py    # E13 rank + cost-aware long-short
 ```
 
 Compact summaries are in `docs/results/`.
@@ -351,8 +352,8 @@ backend/
     market/         # 13 ETFs, 2000–present + provenance
     macro/ sec/ news/  # small public-data snapshots
 frontend/           # zero-build dashboard (HTML/CSS/JS + SVG)
-tests/              # 113 unit/contract tests
-docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, point-in-time contract, accuracy protocol, paper outline, literature sweep, resume bullets
+tests/              # 116 unit/contract tests
+docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, point-in-time contract, accuracy protocol, cross-sectional protocol, paper outline, literature sweep, resume bullets
 ```
 
 ---
@@ -392,7 +393,7 @@ See [`docs/resume_bullets.md`](docs/resume_bullets.md) for Chinese and English v
 
 **English (condensed):**
 
-> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC + 45 surprise-aware events and 113 tests; runs fully offline with no API key.
+> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC + 45 surprise-aware events and 116 tests; runs fully offline with no API key.
 >
 > Implemented finance-aware text normalization (bps vs percentage points vs percent, `$tn`, `mb/d`, Chinese units, surprise vs level), entity linking, LM-style sentiment with negation, and near-duplicate news clustering; added provenance-aware connectors for SEC EDGAR/XBRL, GDELT, Treasury, FRED/ALFRED, World Bank and Yahoo.
 >

@@ -4,12 +4,13 @@
 
 **Domino Agent — 事件驱动宏观传导与证据审计引擎**（个人项目，Python / FastAPI / 无前端构建）
 
-- 将“LLM 生成因果链”的原型重构为六阶段事件驱动宏观传导引擎（增加符号验证层）：金融文本抽取 → 带文献引用的机制检索 → 通道/资产传导图 → 证据审计 → 研究备忘录；沉淀 **20 条引用机制、14 个传导通道、50 个标注事件 + 58 个系统化 FOMC 事件 + 45 个 surprise-aware 事件、113 个测试**，无 API Key 可离线运行。
+- 将“LLM 生成因果链”的原型重构为六阶段事件驱动宏观传导引擎（增加符号验证层）：金融文本抽取 → 带文献引用的机制检索 → 通道/资产传导图 → 证据审计 → 研究备忘录；沉淀 **20 条引用机制、14 个传导通道、50 个标注事件 + 58 个系统化 FOMC 事件 + 45 个 surprise-aware 事件、116 个测试**，无 API Key 可离线运行。
 - 搭建数据与文本处理层：实现 SEC EDGAR/XBRL、GDELT、美国财政部、FRED/ALFRED、世界银行、Yahoo 六类连接器，统一缓存、重试、来源溯源与 point-in-time 说明；完成 **bps/pp/%/$tn/mb/d/中文单位归一、超预期与水平值区分、实体归一、LM 风格金融情感（否定/程度副词）与新闻近重复聚类**。
 - 构建 walk-forward 事件研究：12 只 ETF、市场模型 CAR、盘后/周末事件日对齐、按事件聚类 bootstrap、配对 Brier 检验；样本外 **方向准确率 60.4% vs 53.8% 基线，Brier 0.238 vs 0.244，AUC 0.634，覆盖率 96.4%**；同时用 58 个系统化 FOMC 事件做压力测试，发现机制先验在“只看动作、没有 surprise”时显著为负技能（41.1% vs 56.6% 基线，ΔBrier +0.134，95% CI 0.076–0.180）。
 - 设计证据约束与可审计性：每条图边绑定机制 ID 与文献引用，无匹配则弃权；审计检查引用完整性、证据等级、符号冲突与前视偏差；离线路径不调用 LLM，数字与图结构由确定性代码生成。
 - 引入神经符号内核：把机制库编译为带符号影响图，用定性符号代数组合路径，用 **Z3 求最小证明核（proof core）**，把“歧义”作为一等输出；配合 **P-001–P-013 合规即代码** 与 **SHA-256 哈希链审计账本**。注入“SPY 跌 3.2%、黄金涨 12.5%、建议买入”的幻觉 memo 会被 P-002/P-004 直接拦截；规模化审计 60/60 命中、10 条干净输出 0 误报。
-- 做符号层消融与时间完整性审计：E6 证明符号层**不提升**方向准确率（blend ΔBrier −0.0002, p=0.52），价值在歧义披露与可审计性；E11 用机器可读 point-in-time contract 标注所有基准 `not_point_in_time`，区分参数化前视与数据修订泄漏。113 个测试，CI 全绿。
+- 做符号层消融与时间完整性审计：E6 证明符号层**不提升**方向准确率（blend ΔBrier −0.0002, p=0.52），价值在歧义披露与可审计性；E11 用机器可读 point-in-time contract 标注所有基准 `not_point_in_time`，区分参数化前视与数据修订泄漏。116 个测试，CI 全绿。
+- 引入横截面、成本感知的准确率协议（E13）：目标从 12 个独立涨跌改为事件内 CAR 排名，LightGBM / ridge / momentum / random 四臂，expanding-window 折、严格 pre-event 特征、5/10/20bp 净多空；curated ridge 毛多空 +207.6bp（95% CI 41.5–418.2），但 FOMC/extended 不复现，因此明确不宣称 alpha。
 
 > 如果简历只能放一条：用第 3 条（有可验证的样本外指标），把第 1 条压缩成项目描述的第一句。
 
@@ -17,12 +18,13 @@
 
 **Domino Agent — Event-driven macro transmission with an evidence audit** (personal project; Python / FastAPI / zero-build frontend)
 
-- Rebuilt an LLM-only causal-chain prototype into a six-stage event-driven macro engine (with a symbolic verification layer): finance-aware extraction → cited mechanism retrieval → channel/asset transmission graph → evidence audit → research memo. **20 cited mechanisms, 14 channels, 50 curated + 58 systematic FOMC + 45 surprise-aware events, 113 tests**; fully offline with no API key.
+- Rebuilt an LLM-only causal-chain prototype into a six-stage event-driven macro engine (with a symbolic verification layer): finance-aware extraction → cited mechanism retrieval → channel/asset transmission graph → evidence audit → research memo. **20 cited mechanisms, 14 channels, 50 curated + 58 systematic FOMC + 45 surprise-aware events, 116 tests**; fully offline with no API key.
 - Built the data and text layer: six provenance-aware connectors (SEC EDGAR/XBRL, GDELT, US Treasury, FRED/ALFRED, World Bank, Yahoo) with caching, retries and point-in-time notes; implemented **bps/pp/%/$tn/mb/d and Chinese unit normalization, surprise-vs-level separation, entity linking, LM-style financial sentiment with negation/intensifiers, and near-duplicate news clustering**.
 - Built a walk-forward event study on 12 ETFs with market-model CARs, after-close/weekend alignment, event-clustered bootstrap and paired Brier tests: **60.4% accuracy vs 53.8% base rate, Brier 0.238 vs 0.244, AUC 0.634, 96.4% coverage** on the held-out curated half. Added a 58-event systematic FOMC stress test that exposes **negative skill without a surprise measure** (41.1% vs 56.6% base, ΔBrier +0.134, 95% CI 0.076–0.180).
 - Designed evidence gating and auditability: every graph edge carries a mechanism ID and references; the engine abstains when no cited mechanism matches; the audit checks citation completeness, evidence grade, sign conflicts and look-ahead. The offline path is LLM-free — numbers and graph structure are deterministic.
 - Added a neuro-symbolic kernel: the mechanism library compiles into a signed influence graph; qualitative sign algebra composes paths; **Z3 returns a minimal proof core** or an explicit **ambiguity** status; **P-001–P-013 policy-as-code** enforces disclaimer, no-advice, numeric and unit grounding, abstention, proof consistency and mechanism/citation/asset grounding; every analysis is committed to a **SHA-256 hash-chained audit ledger**. An injected hallucinated memo ("SPY −3.2%, gold +12.5%, we recommend buying gold") is blocked by P-002/P-004 in the test suite.
-- Ran the symbolic ablation and temporal-integrity audit: E6 shows the symbolic layer does **not** improve directional accuracy (blend ΔBrier −0.0002, p=0.52); its value is ambiguity disclosure and auditability. E11 adds a machine-readable point-in-time contract that labels every benchmark `not_point_in_time`, separating parametric lookahead from data-revision leakage. **113 tests**, CI green.
+- Ran the symbolic ablation and temporal-integrity audit: E6 shows the symbolic layer does **not** improve directional accuracy (blend ΔBrier −0.0002, p=0.52); its value is ambiguity disclosure and auditability. E11 adds a machine-readable point-in-time contract that labels every benchmark `not_point_in_time`, separating parametric lookahead from data-revision leakage. **116 tests**, CI green.
+- Added a cross-sectional, cost-aware accuracy protocol (E13): target = within-event CAR rank; LightGBM/ridge/momentum/random; expanding-window folds; strictly pre-event features; 5/10/20bp net long-short. Curated ridge shows +207.6bp gross (95% CI 41.5–418.2), but it does not replicate on FOMC or extended, so the result is explicitly **not** an alpha claim.
 
 ## Interview talking points
 
