@@ -43,4 +43,8 @@ def test_cross_sectional_walk_forward_contract():
             low, high = metrics["gross_ls_ci"]
             assert low <= high
         assert set(metrics["net_ls_bps"]) == {"5", "10", "20"}
+        if metrics.get("deflated_sharpe"):
+            assert 0.0 <= metrics["deflated_sharpe"]["deflated_sharpe"] <= 1.0
     assert result["leakage_checks"]["feature_end_before_event"] is True
+    assert "multiple_testing" in result
+    assert "holm_gross_ls_p" in result["multiple_testing"]

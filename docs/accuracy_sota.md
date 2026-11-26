@@ -120,9 +120,11 @@ The protocol is now in [`cross_sectional.md`](cross_sectional.md) and
 
 Result: curated ridge +207.6bp gross (95% CI 41.5–418.2), but FOMC +2.2bp
 (CI crosses zero), surprise-aware LightGBM +102.5bp (CI crosses zero), extended
-momentum +66.2bp (CI crosses zero). **No model replicates across datasets**;
-LightGBM does not beat ridge/momentum on curated and is unstable across datasets.
-This is exactly the Audit-Ready ML lesson:
+momentum +66.2bp (CI crosses zero). Curated ridge/momentum survive Holm
+(p=0.016/0.036) but fail the deflated Sharpe (0.387/0.260 after four trials);
+**no model passes both gates in any dataset**. LightGBM does not beat
+ridge/momentum on curated and is unstable across datasets. This is exactly the
+Audit-Ready ML lesson:
 the direction edge is not robust, and the honest output is "no consistent edge".
 
 ## What not to chase

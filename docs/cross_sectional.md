@@ -47,12 +47,35 @@ falsifiable.
 
 Raw JSON: [`results/cross_sectional_rank.json`](results/cross_sectional_rank.json).
 
+### Multiple testing and deflated Sharpe
+
+E13 runs four models per dataset, so a raw p-value is not enough. We report
+**Holm-adjusted** bootstrap p-values and the **Deflated Sharpe Ratio** (Bailey &
+López de Prado 2014) using four trials, event-level returns, skew and kurtosis.
+
+| Dataset | Model | Holm p (gross L/S) | Deflated Sharpe | Passes both? |
+|---|---|---:|---:|---|
+| Curated | Ridge | **0.016** | 0.387 | **no** |
+| Curated | Momentum | **0.036** | 0.260 | **no** |
+| FOMC | Ridge | 1.000 | 0.375 | no |
+| FOMC | LightGBM | 1.000 | 0.211 | no |
+| Surprise FOMC | LightGBM | 0.208 | 0.728 | no |
+| Extended | Momentum | 0.432 | 0.713 | no |
+
+The curated ridge result **survives Holm but fails the deflated Sharpe**: its
+per-event return distribution is strongly skewed (3.0) and fat-tailed
+(kurtosis 13.2), so the observed Sharpe is not distinguishable from the maximum
+expected after four trials. **No model passes both gates in any dataset.** This
+is the cleanest evidence that the apparent curated edge is not robust.
+
 ## Interpretation
 
-1. **The curated edge does not replicate.** Ridge and momentum show a positive
-   gross long-short on curated (CI excludes zero), but the same models are flat
-   or negative on FOMC and extended. A result that appears on one benchmark and
-   disappears on the others is not an alpha claim.
+1. **The curated edge does not replicate, and it fails deflation.** Ridge and
+   momentum show a positive gross long-short on curated (CI excludes zero), but
+   the same models are flat or negative on FOMC and extended, and the curated
+   ridge DSR is only 0.387. A result that appears on one benchmark, disappears
+   on the others, and does not survive four-trial deflation is not an alpha
+   claim.
 2. **LightGBM does not beat the simple baselines.** On 600 rows × 67 features,
    LightGBM is flat on curated and negative on FOMC; its surprise-aware result
    has a CI that crosses zero and does not replicate. This is exactly the

@@ -679,6 +679,7 @@ async function loadCrossSectional(dataset) {
           ? `[${fmt(metrics.gross_ls_ci[0], 1)}, ${fmt(metrics.gross_ls_ci[1], 1)}]`
           : "—";
         const net10 = metrics.net_ls_bps ? metrics.net_ls_bps["10"] : null;
+        const dsr = metrics.deflated_sharpe ? metrics.deflated_sharpe.deflated_sharpe : null;
         return `
           <tr>
             <td>${escapeHtml(MODEL_LABELS[name] || name)}</td>
@@ -686,15 +687,16 @@ async function loadCrossSectional(dataset) {
             <td class="num">${metrics.gross_ls_bps === undefined ? "—" : `${fmt(metrics.gross_ls_bps, 1)}bp`}</td>
             <td class="num">${ci}</td>
             <td class="num">${net10 === null ? "—" : `${fmt(net10, 1)}bp`}</td>
+            <td class="num">${dsr === null ? "—" : fmt(dsr, 2)}</td>
           </tr>
         `;
       })
       .join("");
     el.innerHTML = `
       <h3 class="section-title">Cross-sectional rank (E13)</h3>
-      <p class="hint" style="margin:0 0 8px">Target = within-event CAR rank. Features are strictly pre-event; net = gross − 2 × 10bp. No model replicates across datasets, so this is a protocol check, not an alpha claim.</p>
+      <p class="hint" style="margin:0 0 8px">Target = within-event CAR rank. Features are strictly pre-event; net = gross − 2 × 10bp. DSR &lt; 0.95 means the Sharpe is not significant after four trials. No model passes both Holm and DSR, so this is a protocol check, not an alpha claim.</p>
       <table>
-        <thead><tr><th>Model</th><th class="num">Rank IC</th><th class="num">Gross L/S</th><th class="num">95% CI</th><th class="num">Net @10bp</th></tr></thead>
+        <thead><tr><th>Model</th><th class="num">Rank IC</th><th class="num">Gross L/S</th><th class="num">95% CI</th><th class="num">Net @10bp</th><th class="num">DSR</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     `;

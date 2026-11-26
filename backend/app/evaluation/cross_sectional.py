@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
+from statistics import NormalDist
 from typing import Any
 
 import numpy as np
@@ -234,6 +235,72 @@ def _bootstrap_mean(values: np.ndarray, samples: int = 500, seed: int = 17) -> d
     }
 
 
+_NORMAL = NormalDist()
+_EULER_GAMMA = 0.5772156649015329
+
+
+def _sharpe(returns: np.ndarray) -> float | None:
+    if len(returns) < 2:
+        return None
+    std = float(returns.std(ddof=1))
+    return float(returns.mean() / std) if std > 1e-12 else None
+
+
+def _deflated_sharpe(
+    returns: np.ndarray,
+    trial_sharpes: list[float],
+    n_trials: int,
+) -> dict | None:
+    """Bailey & Lopez de Prado (2014) deflated Sharpe ratio.
+
+    The observed Sharpe is compared with the expected maximum Sharpe under the
+    null after ``n_trials`` independent configurations. Returns are per-event
+    long-short returns, so the Sharpe and the sample length are event-level.
+    """
+    if len(returns) < 10 or n_trials < 2:
+        return None
+    sr = _sharpe(returns)
+    if sr is None:
+        return None
+    skew = float(pd.Series(returns).skew())
+    kurt = float(pd.Series(returns).kurt() + 3.0)
+    trial_array = np.asarray(trial_sharpes, dtype=float)
+    trial_var = float(trial_array.var(ddof=1)) if len(trial_array) > 1 else 0.0
+    # Expected maximum of n_trials draws from N(0, trial_var).
+    sr0 = math.sqrt(max(trial_var, 0.0)) * (
+        (1.0 - _EULER_GAMMA) * _NORMAL.inv_cdf(1.0 - 1.0 / n_trials)
+        + _EULER_GAMMA * _NORMAL.inv_cdf(1.0 - 1.0 / (n_trials * math.e))
+    )
+    denom = math.sqrt(
+        max(1e-12, 1.0 - skew * sr + ((kurt - 1.0) / 4.0) * sr * sr)
+    )
+    dsr = _NORMAL.cdf((sr - sr0) * math.sqrt(len(returns) - 1) / denom)
+    return {
+        "sharpe_per_event": round(sr, 4),
+        "expected_max_sharpe": round(sr0, 4),
+        "deflated_sharpe": round(dsr, 4),
+        "skew": round(skew, 4),
+        "kurtosis": round(kurt, 4),
+        "n_trials": n_trials,
+        "n_events": len(returns),
+    }
+
+
+def _holm(p_values: dict[str, float | None]) -> dict[str, float | None]:
+    ordered = sorted(
+        ((name, value) for name, value in p_values.items() if value is not None),
+        key=lambda item: item[1],
+    )
+    adjusted: dict[str, float | None] = {}
+    running = 0.0
+    total = len(ordered)
+    for index, (name, value) in enumerate(ordered):
+        candidate = min(1.0, (total - index) * float(value))
+        running = max(running, candidate)
+        adjusted[name] = round(running, 4)
+    return adjusted
+
+
 def _pair_bootstrap(values: list[float], samples: int = 500, seed: int = 13) -> dict:
     if len(values) < 5:
         return {"delta": None, "ci": None, "p_value": None, "n": len(values)}
@@ -349,6 +416,22 @@ def walk_forward(panel: pd.DataFrame, min_train_events: int = 20, n_folds: int =
         folds.append(fold_metrics)
 
     models = {name: _aggregate(rows) for name, rows in model_event_metrics.items()}
+    trial_sharpes: list[float] = []
+    for rows in model_event_metrics.values():
+        returns = np.asarray([row["gross_ls_bps"] for row in rows], dtype=float)
+        sharpe = _sharpe(returns)
+        if sharpe is not None:
+            trial_sharpes.append(sharpe)
+    for name, rows in model_event_metrics.items():
+        returns = np.asarray([row["gross_ls_bps"] for row in rows], dtype=float)
+        deflated = _deflated_sharpe(returns, trial_sharpes, len(trial_sharpes))
+        if deflated is not None:
+            models[name]["deflated_sharpe"] = deflated
+    multiple_testing = {
+        "holm_gross_ls_p": _holm(
+            {name: metrics.get("gross_ls_p_value") for name, metrics in models.items()}
+        )
+    }
     # Paired difference per event for LightGBM vs momentum.
     lgb_by_day = {row["event_day"]: row for row in model_event_metrics.get("lightgbm", [])}
     mom_by_day = {row["event_day"]: row for row in model_event_metrics.get("momentum", [])}
@@ -363,6 +446,7 @@ def walk_forward(panel: pd.DataFrame, min_train_events: int = 20, n_folds: int =
         "n_folds": len(folds),
         "feature_columns": feature_columns,
         "models": models,
+        "multiple_testing": multiple_testing,
         "comparison": {"lightgbm_minus_momentum_gross_ls_bps": _pair_bootstrap(paired)},
         "feature_importance": [{"feature": name, "importance": round(value, 2)} for name, value in top_importance],
         "folds": folds,

@@ -186,10 +186,12 @@ and caveats: [`cross_sectional.md`](cross_sectional.md).
 
 The curated edge **does not replicate** on FOMC or extended; LightGBM does not
 beat ridge/momentum on curated and is unstable across datasets; FOMC is
-flat/negative after costs. The honest read is **no
-consistent cross-sectional direction edge**. This is the same boundary the
-2026 Audit-Ready ML paper finds with 41 causal folds: direction is hard,
-volatility/risk is more predictable.
+flat/negative after costs. Multiple testing makes the curated result weaker:
+ridge/momentum survive Holm (p=0.016/0.036), but their deflated Sharpe ratios
+are only 0.387/0.260 after four trials, and **no model passes both Holm 5% and
+DSR 95% in any dataset**. The honest read is **no consistent cross-sectional
+direction edge**. This is the same boundary the 2026 Audit-Ready ML paper finds
+with 41 causal folds: direction is hard, volatility/risk is more predictable.
 
 ## Cross-sectional correlation and clustering (E7)
 
