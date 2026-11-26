@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Domino Audit Desk</title>
+    <meta
+      name="description"
+      content="Macro event audit desk: calendar, saved notes, watchlist, digest and post-event review."
+    />
+    <link rel="stylesheet" href="/styles.css?v=0.8.1" />
+    <link rel="stylesheet" href="/product.css?v=0.8.1" />
+  </head>
+  <body class="desk-body">
+    <header class="desk-topbar">
+      <a class="desk-brand" href="/product">
+        <span class="desk-logo">D</span>
+        <span>
+          <strong>Domino Audit Desk</strong>
+          <small>Macro event → evidence → review</small>
+        </span>
+      </a>
+      <nav class="desk-nav" aria-label="Audit desk">
+        <button class="desk-tab" data-view="calendar" type="button">Calendar</button>
+        <button class="desk-tab" data-view="notes" type="button">Notes</button>
+        <button class="desk-tab" data-view="watchlist" type="button">Watchlist</button>
+        <button class="desk-tab" data-view="digest" type="button">Digest</button>
+      </nav>
+      <div class="desk-actions">
+        <span id="deskSummary" class="desk-summary"></span>
+        <a class="button ghost" href="/">Research cockpit</a>
+      </div>
+    </header>
+
+    <main id="productMain" class="desk-main">
+      <div class="placeholder">Loading audit desk…</div>
+    </main>
+
+    <div class="modal" id="customEventModal" hidden>
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="customEventTitle">
+        <div class="modal-head">
+          <div>
+            <span class="eyebrow">Calendar</span>
+            <h2 id="customEventTitle">Add a macro event</h2>
+          </div>
+          <button class="button ghost" id="closeCustomEvent" type="button">Close</button>
+        </div>
+        <form id="customEventForm" class="modal-body desk-form">
+          <label>Date <input name="date" type="date" required /></label>
+          <label>Time / zone <input name="time" type="text" placeholder="08:30 ET" /></label>
+          <label>Title <input name="title" type="text" required maxlength="300" /></label>
+          <label>Type
+            <select name="event_type">
+              <option value="monetary_policy">Monetary policy</option>
+              <option value="inflation">Inflation</option>
+              <option value="labor_market">Labour market</option>
+              <option value="trade_policy">Trade policy</option>
+              <option value="energy_supply">Energy supply</option>
+              <option value="geopolitics">Geopolitics</option>
+              <option value="financial_stability">Financial stability</option>
+              <option value="fiscal_policy">Fiscal policy</option>
+              <option value="china_policy">China policy</option>
+              <option value="other" selected>Other</option>
+            </select>
+          </label>
+          <label>Importance
+            <select name="importance">
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+          <label>Session
+            <select name="session">
+              <option value="before_open">Before open</option>
+              <option value="during" selected>During session</option>
+              <option value="after_close">After close</option>
+              <option value="non_trading">Non-trading</option>
+            </select>
+          </label>
+          <label class="wide">Summary <textarea name="summary" rows="3" maxlength="2000"></textarea></label>
+          <label>Source <input name="source" type="text" value="custom" /></label>
+          <label>Source URL <input name="url" type="url" placeholder="https://…" /></label>
+          <div class="wide desk-form-actions">
+            <button class="button solid" type="submit">Add to calendar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal" id="scenarioModal" hidden>
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="scenarioTitle">
+        <div class="modal-head">
+          <div>
+            <span class="eyebrow">Pre-event note</span>
+            <h2 id="scenarioTitle">Choose a policy scenario</h2>
+          </div>
+          <button class="button ghost" id="closeScenario" type="button">Close</button>
+        </div>
+        <div class="modal-body">
+          <p class="hint">A pre-event note is a scenario, not a forecast. Pick the policy action you want to stress; the engine will run the cited mechanism graph against it.</p>
+          <div id="scenarioOptions" class="scenario-options"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="desk-toast" hidden></div>
+    <script src="/product.js?v=0.8.1" defer></script>
+  </body>
+</html>

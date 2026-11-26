@@ -8,7 +8,7 @@
 
 **An event-driven macro transmission engine with cited mechanisms, deterministic graph construction, and an event-study backtest.**
 
-Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.7 is a rebuild around three questions a macro desk actually asks:
+Most "AI finance agent" repos stop at prompt orchestration: ask an LLM for a causal chain, draw a graph, call it alpha. That is a shell. Domino Agent v0.8 is a rebuild around three questions a macro desk actually asks:
 
 1. **What happened, and how much of it was a surprise?**
    `50bp` is not the same as `50bp more than priced`. `8.6%` CPI is a level; `+0.3pp vs consensus` is the shock.
@@ -25,9 +25,9 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 
 ---
 
-## What v0.7 changes
+## What v0.8 changes
 
-| v0.1 prototype | v0.7 |
+| v0.1 prototype | v0.8 |
 |---|---|
 | 2 LLM personas (Detective / Reviewer), ~300 LOC | 5 typed stages: extract → retrieve → transmit → audit → report |
 | No data layer | 8 data sources (6 live connectors + FOMC + BRW snapshots) + provenance, caching, retries, point-in-time notes |
@@ -36,11 +36,29 @@ The offline path is LLM-free. Every number and every graph edge is produced by t
 | No evaluation | 50 curated + 58 FOMC + 45 surprise-aware + 92 extended events; 1-day market-model CAR; Kolari–Pynnönen cross-correlation adjustment; numeric/symbolic/gated/blend ablation; cross-sectional rank + LightGBM/ridge/momentum baselines with costs; point-in-time contract; walk-forward analog/base rate; stacked ensemble; Platt; event-clustered bootstrap; paired Brier tests; documented FOMC negative skill |
 | "Reviewer agent" prompt | Deterministic audit: citations, evidence grades, sign conflicts, abstention, look-ahead check |
 | No formal verification | **Sign algebra + Z3 proof cores**; ambiguity is first-class; **policy-as-code P-001–P-013**; hash-chained audit ledger |
-| Empty frontend | Zero-build dashboard served by FastAPI; run it with one command |
+| Empty frontend | Zero-build research cockpit + **Audit Desk** product surface; one command |
+| No product workflow | Calendar → scenario note → one-page audit → PDF/share → watchlist/digest → post-event review |
 
 ### Why the agents are not LLM personas
 
 The v0.1 Detective/Reviewer debate is easy to demo and hard to audit. v0.3 keeps the role separation as typed contracts: extractor, retriever, auditor, quantifier, reporter. A language model can be added as a narrator, but it cannot write a number, choose a sign, or invent a mechanism. The moat is the data, text, evidence and evaluation layer — not the prompt.
+
+### Audit Desk (product surface)
+
+The research cockpit answers “what does this headline transmit to?”. The **Audit Desk** at [`/product`](http://127.0.0.1:8000/product) answers the recurring job:
+
+1. **Calendar** — sourced FOMC and BEA events, plus custom events.
+2. **Scenario note** — for FOMC, stress Hike 25bp / Cut 25bp / Hawkish hold / Dovish hold. A scenario is explicitly not a forecast.
+3. **One-page audit** — asset views, proof badges, transmission, falsifiers, policies, ledger hash.
+4. **PDF / share link** — server-side A4 PDF and a self-contained HTML note.
+5. **Watchlist + digest** — a persistent watchlist and an HTML/Markdown digest.
+6. **Post-event review** — realised CAR, hit rate, and the earliest responsible stage (perception / retrieval / symbolic / transmission).
+
+![Audit Desk](docs/assets/audit_desk.png)
+
+![Audit note](docs/assets/audit_note.png)
+
+Full product notes: [`docs/product.md`](docs/product.md).
 
 ---
 
@@ -60,7 +78,7 @@ pip install -r requirements.txt
 uvicorn backend.main:app --reload
 ```
 
-Open **http://127.0.0.1:8000**. The dashboard runs an example on load. The same engine is available from the CLI:
+Open **http://127.0.0.1:8000** for the research cockpit, and **http://127.0.0.1:8000/product** for the Audit Desk (calendar → scenario note → PDF → review). The cockpit runs an example on load. The same engine is available from the CLI:
 
 ```bash
 python -m backend.app.cli analyze "Fed raises rates by 50 basis points"
@@ -352,8 +370,8 @@ backend/
     market/         # 13 ETFs, 2000–present + provenance
     macro/ sec/ news/  # small public-data snapshots
 frontend/           # zero-build dashboard (HTML/CSS/JS + SVG)
-tests/              # 116 unit/contract tests
-docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, point-in-time contract, accuracy protocol, cross-sectional protocol, paper outline, literature sweep, resume bullets
+tests/              # 121 unit/contract tests
+docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, point-in-time contract, accuracy/cross-sectional protocols, product line, paper outline, literature sweep, resume bullets
 ```
 
 ---
@@ -393,7 +411,7 @@ See [`docs/resume_bullets.md`](docs/resume_bullets.md) for Chinese and English v
 
 **English (condensed):**
 
-> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC + 45 surprise-aware events and 116 tests; runs fully offline with no API key.
+> Built a six-stage event-driven macro transmission engine (rule-first extraction → cited mechanism retrieval → deterministic channel/asset graph → **sign-algebra + Z3 proof cores** → policy-as-code compliance → memo), with 20 cited mechanisms, 14 channels, 50 curated + 58 FOMC + 45 surprise-aware events and 121 tests; runs fully offline with no API key.
 >
 > Implemented finance-aware text normalization (bps vs percentage points vs percent, `$tn`, `mb/d`, Chinese units, surprise vs level), entity linking, LM-style sentiment with negation, and near-duplicate news clustering; added provenance-aware connectors for SEC EDGAR/XBRL, GDELT, Treasury, FRED/ALFRED, World Bank and Yahoo.
 >

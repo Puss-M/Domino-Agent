@@ -1,0 +1,143 @@
+# Curated macro calendar.
+#
+# This is a product seed, not a complete economic calendar. Each entry carries
+# its official source and the time at which the information becomes public.
+# Custom events can be added from the Audit Desk and are stored in SQLite.
+
+version: 1
+as_of: "2026-11-26"
+sources:
+  fed: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+  bea: "https://www.bea.gov/news/schedule"
+events:
+  - id: cal-fomc-2026-12-09
+    date: "2026-12-09"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement and target-range decision; press conference at 14:30 ET."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+
+  - id: cal-bea-trade-2026-12-08
+    date: "2026-12-08"
+    time: "08:30 ET"
+    event_type: trade_policy
+    title: "U.S. international trade in goods and services (October 2026)"
+    summary: "BEA monthly trade balance release."
+    importance: medium
+    session: before_open
+    source: U.S. Bureau of Economic Analysis
+    url: "https://www.bea.gov/news/schedule"
+
+  - id: cal-bea-gdp-2026-12-23
+    date: "2026-12-23"
+    time: "08:30 ET"
+    event_type: other
+    title: "GDP third estimate (Q3 2026)"
+    summary: "BEA third estimate of Q3 GDP, industries and corporate profits."
+    importance: high
+    session: before_open
+    source: U.S. Bureau of Economic Analysis
+    url: "https://www.bea.gov/news/schedule"
+
+  - id: cal-bea-pce-2026-12-23
+    date: "2026-12-23"
+    time: "08:30 ET"
+    event_type: inflation
+    title: "Personal income and outlays (November 2026)"
+    summary: "BEA PCE price index and personal income/outlays release."
+    importance: high
+    session: before_open
+    source: U.S. Bureau of Economic Analysis
+    url: "https://www.bea.gov/news/schedule"
+
+  - id: cal-fomc-2027-01-27
+    date: "2027-01-27"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement and target-range decision."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+
+  - id: cal-fomc-2027-03-17
+    date: "2027-03-17"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement, projections and target-range decision."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+
+  - id: cal-fomc-2027-04-28
+    date: "2027-04-28"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement and target-range decision."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+
+  - id: cal-fomc-2027-06-09
+    date: "2027-06-09"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement, projections and target-range decision."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+
+  - id: cal-fomc-2027-07-28
+    date: "2027-07-28"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement and target-range decision."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+
+  - id: cal-fomc-2027-09-15
+    date: "2027-09-15"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement, projections and target-range decision."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+
+  - id: cal-fomc-2027-10-27
+    date: "2027-10-27"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement and target-range decision."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"
+
+  - id: cal-fomc-2027-11-17
+    date: "2027-11-17"
+    time: "14:00 ET"
+    event_type: monetary_policy
+    title: "FOMC rate decision"
+    summary: "FOMC statement and target-range decision."
+    importance: high
+    session: during
+    source: Federal Reserve
+    url: "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm"

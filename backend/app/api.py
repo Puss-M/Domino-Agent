@@ -7,12 +7,13 @@ are cached by their config hash.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__
@@ -25,6 +26,16 @@ from .evaluation.cross_sectional import evaluate_cross_sectional
 from .evaluation.event_study import cross_sectional_test, event_study_summary
 from .evaluation.temporal import audit_point_in_time
 from .knowledge.loader import KnowledgeError
+from .product import (
+    ProductStore,
+    build_digest,
+    calendar_window,
+    find_calendar_event,
+    render_note_html,
+    render_note_pdf,
+    review_note,
+)
+from .product.calendar import calendar_payload
 from .reasoning.engine import AnalysisEngine
 from .symbolic import to_turtle
 from .schemas import (
@@ -33,8 +44,12 @@ from .schemas import (
     BacktestConfig,
     BacktestResponse,
     BatchAnalyzeRequest,
+    CalendarCustomRequest,
     DataSourceInfo,
     LabeledEvent,
+    NoteCreateRequest,
+    NoteUpdateRequest,
+    WatchlistRequest,
 )
 
 
@@ -53,12 +68,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         CORSMiddleware,
         allow_origins=list(settings.cors_origins),
         allow_credentials=False,
-        allow_methods=["GET", "POST"],
+        allow_methods=["GET", "POST", "PATCH", "DELETE"],
         allow_headers=["*"],
     )
 
     engine = AnalysisEngine(settings=settings)
     market = MarketData(settings)
+    product_store = ProductStore(settings)
     backtest_cache: dict[str, BacktestResponse] = {}
 
     def _event_payload(event: LabeledEvent) -> dict:
@@ -214,6 +230,167 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return audit_point_in_time(
             events, dataset=dataset, price_last_date=price_last, settings=settings
         )
+
+    # ------------------------------------------------------------ audit desk
+    @app.get("/api/calendar")
+    def calendar(days: int = 60, include_past: int = 0) -> dict:
+        return calendar_window(
+            days=max(1, min(days, 400)),
+            include_past=max(0, min(include_past, 30)),
+            settings=settings,
+            store=product_store,
+        )
+
+    @app.post("/api/calendar/custom")
+    def calendar_custom(request: CalendarCustomRequest) -> dict:
+        return product_store.add_custom_calendar(request.model_dump())
+
+    @app.get("/api/watchlist")
+    def watchlist() -> dict:
+        return {"assets": product_store.list_watchlist()}
+
+    @app.post("/api/watchlist")
+    def add_watchlist(request: WatchlistRequest) -> dict:
+        try:
+            assets = product_store.add_watchlist(request.asset)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
+        return {"assets": assets}
+
+    @app.delete("/api/watchlist/{asset}")
+    def remove_watchlist(asset: str) -> dict:
+        return {"assets": product_store.remove_watchlist(asset)}
+
+    @app.get("/api/audit-desk")
+    def audit_desk() -> dict:
+        calendar_payload_data = calendar_window(
+            days=120, include_past=0, settings=settings, store=product_store
+        )
+        notes = product_store.list_notes(limit=200)
+        return {
+            "next_event": (
+                calendar_payload_data["events"][0]
+                if calendar_payload_data["events"]
+                else None
+            ),
+            "n_upcoming": calendar_payload_data["n_events"],
+            "watchlist": product_store.list_watchlist(),
+            "n_notes": len(notes),
+            "n_drafts": sum(1 for note in notes if note["status"] == "draft"),
+            "n_reviewed": sum(1 for note in notes if note["status"] == "reviewed"),
+        }
+
+    @app.post("/api/notes")
+    def create_note(request: NoteCreateRequest) -> dict:
+        event_id = request.event_id
+        headline = request.headline
+        summary = request.summary
+        session = request.session
+        published = request.published_at
+        source_name = request.source_name
+        source_url = request.source_url
+        if event_id:
+            try:
+                item = find_calendar_event(
+                    event_id, settings=settings, store=product_store
+                )
+            except KeyError as exc:
+                raise HTTPException(status_code=404, detail="calendar event not found") from exc
+            mapped = calendar_payload(item)
+            headline = request.headline or mapped["headline"]
+            summary = request.summary or mapped["summary"]
+            session = request.session or mapped["session"]
+            published = request.published_at or datetime.fromisoformat(
+                mapped["published_at"]
+            ).replace(tzinfo=timezone.utc)
+            source_name = (
+                request.source_name
+                if request.source_name != "calendar"
+                else mapped["source_name"]
+            )
+            source_url = request.source_url or mapped["source_url"]
+        if not headline:
+            raise HTTPException(status_code=400, detail="headline or event_id required")
+        response = engine.analyze_headline(
+            headline,
+            summary=summary,
+            published_at=published,
+            source_name=source_name,
+            source_url=source_url,
+        )
+        return product_store.create_note(
+            response.model_dump(mode="json"), event_id=event_id, session=session
+        )
+
+    @app.get("/api/notes")
+    def notes(
+        query: str | None = None,
+        status: str | None = None,
+        limit: int = 50,
+    ) -> dict:
+        return {"notes": product_store.list_notes(query=query, status=status, limit=limit)}
+
+    @app.get("/api/notes/{note_id}")
+    def note(note_id: str) -> dict:
+        try:
+            return product_store.get_note(note_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="note not found") from exc
+
+    @app.patch("/api/notes/{note_id}")
+    def update_note(note_id: str, request: NoteUpdateRequest) -> dict:
+        try:
+            return product_store.update_note(
+                note_id, status=request.status, review_notes=request.review_notes
+            )
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="note not found") from exc
+
+    @app.post("/api/notes/{note_id}/review")
+    def review(note_id: str) -> dict:
+        try:
+            saved = product_store.get_note(note_id)
+            return review_note(saved, settings=settings, store=product_store)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="note not found") from exc
+
+    @app.get("/api/notes/{note_id}/html", response_class=HTMLResponse)
+    def note_html(note_id: str) -> HTMLResponse:
+        try:
+            saved = product_store.get_note(note_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="note not found") from exc
+        return HTMLResponse(render_note_html(saved))
+
+    @app.get("/api/notes/{note_id}/pdf")
+    def note_pdf(note_id: str) -> Response:
+        try:
+            saved = product_store.get_note(note_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail="note not found") from exc
+        return Response(
+            content=render_note_pdf(saved),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="domino-{note_id}.pdf"'
+            },
+        )
+
+    @app.get("/api/digest")
+    def digest(days: int = 14, format: Literal["html", "md"] = "html") -> Response:
+        content = build_digest(
+            product_store, settings=settings, days=max(1, min(days, 90)), fmt=format
+        )
+        if format == "md":
+            return PlainTextResponse(content)
+        return HTMLResponse(content)
+
+    @app.get("/product", response_class=HTMLResponse)
+    def product_page() -> HTMLResponse:
+        path = Path(settings.frontend_dir) / "product.html"
+        if not path.exists():
+            raise HTTPException(status_code=404, detail="product page not found")
+        return HTMLResponse(path.read_text(encoding="utf-8"))
 
     @app.get("/api/market/{ticker}")
     def market_snapshot(ticker: str) -> dict:

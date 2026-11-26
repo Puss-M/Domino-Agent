@@ -430,3 +430,37 @@ class AnalyzeRequest(BaseModel):
 
 class BatchAnalyzeRequest(BaseModel):
     items: list[AnalyzeRequest] = Field(min_length=1, max_length=50)
+
+
+class NoteCreateRequest(BaseModel):
+    headline: str | None = Field(default=None, max_length=2000)
+    summary: str = Field(default="", max_length=8000)
+    event_id: str | None = None
+    session: Literal["before_open", "during", "after_close", "non_trading"] | None = None
+    source_name: str = "calendar"
+    source_url: str | None = None
+    published_at: datetime | None = None
+    model_config = ConfigDict(extra="forbid")
+
+
+class NoteUpdateRequest(BaseModel):
+    status: Literal["draft", "reviewed", "archived"] | None = None
+    review_notes: str | None = Field(default=None, max_length=4000)
+    model_config = ConfigDict(extra="forbid")
+
+
+class WatchlistRequest(BaseModel):
+    asset: str = Field(min_length=1, max_length=8)
+
+
+class CalendarCustomRequest(BaseModel):
+    date: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
+    title: str = Field(min_length=3, max_length=300)
+    time: str = Field(default="", max_length=40)
+    event_type: str = "other"
+    summary: str = Field(default="", max_length=2000)
+    importance: Literal["low", "medium", "high"] = "medium"
+    session: Literal["before_open", "during", "after_close", "non_trading"] = "during"
+    source: str = "custom"
+    url: str = ""
+    model_config = ConfigDict(extra="forbid")
