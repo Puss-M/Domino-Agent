@@ -124,7 +124,7 @@ flowchart LR
 ```
 
 Full methodology, formulas and threats to validity: [`docs/methodology.md`](docs/methodology.md).
-Neuro-symbolic design + compliance mapping: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md). Paper outline: [`docs/paper_outline.md`](docs/paper_outline.md). 2026-11 literature sweep: [`docs/literature_2026_11.md`](docs/literature_2026_11.md). Point-in-time contract: [`docs/point_in_time.md`](docs/point_in_time.md).
+Neuro-symbolic design + compliance mapping: [`docs/neuro_symbolic.md`](docs/neuro_symbolic.md). Paper outline: [`docs/paper_outline.md`](docs/paper_outline.md). 2026-11 literature sweep: [`docs/literature_2026_11.md`](docs/literature_2026_11.md). Point-in-time contract: [`docs/point_in_time.md`](docs/point_in_time.md). What credible accuracy looks like: [`docs/accuracy_sota.md`](docs/accuracy_sota.md).
 
 ### The six stages
 
@@ -352,7 +352,7 @@ backend/
     macro/ sec/ news/  # small public-data snapshots
 frontend/           # zero-build dashboard (HTML/CSS/JS + SVG)
 tests/              # 113 unit/contract tests
-docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, point-in-time contract, paper outline, literature sweep, resume bullets
+docs/               # methodology, evaluation, benchmark/model cards, neuro-symbolic design, point-in-time contract, accuracy protocol, paper outline, literature sweep, resume bullets
 ```
 
 ---

@@ -116,6 +116,7 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 | E10 | Monetary / information / supply shock decomposition (Jarociński–Karadi 2020; SSRN 7633199) | todo | FOMC accuracy/Brier after decomposition; needs intraday rate, equity and FX co-movement |
 | E11 | Point-in-time contract and lookahead audit | done | Table 8 (all benchmarks `not_point_in_time`; dataset-specific culprits) |
 | E12 | Period/entity/scope provenance (NumTrace agenda) | partial (P-013 units done) | Provenance failure taxonomy; 60/60 unit injections |
+| E13 | Cross-sectional rank + LightGBM baseline + cost-aware evaluation | todo | IC/RankIC, net Sharpe, break-even cost; see `accuracy_sota.md` |
 
 ## Results to report now
 
@@ -146,12 +147,13 @@ Our contribution is the intersection: a signed macro transmission graph, LLM-per
 1. **Period/entity/scope provenance** (E12) — extend P-013 beyond units, following NumTrace (2610.34887): each memo number should reference the structured field's entity, concept, period and scope.
 2. **Optional LLM perception** (E8) — one open model or API, schema-constrained, with the rule extractor as fallback. Report extraction accuracy and cost. This makes the "neuro-symbolic" claim concrete rather than architectural.
 3. **Monetary/information/supply decomposition** (E10) — the BRW surprise test shows a surprise number is not enough; use Jarociński–Karadi (2020) plus the 2026 supply-side rate–FX comovement result (SSRN 7633199). If intraday data are unavailable, the negative result stands as a benchmark contribution.
-4. **A production point-in-time feed** — E11 is a contract, not a vintage archive. A deployable system needs as-traded prices and a real-time surprise feed; the current benchmark's claim is mechanism-level directional skill, not a trading signal.
-5. **A cleaner related-work positioning** — FinVerify verifies answers, NumTrace verifies number provenance, GURU verifies actions; we verify transmission signs and expose ambiguity. FCM/RICE-Alpha build event graphs; we add solver proof cores and a public negative result. No single neighbor does both.
+4. **Cross-sectional, cost-aware accuracy protocol** (E13) — rank the 12 assets by expected CAR, add a LightGBM/XGBoost baseline, evaluate IC/RankIC and net Sharpe at 0/5/10/20bp. See [`accuracy_sota.md`](accuracy_sota.md): credible ACL18 SOTA is 61.3% / MCC 0.231, and cost-aware evaluation is what separates it from inflated claims.
+5. **A production point-in-time feed** — E11 is a contract, not a vintage archive. A deployable system needs as-traded prices and a real-time surprise feed; the current benchmark's claim is mechanism-level directional skill, not a trading signal.
+6. **A cleaner related-work positioning** — FinVerify verifies answers, NumTrace verifies number provenance, GURU verifies actions; we verify transmission signs and expose ambiguity. FCM/RICE-Alpha build event graphs; we add solver proof cores and a public negative result. No single neighbor does both.
 
 ## Suggested timeline
 
-- Week 1: E10 (shock decomposition), optional E8, E12 (period/entity provenance).
+- Week 1: E10 (shock decomposition), E13 (cross-sectional/cost-aware baseline), optional E8, E12 (period/entity provenance).
 - Week 2: paper draft (8 pages), figures from `docs/results/`, artifact appendix.
 - Week 3: internal review, reproduction from a clean clone, submission.
 - Optional parallel: high-frequency surprise adapter; if it works, promote E9 to a main result.
